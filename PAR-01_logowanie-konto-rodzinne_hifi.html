@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR-01 · Logowanie z kontem rodzinnym</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;
+  --accent:#ef5a3c;
+
+  --color-success:#1f9d57;
+  --color-warning:#c47d0a;
+  --color-error:#d6402a;
+  --color-info:#2f72d6;
+
+  --paper:#faf5ee;
+  --surface-1:#ffffff;
+  --surface-2:#fff9f2;
+  --surface-3:#f3ebe0;
+  --hairline:#e7ddcf;
+  --text-strong:#241c17;
+  --text:#4a4039;
+  --text-muted:#8a7d70;
+  --on-accent:#fff7f3;
+
+  --kid-1:#ef5a3c;
+  --kid-2:#1f9d8f;
+  --kid-3:#7a5cd6;
+  --kid-4:#c47d0a;
+
+  --font-display:"Fraunces", Georgia, serif;
+  --font-body:"Hanken Grotesk", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:20px;
+  --shadow:0 14px 34px -16px rgba(60,40,30,.28);
+  --tap:48px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font-body);
+  color:var(--text);
+  background:
+    radial-gradient(120% 80% at 80% -10%, #fff 0%, transparent 55%),
+    radial-gradient(90% 70% at -10% 110%, #fff4ea 0%, transparent 60%),
+    var(--paper);
+  min-height:100%;
+  font-size:16px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+/* header */
+.appbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s3);
+  padding:var(--s4) var(--s5);
+  background:color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--hairline);
+}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.brand-mark{
+  width:38px;height:38px;flex:none;border-radius:12px;
+  background:linear-gradient(150deg,var(--accent),#ff8a5c);
+  color:var(--on-accent);display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:700;font-size:19px;
+  box-shadow:0 6px 14px -6px rgba(239,90,60,.7);
+}
+.brand-name{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:17px;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brand-name small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted)}
+
+.lang{display:inline-flex;align-items:center;gap:var(--s1);flex:none}
+.lang button{
+  font-family:var(--font-body);font-weight:600;font-size:12px;
+  min-height:32px;padding:0 var(--s3);border:1px solid var(--hairline);
+  background:var(--surface-1);color:var(--text-muted);border-radius:999px;cursor:pointer;
+}
+.lang button[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.lang button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* state switcher (makieta) */
+.statebar{
+  display:flex;align-items:center;gap:var(--s3);
+  padding:var(--s3) var(--s5);
+  background:var(--surface-3);
+  border-bottom:1px dashed var(--hairline);
+  font-size:12px;color:var(--text-muted);
+}
+.statebar .lbl{font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:10.5px}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{
+  border:0;background:transparent;cursor:pointer;border-radius:999px;
+  font-family:var(--font-body);font-weight:600;font-size:12px;color:var(--text-muted);
+  min-height:30px;padding:0 var(--s3);
+}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+main{flex:1;padding:var(--s6) var(--s5) calc(var(--s10) + 96px)}
+
+.lede{margin:var(--s4) 0 var(--s6)}
+.lede h1{font-family:var(--font-display);font-weight:600;font-size:30px;line-height:1.05;color:var(--text-strong);letter-spacing:-.01em}
+.lede p{margin-top:var(--s2);color:var(--text);font-size:15px;max-width:34ch}
+
+.card{
+  background:var(--surface-1);border:1px solid var(--hairline);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:var(--s6);
+}
+.field{margin-bottom:var(--s4)}
+.field > label{display:block;font-weight:600;font-size:13px;color:var(--text-strong);margin-bottom:var(--s2)}
+.input{
+  width:100%;min-height:var(--tap);
+  font-family:var(--font-body);font-size:16px;color:var(--text-strong);
+  background:var(--surface-2);border:1.5px solid var(--hairline);border-radius:14px;
+  padding:0 var(--s4);
+}
+.input:focus-visible{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.input.bad{border-color:var(--color-error);background:#fdf1ee}
+
+.hint{font-size:12.5px;color:var(--text-muted);margin-top:var(--s2)}
+
+.alert{
+  display:flex;gap:var(--s3);align-items:flex-start;
+  border-radius:14px;padding:var(--s3) var(--s4);font-size:13.5px;
+  margin-bottom:var(--s4);
+}
+.alert .ico{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;margin-top:1px}
+.alert.error{background:#fdeee9;border:1px solid #f3c9bd;color:#8f2c1c}
+.alert.error .ico{background:var(--color-error)}
+.alert strong{color:inherit}
+.alert b{font-variant-numeric:tabular-nums}
+
+.btn{
+  width:100%;min-height:var(--tap);cursor:pointer;
+  font-family:var(--font-body);font-weight:700;font-size:16px;
+  border-radius:14px;border:1.5px solid transparent;
+}
+.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 22px -12px rgba(239,90,60,.9)}
+.btn-primary:active{transform:translateY(1px)}
+.btn-ghost{background:var(--surface-1);color:var(--text-strong);border-color:var(--hairline);font-weight:600;font-size:15px}
+
+.or{display:flex;align-items:center;gap:var(--s3);color:var(--text-muted);font-size:12px;margin:var(--s5) 0;text-transform:uppercase;letter-spacing:.08em}
+.or::before,.or::after{content:"";height:1px;background:var(--hairline);flex:1}
+
+.idp{display:flex;flex-direction:column;gap:var(--s3)}
+.idp button{display:flex;align-items:center;justify-content:center;gap:var(--s3)}
+.idp .g{width:18px;height:18px;border-radius:50%;border:2px solid var(--text-muted)}
+
+.remember{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s5);font-size:14px;color:var(--text)}
+.remember input{width:22px;height:22px;accent-color:var(--accent)}
+
+.sys{display:flex;align-items:center;gap:var(--s2);margin-top:var(--s5);font-size:12.5px;color:var(--text-muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--color-success);flex:none}
+
+.links{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--hairline)}
+.links a{color:var(--text-muted);font-size:13px;text-decoration:none;font-weight:500}
+.links a:hover{color:var(--accent);text-decoration:underline}
+.links a:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+footer.legal{padding:var(--s5);text-align:center;font-size:11.5px;color:var(--text-muted)}
+
+[data-when]{display:none}
+body[data-state="default"] [data-when="default"]{display:revert}
+body[data-state="alt"] [data-when="alt"]{display:revert}
+
+/* entrance animation */
+.reveal{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
+.reveal:nth-child(1){animation-delay:.05s}
+.reveal:nth-child(2){animation-delay:.12s}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}}
+
+[dir="rtl"] .alert,[dir="rtl"] .remember,[dir="rtl"] .idp button{flex-direction:row-reverse}
+</style>
+</head>
+<body data-state="default">
+<div class="app">
+
+  <header class="appbar">
+    <div class="brand">
+      <div class="brand-mark">D</div>
+      <div class="brand-name" data-i18n="org.name">Klub Pływacki Delfin
+        <small data-i18n="org.kicker">zapisy rodzinne</small>
+      </div>
+    </div>
+    <div class="lang" role="group" aria-label="Język">
+      <button data-lang="pl-PL" aria-pressed="true">PL</button>
+      <button data-lang="en-GB" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <div class="statebar">
+    <span class="lbl" data-i18n="state.label">Stan makiety</span>
+    <div class="seg" role="group" aria-label="Stan ekranu">
+      <button data-state-btn="default" aria-pressed="true" data-i18n="state.default">domyślny</button>
+      <button data-state-btn="alt" aria-pressed="false" data-i18n="state.alt01">błąd: link wygasł</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="lede reveal">
+      <h1 data-i18n="par01.title">Jedno konto dla całej rodziny</h1>
+      <p data-i18n="par01.sub">Obsłuży zajęcia i zawody wszystkich dzieci, niezależnie od liczby organizatorów.</p>
+    </div>
+
+    <section class="card reveal" aria-labelledby="formHead">
+      <h2 id="formHead" class="sr-only" style="position:absolute;left:-9999px" data-i18n="par01.formHead">Logowanie lub założenie konta</h2>
+
+      <!-- ALT: expired-link error -->
+      <div class="alert error" data-when="alt" role="alert">
+        <span class="ico">!</span>
+        <div>
+          <strong data-i18n="par01.err.title">Link logowania wygasł.</strong>
+          <div style="margin-top:2px" data-i18n-html="par01.err.body">Nowy link wyślemy na <b>a.kowalska@poczta.pl</b>. Pozostały <b>2</b> próby przed chwilową blokadą.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email" data-i18n="par01.emailLabel">Adres e-mail lub telefon</label>
+        <input class="input" id="email" data-when="default" type="email" inputmode="email"
+               value="a.kowalska@poczta.pl" autocomplete="username" aria-describedby="emailHint">
+        <input class="input bad" id="emailAlt" data-when="alt" type="email" inputmode="email"
+               value="a.kowalska@poczta.pl" autocomplete="username" aria-invalid="true">
+        <p class="hint" id="emailHint" data-i18n="par01.emailHint">Wyślemy jednorazowy link, bez hasła.</p>
+      </div>
+
+      <button class="btn btn-primary" data-when="default" data-i18n="par01.cta">Wyślij link bez hasła</button>
+      <button class="btn btn-primary" data-when="alt" data-i18n="par01.ctaRetry">Wyślij nowy link</button>
+
+      <div class="or" data-i18n="par01.or">lub</div>
+
+      <div class="idp">
+        <button class="btn btn-ghost"><span class="g" aria-hidden="true"></span><span data-i18n="par01.idpGoogle">Zaloguj przez Google</span></button>
+        <button class="btn btn-ghost"><span class="g" aria-hidden="true"></span><span data-i18n="par01.idpApple">Zaloguj przez Apple</span></button>
+      </div>
+
+      <label class="remember">
+        <input type="checkbox" checked>
+        <span data-i18n="par01.remember">Zapamiętaj to urządzenie (odcisk palca / Face)</span>
+      </label>
+
+      <div class="sys" data-when="default">
+        <span class="dot" aria-hidden="true"></span>
+        <span data-i18n="par01.sysReady">Gotowy do wypełnienia</span>
+      </div>
+      <div class="sys" data-when="alt">
+        <span class="dot" style="background:var(--color-warning)" aria-hidden="true"></span>
+        <span data-i18n="par01.sysAttempts">Ostatnia próba: dziś, 18:41</span>
+      </div>
+
+      <nav class="links" aria-label="Pomoc">
+        <a href="#" data-when="default" data-i18n="par01.newLink">Poproś o nowy link</a>
+        <a href="#" data-i18n="par01.recover">Odzyskaj dostęp</a>
+        <a href="#" data-i18n="par01.help">Pomoc</a>
+        <a href="#" data-i18n="par01.terms">Regulamin</a>
+      </nav>
+    </section>
+  </main>
+
+  <footer class="legal">
+    <span data-i18n="par01.legal">Zakładając konto, akceptujesz regulamin i politykę prywatności w zapisanej wersji.</span>
+  </footer>
+</div>
+
+<script>
+/* ---------- i18n ---------- */
+const I18N = {
+  "pl-PL":{
+    "org.name":"Klub Pływacki Delfin","org.kicker":"zapisy rodzinne",
+    "state.label":"Stan makiety","state.default":"domyślny","state.alt01":"błąd: link wygasł",
+    "par01.title":"Jedno konto dla całej rodziny",
+    "par01.sub":"Obsłuży zajęcia i zawody wszystkich dzieci, niezależnie od liczby organizatorów.",
+    "par01.formHead":"Logowanie lub założenie konta",
+    "par01.emailLabel":"Adres e-mail lub telefon",
+    "par01.emailHint":"Wyślemy jednorazowy link, bez hasła.",
+    "par01.cta":"Wyślij link bez hasła","par01.ctaRetry":"Wyślij nowy link","par01.or":"lub",
+    "par01.idpGoogle":"Zaloguj przez Google","par01.idpApple":"Zaloguj przez Apple",
+    "par01.remember":"Zapamiętaj to urządzenie (odcisk palca / Face)",
+    "par01.sysReady":"Gotowy do wypełnienia","par01.sysAttempts":"Ostatnia próba: dziś, 18:41",
+    "par01.newLink":"Poproś o nowy link","par01.recover":"Odzyskaj dostęp","par01.help":"Pomoc","par01.terms":"Regulamin",
+    "par01.legal":"Zakładając konto, akceptujesz regulamin i politykę prywatności w zapisanej wersji.",
+    "par01.err.title":"Link logowania wygasł.",
+    "par01.err.body.tpl":"Nowy link wyślemy na <b>{email}</b>. {n,plural,one{Pozostała <b>#</b> próba}few{Pozostały <b>#</b> próby}many{Pozostało <b>#</b> prób}other{Pozostało <b>#</b> prób}} przed chwilową blokadą."
+  },
+  "en-GB":{
+    "org.name":"Delfin Swimming Club","org.kicker":"family sign-ups",
+    "state.label":"Mockup state","state.default":"default","state.alt01":"error: link expired",
+    "par01.title":"One account for the whole family",
+    "par01.sub":"Covers classes and competitions for every child, no matter how many organisers.",
+    "par01.formHead":"Sign in or create an account",
+    "par01.emailLabel":"Email or phone",
+    "par01.emailHint":"We send a one-time link, no password.",
+    "par01.cta":"Send passwordless link","par01.ctaRetry":"Send a new link","par01.or":"or",
+    "par01.idpGoogle":"Sign in with Google","par01.idpApple":"Sign in with Apple",
+    "par01.remember":"Remember this device (fingerprint / Face)",
+    "par01.sysReady":"Ready to fill in","par01.sysAttempts":"Last attempt: today, 18:41",
+    "par01.newLink":"Request a new link","par01.recover":"Recover access","par01.help":"Help","par01.terms":"Terms",
+    "par01.legal":"Creating an account means accepting the terms and privacy policy in the saved version.",
+    "par01.err.title":"The sign-in link has expired.",
+    "par01.err.body.tpl":"We will send a new link to <b>{email}</b>. {n,plural,one{<b>#</b> attempt remains}other{<b>#</b> attempts remain}} before a temporary lock."
+  }
+};
+const RTL = new Set(["ar","he","fa","ur"]);
+let lang = "pl-PL";
+
+function t(key){
+  return (I18N[lang] && I18N[lang][key]) ?? (I18N["en-GB"] && I18N["en-GB"][key]) ?? key;
+}
+function render(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = RTL.has(lang.split("-")[0]) ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const k = el.getAttribute("data-i18n");
+    // keep nested <small> for brand name
+    const small = el.querySelector("small");
+    if(small){ el.childNodes[0].nodeValue = t(k)+" "; }
+    else el.textContent = t(k);
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach(el=>{
+    el.innerHTML = t(el.getAttribute("data-i18n-html"));
+  });
+}
+
+/* language switch */
+document.querySelectorAll(".lang button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    lang = b.dataset.lang;
+    document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed", String(x===b)));
+    render();
+  });
+});
+
+/* state switch */
+document.querySelectorAll("[data-state-btn]").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.body.dataset.state = b.dataset.stateBtn;
+    document.querySelectorAll("[data-state-btn]").forEach(x=>x.setAttribute("aria-pressed", String(x===b)));
+  });
+});
+
+render();
+</script>
+</body>
+</html>

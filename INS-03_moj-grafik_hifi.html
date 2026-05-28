@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INS-03 · Mój grafik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#0d1a1e; --accent:#21d8c4;
+  --color-success:#4ade80; --color-warning:#f6b73c; --color-error:#ff6b5e; --color-info:#5aa8ff;
+  --surface-1:#13242a; --surface-2:#1a313a; --surface-3:#234049; --hairline:#2c4b55;
+  --text-strong:#f0f6f5; --text:#c7d6d8; --text-muted:#83a0a5; --on-accent:#062420; --paper:#eef4f1;
+  --lvl1:#5aa8ff; --lvl2:#4ade80; --lvl3:#21d8c4;
+  --font-display:"Bricolage Grotesque", system-ui; --font-body:"IBM Plex Sans", system-ui;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:16px; --shadow:0 12px 32px -14px rgba(0,0,0,.7); --tap:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06100f;color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%}
+.num{font-variant-numeric:tabular-nums}
+.shell{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--brand-ink)}
+header.app{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border-bottom:1px solid var(--hairline)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);min-height:var(--tap)}
+.htitle{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:18px}
+.right{display:flex;align-items:center;gap:var(--s2)}
+.view-tog{display:flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:2px}
+.view-tog button{border:0;background:transparent;color:var(--text-muted);font:600 13px/1 var(--font-body);height:34px;padding:0 12px;border-radius:999px;cursor:pointer}
+.view-tog button[aria-pressed=true]{background:var(--surface-3);color:var(--text-strong)}
+.view-tog button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.lang{display:flex;align-items:center;gap:var(--s1);background:var(--surface-3);border:1px solid var(--hairline);color:var(--text-strong);border-radius:999px;padding:0 var(--s3);height:38px;font:600 14px/1 var(--font-body);cursor:pointer}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);font-size:12.5px;color:var(--text-muted);border-top:1px solid var(--hairline);background:var(--surface-1)}
+.placePick{background:transparent;border:0;color:var(--text);font:600 12.5px/1 var(--font-body);cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.spacer{flex:1}.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.on{background:var(--color-success);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-success) 25%,transparent)}
+body.is-offline .dot.on{background:var(--color-warning);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-warning) 25%,transparent)}
+.netnote .off{display:none;color:var(--color-warning);font-weight:600}body.is-offline .netnote .on{display:none}body.is-offline .netnote .off{display:inline}
+.offline-banner{display:none;align-items:flex-start;gap:var(--s3);margin:var(--s4) var(--s4) 0;padding:var(--s3) var(--s4);border:1px solid color-mix(in srgb,var(--color-warning) 50%,var(--hairline));border-left:4px solid var(--color-warning);border-radius:var(--radius);background:color-mix(in srgb,var(--color-warning) 12%,var(--surface-1));color:var(--text-strong);font-size:13.5px;line-height:1.4}
+body.is-offline .offline-banner{display:flex}.offline-banner b{font-weight:600}
+.seg{display:flex;gap:var(--s1);margin:var(--s4) var(--s4) 0;padding:var(--s1);background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px}
+.seg button{flex:1;border:0;background:transparent;color:var(--text-muted);font:600 13.5px/1 var(--font-body);height:40px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected=true]{background:var(--surface-3);color:var(--text-strong)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{flex:1;padding:var(--s4) var(--s4) calc(var(--s10)*2)}
+.weekhead{display:flex;align-items:baseline;justify-content:space-between;margin:var(--s4) 0 var(--s3)}
+.weekhead b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:16px}
+.weekhead small{color:var(--text-muted);font-size:12.5px}
+.day{margin-bottom:var(--s2)}
+.dayname{font:700 11.5px/1 var(--font-display);letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin:var(--s4) 0 var(--s2);display:flex;gap:var(--s2);align-items:center}
+.dayname .holiday{color:var(--color-warning);font-size:11px;letter-spacing:.3px;text-transform:none;font-weight:600}
+.block{display:flex;align-items:center;gap:var(--s3);width:100%;text-align:left;min-height:var(--tap);padding:var(--s3);background:var(--surface-1);border:1px solid var(--hairline);border-left:5px solid var(--lvl);border-radius:var(--radius);margin-bottom:var(--s2);cursor:pointer;color:inherit;animation:rise .4s both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.block:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.block[aria-pressed=true]{border-color:var(--accent);box-shadow:var(--shadow);background:var(--surface-2)}
+.block .time{font-family:var(--font-display);font-weight:800;color:var(--text-strong);font-size:19px;flex:none;width:54px}
+.block .info{flex:1;min-width:0}
+.block .gname{font-weight:600;color:var(--text-strong);font-size:15.5px}
+.block .gwhere{color:var(--text-muted);font-size:12.5px}
+.block .badge{font-size:11px;font-weight:600;height:22px;padding:0 9px;border-radius:999px;display:inline-flex;align-items:center;flex:none;border:1px solid var(--hairline);color:var(--text-muted)}
+.badge.sub{color:var(--color-info);border-color:color-mix(in srgb,var(--color-info) 45%,transparent)}
+.badge.cancel{color:var(--color-error);border-color:color-mix(in srgb,var(--color-error) 45%,transparent)}
+.block.cancelled .gname{text-decoration:line-through;color:var(--text-muted)}
+.rest{color:var(--text-muted);font-size:13px;padding:var(--s2) var(--s3)}
+.info-note{display:flex;gap:var(--s3);margin-top:var(--s4);padding:var(--s3) var(--s4);border-radius:12px;font-size:13px;line-height:1.4;background:color-mix(in srgb,var(--color-info) 11%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-info) 38%,transparent);color:#d6ecff}
+.empty{text-align:center;padding:var(--s10) var(--s4) var(--s8);display:none}
+body.is-empty .week{display:none} body.is-empty .empty{display:block} body.is-empty .info-note{display:none}
+.empty .ic{font-size:40px;margin-bottom:var(--s3)}
+.empty h2{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:20px;margin-bottom:var(--s2)}
+.empty p{color:var(--text-muted);font-size:14px;max-width:32ch;margin:0 auto var(--s5)}
+.hide{display:none!important}
+footer.app{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:20;background:linear-gradient(0deg,var(--surface-2),var(--surface-1));border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom))}
+.saveline{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s3)}
+.cta{width:100%;min-height:var(--tap);border:0;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
+.cta:focus-visible{outline:3px solid var(--text-strong);outline-offset:3px}.cta[disabled]{opacity:.45}
+.cta.ghost{background:transparent;color:var(--accent);box-shadow:none;border:1.5px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+.links{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);justify-content:center;margin-top:var(--s4)}
+.links a{color:var(--text-muted);font-size:14px;text-decoration:none;min-height:40px;display:inline-flex;align-items:center}
+.links a:hover{color:var(--text-strong)}.links a:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+@media(prefers-reduced-motion:reduce){.block{animation:none}}
+</style>
+</head>
+<body class="pl-PL">
+<div class="shell">
+  <header class="app">
+    <div class="bar">
+      <span class="htitle" data-i="title">Mój grafik</span>
+      <div class="right">
+        <div class="view-tog" role="group" aria-label="Widok">
+          <button data-view="day" aria-pressed="false" data-i="vDay">Dzień</button>
+          <button data-view="week" aria-pressed="true" data-i="vWeek">Tydzień</button>
+        </div>
+        <button class="lang" id="langBtn" aria-label="Zmień język"><span id="langLabel">PL</span> ▾</button>
+      </div>
+    </div>
+    <div class="sys">
+      <span class="num" id="weekNo">Tydz. 22</span>
+      <button class="placePick" id="placeBtn">Klub Pływacki Delfin ▾</button>
+      <span class="spacer"></span>
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="netnote"><span class="on" data-i="synced">Sync ok</span><span class="off" data-i="offShort">Offline</span></span>
+    </div>
+  </header>
+
+  <div class="offline-banner" role="status">
+    <span aria-hidden="true">⚠</span>
+    <span><b data-i="offTitle">Tryb offline.</b> <span data-i="offBody">Tydzień pochodzi z ostatniej synchronizacji, aktualizacja jest wstrzymana do powrotu sieci.</span></span>
+  </div>
+
+  <div class="seg" role="tablist" aria-label="Podgląd stanu ekranu">
+    <button role="tab" aria-selected="true" data-state="default" data-i="stDefault">Z zajęciami</button>
+    <button role="tab" aria-selected="false" data-state="empty" data-i="stEmpty">Pusty tydzień</button>
+  </div>
+
+  <main>
+    <div class="week">
+      <div class="weekhead"><b id="rangeLbl" class="num">25–31 maja 2026</b><small data-i="ownOnly">Tylko Twoje bloki</small></div>
+
+      <div class="day">
+        <div class="dayname" id="dPon">Poniedziałek</div>
+        <button class="block" style="--lvl:var(--lvl3)" aria-pressed="false">
+          <span class="time num">16:00</span>
+          <span class="info"><span class="gname" data-i="gDelfinki">Delfinki · poz. 3</span><br><span class="gwhere" data-i="t2">Tor 2</span></span>
+        </button>
+      </div>
+      <div class="day">
+        <div class="dayname" id="dWt">Wtorek</div>
+        <button class="block" style="--lvl:var(--lvl3)" aria-pressed="false">
+          <span class="time num">16:00</span>
+          <span class="info"><span class="gname" data-i="gDelfinki">Delfinki · poz. 3</span><br><span class="gwhere" data-i="t2">Tor 2</span></span>
+        </button>
+        <button class="block" style="--lvl:var(--lvl2)" aria-pressed="false">
+          <span class="time num">17:00</span>
+          <span class="info"><span class="gname" data-i="gZabki">Żabki · poz. 2</span><br><span class="gwhere" data-i="sA">Sala A</span></span>
+          <span class="badge sub" data-i="bSub">zastępstwo</span>
+        </button>
+      </div>
+      <div class="day">
+        <div class="dayname" id="dSr">Środa</div>
+        <div class="rest" data-i="free">· wolne ·</div>
+      </div>
+      <div class="day">
+        <div class="dayname" id="dCz">Czwartek</div>
+        <button class="block cancelled" style="--lvl:var(--lvl1)" aria-pressed="false">
+          <span class="time num">18:00</span>
+          <span class="info"><span class="gname" data-i="gRekiny">Rekiny · poz. 1</span><br><span class="gwhere" data-i="t1">Tor 1</span></span>
+          <span class="badge cancel" data-i="bCancel">odwołane</span>
+        </button>
+      </div>
+      <div class="day">
+        <div class="dayname" id="dPt">Piątek <span class="holiday" data-i="holiday">· dzień wolny od zajęć</span></div>
+        <button class="block" style="--lvl:var(--lvl3)" aria-pressed="false">
+          <span class="time num">16:00</span>
+          <span class="info"><span class="gname" data-i="gDelfinki">Delfinki · poz. 3</span><br><span class="gwhere" data-i="t2">Tor 2</span></span>
+        </button>
+      </div>
+
+      <div class="info-note" role="note">
+        <span aria-hidden="true">ⓘ</span>
+        <span data-i="orgNote">Zmiany terminu i sali ustawia organizator. Jeśli nie możesz poprowadzić bloku, zgłoś niedostępność - to właściwa ścieżka.</span>
+      </div>
+    </div>
+
+    <div class="empty">
+      <div class="ic" aria-hidden="true">🗓</div>
+      <h2 data-i="emTitle">W tym tygodniu nie masz przypisanych zajęć</h2>
+      <p data-i="emBody">Grafik układa organizator. Najszybsza droga do dyżurów to zgłoszenie, kiedy jesteś dostępny.</p>
+    </div>
+  </main>
+
+  <footer class="app">
+    <div class="saveline"><span class="dot on" aria-hidden="true"></span><span data-i="readonly">Grafik tylko do odczytu</span></div>
+    <button class="cta" id="ctaOpen" disabled data-i="ctaOpen">Otwórz wybrany blok</button>
+    <button class="cta ghost hide" id="ctaAvail" data-i="ctaAvail">Zgłoś dostępność</button>
+    <div class="links">
+      <a href="#" data-i="aUnavail">Zgłoś niedostępność</a>
+      <a href="#" data-i="aCal">Dodaj do kalendarza</a>
+      <a href="#" data-i="aNext">Następny tydzień →</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL", weekStart:new Date(2026,4,25), weekEnd:new Date(2026,4,31)};
+const I18N={
+ "pl-PL":{title:"Mój grafik", vDay:"Dzień", vWeek:"Tydzień",
+  synced:"Sync ok", offShort:"Offline", offTitle:"Tryb offline.", offBody:"Tydzień pochodzi z ostatniej synchronizacji, aktualizacja jest wstrzymana do powrotu sieci.",
+  stDefault:"Z zajęciami", stEmpty:"Pusty tydzień", ownOnly:"Tylko Twoje bloki",
+  gDelfinki:"Delfinki · poz. 3", gZabki:"Żabki · poz. 2", gRekiny:"Rekiny · poz. 1",
+  t1:"Tor 1", t2:"Tor 2", sA:"Sala A", bSub:"zastępstwo", bCancel:"odwołane", free:"· wolne ·",
+  holiday:"· dzień wolny od zajęć",
+  orgNote:"Zmiany terminu i sali ustawia organizator. Jeśli nie możesz poprowadzić bloku, zgłoś niedostępność - to właściwa ścieżka.",
+  emTitle:"W tym tygodniu nie masz przypisanych zajęć", emBody:"Grafik układa organizator. Najszybsza droga do dyżurów to zgłoszenie, kiedy jesteś dostępny.",
+  readonly:"Grafik tylko do odczytu", ctaOpen:"Otwórz wybrany blok", ctaAvail:"Zgłoś dostępność",
+  aUnavail:"Zgłoś niedostępność", aCal:"Dodaj do kalendarza", aNext:"Następny tydzień →",
+  weekWord:"Tydz."
+ },
+ "en-GB":{title:"My schedule", vDay:"Day", vWeek:"Week",
+  synced:"Synced", offShort:"Offline", offTitle:"Offline mode.", offBody:"This week is from the last sync; updates are paused until you're back online.",
+  stDefault:"With classes", stEmpty:"Empty week", ownOnly:"Your blocks only",
+  gDelfinki:"Dolphins · lvl 3", gZabki:"Frogs · lvl 2", gRekiny:"Sharks · lvl 1",
+  t1:"Lane 1", t2:"Lane 2", sA:"Hall A", bSub:"cover", bCancel:"cancelled", free:"· free ·",
+  holiday:"· no classes",
+  orgNote:"The organiser sets times and rooms. If you can't take a block, report unavailability - that's the right path.",
+  emTitle:"You have no classes assigned this week", emBody:"The organiser builds the schedule. The quickest route to shifts is telling them when you're free.",
+  readonly:"Schedule is read-only", ctaOpen:"Open selected block", ctaAvail:"Report availability",
+  aUnavail:"Report unavailability", aCal:"Add to calendar", aNext:"Next week →",
+  weekWord:"Wk"
+ }
+};
+const FALLBACK="en-GB";
+function t(k){const l=I18N[DATA.locale]||{};return (k in l)?l[k]:(I18N[FALLBACK][k]??k);}
+function wknum(d){const o=new Date(d);o.setHours(0,0,0,0);o.setDate(o.getDate()+3-((o.getDay()+6)%7));const w1=new Date(o.getFullYear(),0,4);return 1+Math.round(((o-w1)/86400000-3+((w1.getDay()+6)%7))/7);}
+function fmt(){
+  const wd=i=>new Intl.DateTimeFormat(DATA.locale,{weekday:"long"}).format(new Date(2026,4,25+i));
+  const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+  document.getElementById("dPon").firstChild&&(document.getElementById("dPon").childNodes[0].nodeValue=cap(wd(0))+" ");
+  document.getElementById("dWt").childNodes[0].nodeValue=cap(wd(1))+" ";
+  document.getElementById("dSr").childNodes[0].nodeValue=cap(wd(2))+" ";
+  document.getElementById("dCz").childNodes[0].nodeValue=cap(wd(3))+" ";
+  document.getElementById("dPt").childNodes[0].nodeValue=cap(wd(4))+" ";
+  const r=new Intl.DateTimeFormat(DATA.locale,{day:"numeric",month:"long",year:"numeric"});
+  const s=new Intl.DateTimeFormat(DATA.locale,{day:"numeric"}).format(DATA.weekStart);
+  document.getElementById("rangeLbl").textContent=s+"–"+r.format(DATA.weekEnd);
+  document.getElementById("weekNo").textContent=t("weekWord")+" "+wknum(DATA.weekStart);
+}
+function applyLang(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i);});
+  document.getElementById("langLabel").textContent=DATA.locale.split("-")[0].toUpperCase();
+  document.documentElement.lang=DATA.locale;document.documentElement.dir=RTL.has(DATA.locale.split("-")[0])?"rtl":"ltr";
+  fmt();
+}
+document.getElementById("langBtn").addEventListener("click",()=>{DATA.locale=DATA.locale==="pl-PL"?"en-GB":"pl-PL";applyLang();});
+document.querySelectorAll(".view-tog button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".view-tog button").forEach(x=>x.setAttribute("aria-pressed",x===b));}));
+
+const blocks=[...document.querySelectorAll(".block")];
+const ctaOpen=document.getElementById("ctaOpen");
+blocks.forEach(b=>b.addEventListener("click",()=>{
+  const sel=b.getAttribute("aria-pressed")==="true";
+  blocks.forEach(x=>x.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed", String(!sel));
+  ctaOpen.disabled = sel;
+}));
+
+const tabs=document.querySelectorAll('[role=tab]');
+tabs.forEach(tb=>tb.addEventListener("click",()=>{
+  tabs.forEach(x=>x.setAttribute("aria-selected",x===tb));
+  const empty=tb.dataset.state==="empty";
+  document.body.classList.toggle("is-empty",empty);
+  ctaOpen.classList.toggle("hide",empty);
+  document.getElementById("ctaAvail").classList.toggle("hide",!empty);
+}));
+
+applyLang();
+</script>
+</body>
+</html>

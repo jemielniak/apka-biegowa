@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<!--
+  ATH-02 - dashboard z moimi zapisami (panel zawodnika, moduł zawodów)
+  Stan domyślny: alerty uszeregowane po pilności + kafelki startów ze statusem i numerem.
+  Stan alternatywny: offline - ostatnia synchronizacja, numer startowy dostępny lokalnie, zmiany wstrzymane.
+  Napisy = klucze tłumaczeń BCP 47 (pl-PL domyślny, en-GB zapasowy). Motywowanie tylko przez zmienne CSS.
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moje starty · ATH-02</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#10141b;--accent:#d6f622;
+  --color-success:#3ddc84;--color-warning:#ffb84d;--color-error:#ff6b5e;--color-info:#6aa9ff;
+  --surface-1:#181e28;--surface-2:#1f2733;--surface-3:#283241;--hairline:#313c4c;
+  --text-strong:#f2f5f7;--text:#cdd5df;--text-muted:#8c97a6;--on-accent:#10141b;--paper:#f4f5ef;
+  --font-display:"Saira Condensed",system-ui;--font-body:"Barlow",system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);
+  --radius:14px;--shadow:0 10px 30px -12px rgba(0,0,0,.65);--tap:48px;
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 60% at 80% -10%,rgba(214,246,34,.10),transparent 60%),var(--brand-ink);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+[dir="rtl"] body{direction:rtl}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 64px);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 80%,transparent)}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:150px}
+header.bar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(16,20,27,.96),rgba(16,20,27,.86));backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);box-shadow:0 1px 0 rgba(214,246,34,.18)}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--accent);position:relative;overflow:hidden}
+.mark::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 38%,var(--on-accent) 38% 50%,transparent 50% 60%,var(--on-accent) 60% 72%,transparent 72%)}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:15px;line-height:1.05}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+.lang{margin-inline-start:auto;position:relative}
+.lang select{appearance:none;-webkit-appearance:none;font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s2) var(--s4) var(--s3);font-size:12.5px;color:var(--text-muted)}
+.dot{display:inline-flex;align-items:center;gap:6px}.dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--color-success);box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+.dot.off::before{background:var(--color-warning);box-shadow:0 0 0 3px rgba(255,184,77,.18)}
+.seg{display:flex;gap:var(--s2);padding:var(--s4) var(--s4) var(--s2)}
+.seg button{flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.3px;background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);transition:all .18s}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 18px -8px rgba(214,246,34,.6)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding:var(--s2) var(--s4) 0;animation:rise .4s ease both}
+.countdown{margin-top:var(--s4);display:flex;align-items:baseline;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--radius);background:linear-gradient(160deg,var(--surface-2),var(--surface-1));border:1px solid var(--hairline)}
+.countdown .cd-l{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.countdown .cd-v{margin-inline-start:auto;font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.countdown .cd-ev{font-size:13px;color:var(--text)}
+.sec-h{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-muted);margin:var(--s5) 0 var(--s2)}
+.alert{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s4);border-radius:var(--radius);margin-top:var(--s2);border:1px solid var(--hairline);background:var(--surface-1);cursor:pointer;text-align:start;width:100%;font:inherit;color:inherit;transition:transform .1s}
+.alert:active{transform:scale(.995)}
+.alert:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.alert .ab{flex:0 0 4px;align-self:stretch;border-radius:4px;background:var(--text-muted)}
+.alert.err .ab{background:var(--color-error)}.alert.warn .ab{background:var(--color-warning)}.alert.info .ab{background:var(--color-info)}
+.alert .ac{flex:1;min-width:0}
+.alert .at{font-weight:700;color:var(--text-strong);font-size:14.5px}
+.alert .ad{font-size:13px;color:var(--text-muted);margin-top:2px}
+.alert .ad b{color:var(--text);font-variant-numeric:tabular-nums}
+.alert .ago{flex:0 0 auto;align-self:center;color:var(--text-muted)}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.3px;padding:2px 8px;border-radius:999px;border:1px solid currentColor;text-transform:uppercase}
+.b-pay{color:var(--color-error)}.b-paid{color:var(--color-success)}.b-wait{color:var(--color-info)}.b-defer{color:var(--text-muted)}
+.tile{margin-top:var(--s2);border-radius:var(--radius);border:1px solid var(--hairline);background:linear-gradient(160deg,var(--surface-2),var(--surface-1));overflow:hidden}
+.tile .th{display:flex;align-items:center;gap:var(--s3);padding:var(--s4) var(--s4) var(--s3)}
+.tile .org-chip{font-size:11px;color:var(--text-muted);letter-spacing:.3px;text-transform:uppercase}
+.tile h3{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong);margin:1px 0 0}
+.tile .meta{padding:0 var(--s4) var(--s3);font-size:13px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4)}
+.tile .meta span{display:inline-flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
+.bibrow{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-top:1px dashed var(--hairline);background:rgba(214,246,34,.04)}
+.bibrow.empty{background:none}
+.bib{flex:0 0 auto;min-width:58px;text-align:center;padding:4px 10px;border-radius:8px;background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:22px;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.bibrow .bl{font-size:12px;color:var(--text-muted)}
+.bibrow .bl b{display:block;color:var(--text);font-size:13px;text-transform:none;letter-spacing:0}
+.bibrow.empty .ph{flex:1;font-size:12.5px;color:var(--text-muted)}
+.shortcuts{display:flex;gap:var(--s2);margin-top:var(--s5)}
+.sc{flex:1;border-radius:12px;border:1px solid var(--hairline);background:var(--surface-1);padding:var(--s3);text-align:center;cursor:pointer;color:inherit;font:inherit;transition:border-color .15s}
+.sc:hover{border-color:#46566b}.sc:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sc .sv{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.sc .sl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;margin-top:3px}
+/* offline */
+.off-banner{margin-top:var(--s4);display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s4);border-radius:var(--radius);background:rgba(255,184,77,.1);border:1px solid rgba(255,184,77,.4)}
+.off-banner svg{flex:0 0 auto;color:var(--color-warning);margin-top:1px}
+.off-banner .ot{font-size:13px;color:var(--text)}
+.off-banner .ot b{color:var(--text-strong)}
+.off-banner .ot small{display:block;color:var(--text-muted);font-size:12px;margin-top:2px}
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:linear-gradient(180deg,rgba(16,20,27,.4),var(--brand-ink) 40%);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+.inner{max-width:480px;margin:0 auto}
+.status-line{display:none;align-items:center;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600;text-align:center}
+.status-line.show{display:flex}
+.cta{width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.4px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s}
+.cta:active{transform:translateY(1px) scale(.995)}
+.cta.ghost{background:var(--surface-2);color:var(--text-strong);box-shadow:none;border:1px solid var(--hairline)}
+.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}
+.hidden{display:none !important}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo"><div class="mark" aria-hidden="true"></div>
+        <div class="org"><b data-i18n="title">Moje starty</b><span data-i18n="kicker">panel zawodnika</span></div></div>
+      <div class="lang"><label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language"><option value="pl-PL">PL</option><option value="en-GB">EN</option></select></div>
+    </div>
+    <div class="sys">
+      <span class="dot" id="netDot"><span data-i18n="online">online</span></span>
+      <span id="syncVal"></span>
+    </div>
+  </header>
+
+  <div class="seg" role="group" aria-label="Stan ekranu">
+    <button id="segOn" aria-pressed="true" data-i18n="segOnline">Pulpit</button>
+    <button id="segOff" aria-pressed="false" data-i18n="segOffline">Offline</button>
+  </div>
+
+  <!-- STAN DOMYŚLNY -->
+  <main id="viewOn">
+    <div class="countdown">
+      <div><div class="cd-l" data-i18n="cdLabel">do najbliższego startu</div><div class="cd-ev" id="cdEvent"></div></div>
+      <div class="cd-v" id="cdValue"></div>
+    </div>
+
+    <div class="sec-h" data-i18n="alertsHead">Wymaga reakcji</div>
+    <button class="alert err" id="alPay">
+      <span class="ab" aria-hidden="true"></span>
+      <span class="ac"><span class="at" data-i18n="alPayT">Nieopłacone zgłoszenie</span>
+        <span class="ad" data-i18n="alPayD">Bieg Stołeczny - miejsce zwolni się za <b id="payCd">04:59</b></span></span>
+      <span class="ago" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
+    <button class="alert info" id="alWait">
+      <span class="ab" aria-hidden="true"></span>
+      <span class="ac"><span class="at" data-i18n="alWaitT">Oferta z listy rezerwowej</span>
+        <span class="ad" data-i18n="alWaitD">Górski Trail 21 km - decyzja w <b id="waitCd">09:58</b></span></span>
+      <span class="ago" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
+    <button class="alert warn" id="alConsent">
+      <span class="ab" aria-hidden="true"></span>
+      <span class="ac"><span class="at" data-i18n="alConsentT">Brakuje zgody</span>
+        <span class="ad" data-i18n="alConsentD">Oświadczenie zdrowotne blokuje wydanie pakietu</span></span>
+      <span class="ago" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
+    <button class="alert warn" id="alWeather">
+      <span class="ab" aria-hidden="true"></span>
+      <span class="ac"><span class="at" data-i18n="alWeatherT">Ostrzeżenie pogodowe</span>
+        <span class="ad" data-i18n="alWeatherD">Górski Trail - możliwe burze w oknie startu</span></span>
+      <span class="ago" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
+
+    <div class="sec-h" data-i18n="startsHead">Moje starty</div>
+
+    <div class="tile">
+      <div class="th"><div><div class="org-chip">Stołeczny Klub Biegacza</div><h3 data-i18n="ev1">Bieg Stołeczny</h3></div>
+        <span class="badge b-pay" style="margin-inline-start:auto" data-i18n="stPay">oczekuje na płatność</span></div>
+      <div class="meta"><span id="ev1date"></span><span data-i18n="ev1dist">10 km</span><span data-i18n="ev1cat">kat. M40</span></div>
+      <div class="bibrow empty"><span class="ph" data-i18n="bibAfterPay">Numer startowy pojawi się po zaksięgowaniu wpłaty.</span></div>
+    </div>
+
+    <div class="tile">
+      <div class="th"><div><div class="org-chip">Górski Klub Trailowy</div><h3 data-i18n="ev2">Górski Trail</h3></div>
+        <span class="badge b-paid" style="margin-inline-start:auto" data-i18n="stPaid">opłacone</span></div>
+      <div class="meta"><span id="ev2date"></span><span data-i18n="ev2dist">21 km</span><span data-i18n="ev2cat">kat. M40</span></div>
+      <div class="bibrow"><span class="bib">1287</span><span class="bl"><span data-i18n="bibLabel">numer startowy</span><b data-i18n="bibPickup">odbiór pakietu 17.05, hala A</b></span></div>
+    </div>
+
+    <div class="tile">
+      <div class="th"><div><div class="org-chip">Stołeczny Klub Biegacza</div><h3 data-i18n="ev3">Nocna Piątka</h3></div>
+        <span class="badge b-defer" style="margin-inline-start:auto" data-i18n="stDefer">odroczone 2027</span></div>
+      <div class="meta"><span data-i18n="ev3date">edycja 2027</span><span data-i18n="ev3dist">5 km</span></div>
+    </div>
+
+    <div class="shortcuts">
+      <button class="sc" id="scWallet"><div class="sv" id="walletVal"></div><div class="sl" data-i18n="scWallet">portfel</div></button>
+      <button class="sc" id="scGallery"><div class="sv">36</div><div class="sl" data-i18n="scGallery">zdjęcia</div></button>
+      <button class="sc" id="scRanking"><div class="sv">7.</div><div class="sl" data-i18n="scRanking">klasyfikacja</div></button>
+    </div>
+  </main>
+
+  <!-- STAN ALTERNATYWNY: offline -->
+  <main id="viewOff" class="hidden">
+    <div class="off-banner">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M1 1l22 22M16.7 16.7A11 11 0 0 0 12 16M5 12.5a11 11 0 0 1 5-2.8M8.5 8.6A16 16 0 0 0 3 9M21 9a16 16 0 0 0-5.4-2.6M12 20h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="ot"><b data-i18n="offTitle">Jesteś offline.</b> <span data-i18n="offBody">Pokazujemy ostatnio wczytany pulpit. Zmiany - płatności, decyzje, zgody - poczekają na połączenie.</span><small id="offSync"></small></div>
+    </div>
+
+    <div class="sec-h" data-i18n="offlineUsable">Dostępne bez sieci</div>
+    <div class="tile">
+      <div class="th"><div><div class="org-chip">Górski Klub Trailowy</div><h3 data-i18n="ev2">Górski Trail</h3></div>
+        <span class="badge b-paid" style="margin-inline-start:auto" data-i18n="stPaid">opłacone</span></div>
+      <div class="meta"><span id="ev2dateOff"></span><span data-i18n="ev2dist">21 km</span><span data-i18n="ev2cat">kat. M40</span></div>
+      <div class="bibrow"><span class="bib">1287</span><span class="bl"><span data-i18n="bibLocal">numer dostępny lokalnie</span><b data-i18n="bibPickup">odbiór pakietu 17.05, hala A</b></span></div>
+    </div>
+    <div class="off-banner" style="background:rgba(106,169,255,.08);border-color:rgba(106,169,255,.3)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="color:var(--color-info)"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="ot"><span data-i18n="offHint">Numer startowy i kod odbioru pokażesz na starcie nawet bez zasięgu. Resztę pulpitu odświeżymy, gdy wróci łącze.</span></div>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="inner">
+      <div class="status-line" id="statusLine"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="statusText"></span></div>
+      <button class="cta" id="mainCta"><span class="spinner" aria-hidden="true"></span><span id="ctaLabel"></span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const I18N={
+ "pl-PL":{title:"Moje starty",kicker:"panel zawodnika",langLabel:"Język",online:"online",offline:"offline",
+  segOnline:"Pulpit",segOffline:"Offline",
+  cdLabel:"do najbliższego startu",cdEventTpl:"Bieg Stołeczny · {date}",
+  alertsHead:"Wymaga reakcji",startsHead:"Moje starty",
+  alPayT:"Nieopłacone zgłoszenie",alPayD:"Bieg Stołeczny - miejsce zwolni się za <b id=\"payCd\">{cd}</b>",
+  alWaitT:"Oferta z listy rezerwowej",alWaitD:"Górski Trail 21 km - decyzja w <b id=\"waitCd\">{cd}</b>",
+  alConsentT:"Brakuje zgody",alConsentD:"Oświadczenie zdrowotne blokuje wydanie pakietu",
+  alWeatherT:"Ostrzeżenie pogodowe",alWeatherD:"Górski Trail - możliwe burze w oknie startu",
+  ev1:"Bieg Stołeczny",ev1dist:"10 km",ev1cat:"kat. M40",stPay:"oczekuje na płatność",bibAfterPay:"Numer startowy pojawi się po zaksięgowaniu wpłaty.",
+  ev2:"Górski Trail",ev2dist:"21 km",ev2cat:"kat. M40",stPaid:"opłacone",bibLabel:"numer startowy",bibPickup:"odbiór pakietu 17.05, hala A",bibLocal:"numer dostępny lokalnie",
+  ev3:"Nocna Piątka",ev3date:"edycja 2027",ev3dist:"5 km",stDefer:"odroczone 2027",
+  scWallet:"portfel",scGallery:"zdjęcia",scRanking:"klasyfikacja",
+  offTitle:"Jesteś offline.",offBody:"Pokazujemy ostatnio wczytany pulpit. Zmiany - płatności, decyzje, zgody - poczekają na połączenie.",
+  offlineUsable:"Dostępne bez sieci",offHint:"Numer startowy i kod odbioru pokażesz na starcie nawet bez zasięgu. Resztę pulpitu odświeżymy, gdy wróci łącze.",
+  syncTpl:"synchronizacja {date}",offSyncTpl:"ostatnia synchronizacja: {date}",
+  ctaPayTpl:"Dokończ płatność ({cd})",ctaDecide:"Zdecyduj o ofercie rezerwowej",ctaOffline:"Odśwież, gdy wróci sieć",processingTxt:"Otwieram…",
+  goPay:"Przechodzę do podsumowania i płatności (ATH-06).",goWait:"Otwieram ofertę z listy rezerwowej (ATH-08).",
+  goConsent:"Otwieram zgody i regulaminy (ATH-05).",goWeather:"Otwieram prognozę i komunikat (ATH-13).",
+  goWallet:"Otwieram portfel (ATH-10).",goGallery:"Otwieram galerię zdjęć (ATH-11).",goRanking:"Otwieram klasyfikację serii (ATH-12).",
+  goStart:"Otwieram szczegóły startu.",offlineBlocked:"Bez sieci nie odświeżymy danych. Numer i kod odbioru masz dostępne lokalnie."},
+ "en-GB":{title:"My races",kicker:"athlete panel",langLabel:"Language",online:"online",offline:"offline",
+  segOnline:"Dashboard",segOffline:"Offline",
+  cdLabel:"to your next race",cdEventTpl:"City Run · {date}",
+  alertsHead:"Needs action",startsHead:"My races",
+  alPayT:"Unpaid registration",alPayD:"City Run - your place is released in <b id=\"payCd\">{cd}</b>",
+  alWaitT:"Wait-list offer",alWaitD:"Mountain Trail 21 km - decide within <b id=\"waitCd\">{cd}</b>",
+  alConsentT:"Missing consent",alConsentD:"Health declaration is blocking pack collection",
+  alWeatherT:"Weather warning",alWeatherD:"Mountain Trail - storms possible in the start window",
+  ev1:"City Run",ev1dist:"10 km",ev1cat:"M40",stPay:"awaiting payment",bibAfterPay:"Your race number appears once the payment is settled.",
+  ev2:"Mountain Trail",ev2dist:"21 km",ev2cat:"M40",stPaid:"paid",bibLabel:"race number",bibPickup:"pack collection 17 May, hall A",bibLocal:"number available offline",
+  ev3:"Night Five",ev3date:"2027 edition",ev3dist:"5 km",stDefer:"deferred to 2027",
+  scWallet:"wallet",scGallery:"photos",scRanking:"standings",
+  offTitle:"You're offline.",offBody:"Showing the last loaded dashboard. Changes - payments, decisions, consents - will wait for a connection.",
+  offlineUsable:"Available without a connection",offHint:"You can show your race number and collection code at the start even with no signal. The rest refreshes when the link is back.",
+  syncTpl:"synced {date}",offSyncTpl:"last synced: {date}",
+  ctaPayTpl:"Finish payment ({cd})",ctaDecide:"Decide on the wait-list offer",ctaOffline:"Refresh when back online",processingTxt:"Opening…",
+  goPay:"Opening the summary and payment (ATH-06).",goWait:"Opening the wait-list offer (ATH-08).",
+  goConsent:"Opening consents and terms (ATH-05).",goWeather:"Opening the forecast and message (ATH-13).",
+  goWallet:"Opening the wallet (ATH-10).",goGallery:"Opening the photo gallery (ATH-11).",goRanking:"Opening the series standings (ATH-12).",
+  goStart:"Opening the race details.",offlineBlocked:"We can't refresh without a connection. Your number and collection code are available offline."}
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL",online:true,
+  nextStart:new Date("2026-05-18T10:00:00"),ev1date:new Date("2026-05-18T10:00:00"),ev2date:new Date("2026-06-07T08:00:00"),
+  sync:new Date("2026-05-26T07:40:00"),wallet:120,
+  payLeft:299,waitLeft:598};
+const UI={view:"on"};
+const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function t(k){const L=I18N[DATA.locale]||{},F=I18N["en-GB"];return (k in L)?L[k]:(F[k]??k);}
+function tpl(k,m){let s=t(k);for(const x in m)s=s.replace(new RegExp("{"+x+"}","g"),m[x]);return s;}
+function applyStatic(){$$("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-i18n");if(["alPayD","alWaitD"].includes(k))return;e.textContent=t(k);});}
+const fmtDate=(d)=>new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"long"}).format(d);
+const fmtDT=(d)=>new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}).format(d);
+const fmtMoney=(v)=>new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN",maximumFractionDigits:0}).format(v);
+function mmss(s){const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0");}
+function renderSys(){const d=$("#netDot");d.classList.toggle("off",!DATA.online);d.querySelector("span").textContent=DATA.online?t("online"):t("offline");$("#syncVal").textContent=tpl("syncTpl",{date:fmtDT(DATA.sync)});}
+function renderStatic2(){
+  $("#cdEvent").textContent=tpl("cdEventTpl",{date:fmtDate(DATA.ev1date)});
+  $("#ev1date").textContent=fmtDate(DATA.ev1date);
+  $("#ev2date").textContent=fmtDate(DATA.ev2date);
+  $("#ev2dateOff").textContent=fmtDate(DATA.ev2date);
+  $("#offSync").textContent=tpl("offSyncTpl",{date:fmtDT(DATA.sync)});
+  $("#walletVal").textContent=fmtMoney(DATA.wallet);
+  // alerty z odliczaniem (zachowują znacznik czasu w treści)
+  $("#alPay .ad").innerHTML=tpl("alPayD",{cd:mmss(DATA.payLeft)});
+  $("#alWait .ad").innerHTML=tpl("alWaitD",{cd:mmss(DATA.waitLeft)});
+}
+function days(){const ms=DATA.nextStart-new Date("2026-05-26T08:00:00");return Math.max(0,Math.round(ms/86400000));}
+function renderCountdown(){const dd=days();const u=DATA.locale==="pl-PL"?(dd===1?"dzień":"dni"):(dd===1?"day":"days");$("#cdValue").textContent=dd+" "+u;}
+function renderCta(){const l=$("#ctaLabel"),c=$("#mainCta");c.classList.toggle("ghost",UI.view==="off"||!DATA.online);
+  if(UI.view==="off"){l.textContent=t("ctaOffline");return;}
+  l.textContent=tpl("ctaPayTpl",{cd:mmss(DATA.payLeft)});}
+let st=null;
+function showStatus(x){$("#statusText").textContent=x;$("#statusLine").classList.add("show");}
+function hideStatus(){$("#statusLine").classList.remove("show");}
+function runProcessing(done){const c=$("#mainCta"),l=$("#ctaLabel");c.disabled=true;c.classList.add("processing");l.textContent=t("processingTxt");$(".spinner").style.display="inline-block";clearTimeout(st);st=setTimeout(()=>{c.classList.remove("processing");c.disabled=false;renderCta();done();},800);}
+function setView(v){UI.view=v;DATA.online=(v==="on");$("#segOn").setAttribute("aria-pressed",v==="on");$("#segOff").setAttribute("aria-pressed",v==="off");
+  $("#viewOn").classList.toggle("hidden",v!=="on");$("#viewOff").classList.toggle("hidden",v!=="off");hideStatus();renderSys();renderCta();}
+function setLocale(loc){DATA.locale=loc;document.documentElement.lang=loc;document.documentElement.dir=RTL.has(loc.split("-")[0])?"rtl":"ltr";applyStatic();renderSys();renderStatic2();renderCountdown();renderCta();}
+let tick=null;
+function startTick(){clearInterval(tick);tick=setInterval(()=>{
+  if(UI.view!=="on")return;
+  if(DATA.payLeft>0)DATA.payLeft--;if(DATA.waitLeft>0)DATA.waitLeft--;
+  const p=$("#payCd"),w=$("#waitCd");if(p)p.textContent=mmss(DATA.payLeft);if(w)w.textContent=mmss(DATA.waitLeft);
+  if(UI.view==="on"&&DATA.online){const l=$("#ctaLabel");if(!$("#mainCta").classList.contains("processing"))l.textContent=tpl("ctaPayTpl",{cd:mmss(DATA.payLeft)});}
+},1000);}
+document.addEventListener("DOMContentLoaded",()=>{
+  setLocale("pl-PL");$("#langSel").value="pl-PL";
+  $("#langSel").addEventListener("change",e=>setLocale(e.target.value));
+  $("#segOn").addEventListener("click",()=>setView("on"));
+  $("#segOff").addEventListener("click",()=>setView("off"));
+  $("#mainCta").addEventListener("click",()=>{if(UI.view==="off"){showStatus(t("offlineBlocked"));return;}runProcessing(()=>showStatus(t("goPay")));});
+  $("#alPay").addEventListener("click",()=>runProcessing(()=>showStatus(t("goPay"))));
+  $("#alWait").addEventListener("click",()=>runProcessing(()=>showStatus(t("goWait"))));
+  $("#alConsent").addEventListener("click",()=>runProcessing(()=>showStatus(t("goConsent"))));
+  $("#alWeather").addEventListener("click",()=>runProcessing(()=>showStatus(t("goWeather"))));
+  $("#scWallet").addEventListener("click",()=>showStatus(t("goWallet")));
+  $("#scGallery").addEventListener("click",()=>showStatus(t("goGallery")));
+  $("#scRanking").addEventListener("click",()=>showStatus(t("goRanking")));
+  startTick();
+});
+</script>
+</body>
+</html>

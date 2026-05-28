@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<!--
+  ATH-01 - rejestracja i logowanie (panel zawodnika, moduł zawodów)
+  Stan domyślny: logowanie bez hasła (e-mail lub telefon, link logowania, dostawca tożsamości).
+  Stan alternatywny: urządzenie zapamiętane - monit biometryczny jako akcja dominująca.
+  Napisy = klucze tłumaczeń BCP 47 (pl-PL domyślny, en-GB zapasowy). Motywowanie tylko przez zmienne CSS.
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Logowanie · ATH-01</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#10141b;--accent:#d6f622;
+  --color-success:#3ddc84;--color-warning:#ffb84d;--color-error:#ff6b5e;--color-info:#6aa9ff;
+  --surface-1:#181e28;--surface-2:#1f2733;--surface-3:#283241;--hairline:#313c4c;
+  --text-strong:#f2f5f7;--text:#cdd5df;--text-muted:#8c97a6;--on-accent:#10141b;--paper:#f4f5ef;
+  --font-display:"Saira Condensed",system-ui;--font-body:"Barlow",system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);
+  --radius:14px;--shadow:0 10px 30px -12px rgba(0,0,0,.65);--tap:48px;
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 60% at 80% -10%,rgba(214,246,34,.10),transparent 60%),var(--brand-ink);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+[dir="rtl"] body{direction:rtl}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 64px);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 80%,transparent)}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:176px}
+header.bar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(16,20,27,.96),rgba(16,20,27,.86));backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);box-shadow:0 1px 0 rgba(214,246,34,.18)}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--accent);position:relative;overflow:hidden}
+.mark::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 38%,var(--on-accent) 38% 50%,transparent 50% 60%,var(--on-accent) 60% 72%,transparent 72%)}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:15px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+.lang{margin-inline-start:auto;position:relative}
+.lang select{appearance:none;-webkit-appearance:none;font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s2) var(--s4) var(--s3);font-size:12.5px;color:var(--text-muted)}
+.dot{display:inline-flex;align-items:center;gap:6px}.dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--color-success);box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+.dot.off::before{background:var(--color-warning);box-shadow:0 0 0 3px rgba(255,184,77,.18)}
+.seg{display:flex;gap:var(--s2);padding:var(--s4) var(--s4) var(--s2)}
+.seg button{flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:14.5px;letter-spacing:.3px;background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);transition:all .18s;padding:0 var(--s2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 18px -8px rgba(214,246,34,.6)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding:var(--s2) var(--s4) 0;animation:rise .4s ease both}
+.lead{font-family:var(--font-display);font-weight:800;font-size:27px;line-height:1.05;color:var(--text-strong);margin:var(--s4) 0 var(--s2)}
+.sub{font-size:14px;color:var(--text-muted);margin-bottom:var(--s4)}
+.field{margin-top:var(--s4)}
+.field label{display:block;font-size:12.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.field input{width:100%;min-height:var(--tap);background:var(--surface-1);border:1px solid var(--hairline);border-radius:12px;color:var(--text-strong);font:inherit;font-size:16px;padding:0 14px}
+.field input::placeholder{color:var(--text-muted)}
+.field input:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-color:var(--accent)}
+.field.bad input{border-color:var(--color-error);background:rgba(255,107,94,.06)}
+.msg{display:none;margin-top:8px;font-size:13px;color:var(--color-error);align-items:flex-start;gap:7px}
+.msg svg{flex:0 0 auto;margin-top:2px}
+.field.bad .msg{display:flex}
+.note{margin-top:var(--s4);display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s4);border-radius:var(--radius);background:rgba(106,169,255,.08);border:1px solid rgba(106,169,255,.32)}
+.note svg{flex:0 0 auto;color:var(--color-info);margin-top:1px}
+.note p{margin:0;font-size:13px;color:var(--text)}
+.note p b{color:var(--text-strong)}
+.divider{display:flex;align-items:center;gap:var(--s3);margin:var(--s5) 0 var(--s3);color:var(--text-muted);font-size:12px;letter-spacing:.5px;text-transform:uppercase}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--hairline)}
+.idp{display:flex;flex-direction:column;gap:var(--s2)}
+.idp button{display:flex;align-items:center;justify-content:center;gap:10px;min-height:var(--tap);border-radius:12px;background:var(--surface-2);border:1px solid var(--hairline);color:var(--text-strong);font:inherit;font-weight:600;font-size:14.5px;cursor:pointer}
+.idp button:hover{border-color:var(--text-muted)}.idp button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.idp .gl{width:18px;height:18px;border-radius:4px;background:conic-gradient(from -45deg,#ea4335 0 25%,#fbbc05 25% 50%,#34a853 50% 75%,#4285f4 75% 100%)}
+.idp .ap{font-size:17px;line-height:1}
+.remember{margin-top:var(--s4);display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1)}
+.remember .rt{flex:1;font-size:13.5px;color:var(--text)}
+.remember .rt small{display:block;color:var(--text-muted);font-size:12px;margin-top:1px}
+.switch{flex:0 0 auto;width:50px;height:30px;border-radius:999px;background:var(--surface-3);border:1px solid var(--hairline);position:relative;cursor:pointer;padding:0}
+.switch::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:24px;height:24px;border-radius:50%;background:var(--text-muted);transition:all .18s}
+.switch[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+.switch[aria-checked="true"]::after{inset-inline-start:22px;background:var(--on-accent)}
+.switch:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* stan alternatywny: urządzenie zapamiętane */
+.bio{padding-top:var(--s5);text-align:center}
+.bio .acct{display:inline-flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:999px;background:var(--surface-2);border:1px solid var(--hairline);margin-bottom:var(--s5)}
+.bio .ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent),#000 18%));color:var(--on-accent);display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:15px}
+.bio .acct .am{text-align:start}.bio .acct .am b{display:block;color:var(--text-strong);font-size:14px}.bio .acct .am small{color:var(--text-muted);font-size:12px}
+.bio .ring{width:104px;height:104px;border-radius:50%;margin:0 auto var(--s4);display:grid;place-items:center;background:radial-gradient(circle,rgba(214,246,34,.14),transparent 70%);border:1px solid rgba(214,246,34,.4);color:var(--accent)}
+.bio h2{font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--text-strong);margin:0 0 var(--s2)}
+.bio p{font-size:13.5px;color:var(--text-muted);margin:0 auto;max-width:32ch}
+.lastlogin{margin-top:var(--s5);font-size:12.5px;color:var(--text-muted);text-align:center}
+.helprow{margin-top:var(--s5);text-align:center}
+.helprow a{color:var(--text-muted);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:linear-gradient(180deg,rgba(16,20,27,.4),var(--brand-ink) 40%);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+.inner{max-width:480px;margin:0 auto}
+.status-line{display:none;align-items:flex-start;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600;text-align:center}
+.status-line svg{flex:0 0 auto;margin-top:2px}
+.status-line.show{display:flex}
+.status-line.lock{color:var(--color-warning)}
+.sec-actions{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-bottom:var(--s3)}
+.sec-actions button{background:none;border:none;color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hairline)}
+.sec-actions button:hover{color:var(--text)}.sec-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.cta{width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.4px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s}
+.cta:active{transform:translateY(1px) scale(.995)}
+.cta[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none}
+.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}
+.hidden{display:none !important}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo"><div class="mark" aria-hidden="true"></div>
+        <div class="org"><b id="orgName">Stołeczny Klub Biegacza</b><span data-i18n="orgKicker">zapisy na zawody</span></div></div>
+      <div class="lang"><label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language"><option value="pl-PL">PL</option><option value="en-GB">EN</option></select></div>
+    </div>
+    <div class="sys">
+      <span class="dot" id="netDot"><span data-i18n="online">online</span></span>
+      <span data-i18n="secureNote">połączenie szyfrowane</span>
+    </div>
+  </header>
+
+  <div class="seg" role="group" aria-label="Sposób wejścia">
+    <button id="segLogin" aria-pressed="true" data-i18n="segLogin">Logowanie</button>
+    <button id="segDevice" aria-pressed="false" data-i18n="segDevice">Urządzenie zapamiętane</button>
+  </div>
+
+  <!-- STAN DOMYŚLNY: logowanie bez hasła -->
+  <main id="viewLogin">
+    <h1 class="lead" data-i18n="loginLead">Zaloguj się lub załóż konto</h1>
+    <p class="sub" data-i18n="loginSub">Bez hasła. Podaj adres lub numer, a wyślemy link, który zaloguje Cię albo od razu założy konto.</p>
+
+    <div class="field" id="idField">
+      <label for="idInput" data-i18n="idLabel">E-mail lub telefon</label>
+      <input id="idInput" type="text" inputmode="email" autocomplete="username" placeholder="kasia@przyklad.pl" aria-describedby="idMsg">
+      <div class="msg" id="idMsg" role="alert"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="idMsgText"></span></div>
+    </div>
+
+    <div class="note">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <p data-i18n="familyNote"><b>Jedno konto rodzinne.</b> Tym samym logowaniem zapiszesz swój start i, jako rodzic, zapiszesz dziecko. Nie zakładaj drugiego konta.</p>
+    </div>
+
+    <div class="divider" data-i18n="orContinue">lub kontynuuj przez</div>
+    <div class="idp">
+      <button id="idpGoogle"><span class="gl" aria-hidden="true"></span><span data-i18n="idpGoogle">Kontynuuj z Google</span></button>
+      <button id="idpApple"><span class="ap" aria-hidden="true"></span><span data-i18n="idpApple">Kontynuuj z Apple</span></button>
+    </div>
+
+    <div class="remember">
+      <div class="rt"><span data-i18n="rememberLabel">Zapamiętaj to urządzenie</span><small data-i18n="rememberHint">następnym razem zalogujesz się odciskiem lub skanem twarzy</small></div>
+      <button class="switch" id="rememberSw" role="switch" aria-checked="false" aria-label="Zapamiętaj to urządzenie"></button>
+    </div>
+
+    <div class="helprow"><a href="#" id="helpLink" data-i18n="helpLink">Pomoc i odzyskanie dostępu</a></div>
+  </main>
+
+  <!-- STAN ALTERNATYWNY: urządzenie zapamiętane (biometria) -->
+  <main id="viewDevice" class="hidden">
+    <div class="bio">
+      <div class="acct">
+        <div class="ava" aria-hidden="true">KW</div>
+        <div class="am"><b id="acctName">Kasia W.</b><small id="acctMail">k•••a@przyklad.pl</small></div>
+      </div>
+      <div class="ring" aria-hidden="true">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none"><path d="M12 11a3 3 0 0 1 3 3v2M9 16v-2a3 3 0 0 1 .4-1.5M7 12.5A6 6 0 0 1 17 12M5 11a8 8 0 0 1 13.3-3M12 14v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="0" /></svg>
+      </div>
+      <h2 data-i18n="bioHeading">Zaloguj się odciskiem</h2>
+      <p data-i18n="bioBody">To urządzenie jest zapamiętane na tym koncie. Potwierdź tożsamość, a wejdziesz prosto na pulpit.</p>
+      <div class="lastlogin" id="lastLogin"></div>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="inner">
+      <div class="status-line" id="statusLine"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="statusText"></span></div>
+      <div class="sec-actions" id="secLogin">
+        <button id="secNewLink" data-i18n="secNewLink">Wyślij nowy link</button>
+        <button id="secRecover" data-i18n="secRecover">Odzyskaj dostęp</button>
+      </div>
+      <div class="sec-actions hidden" id="secDevice">
+        <button id="secOtherAcct" data-i18n="secOtherAcct">Użyj innego konta</button>
+        <button id="secUseLink" data-i18n="secUseLink">Zaloguj linkiem zamiast tego</button>
+      </div>
+      <button class="cta" id="mainCta"><span class="spinner" aria-hidden="true"></span><span id="ctaLabel"></span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const I18N={
+ "pl-PL":{title:"Logowanie",langLabel:"Język",online:"online",offline:"offline - pierwsze wejście wymaga sieci",
+  orgKicker:"zapisy na zawody",secureNote:"połączenie szyfrowane",
+  segLogin:"Logowanie",segDevice:"Urządzenie zapamiętane",
+  loginLead:"Zaloguj się lub załóż konto",loginSub:"Bez hasła. Podaj adres lub numer, a wyślemy link, który zaloguje Cię albo od razu założy konto.",
+  idLabel:"E-mail lub telefon",familyNote:"<b>Jedno konto rodzinne.</b> Tym samym logowaniem zapiszesz swój start i, jako rodzic, zapiszesz dziecko. Nie zakładaj drugiego konta.",
+  orContinue:"lub kontynuuj przez",idpGoogle:"Kontynuuj z Google",idpApple:"Kontynuuj z Apple",
+  rememberLabel:"Zapamiętaj to urządzenie",rememberHint:"następnym razem zalogujesz się odciskiem lub skanem twarzy",
+  helpLink:"Pomoc i odzyskanie dostępu",
+  bioHeading:"Zaloguj się odciskiem",bioBody:"To urządzenie jest zapamiętane na tym koncie. Potwierdź tożsamość, a wejdziesz prosto na pulpit.",
+  lastLoginTpl:"Ostatnie udane logowanie: {date}",
+  ctaSendLink:"Wyślij link logowania",ctaBio:"Zaloguj się odciskiem",processingSend:"Wysyłanie…",processingBio:"Sprawdzanie…",
+  secNewLink:"Wyślij nowy link",secRecover:"Odzyskaj dostęp",secOtherAcct:"Użyj innego konta",secUseLink:"Zaloguj linkiem zamiast tego",
+  errEmpty:"Podaj adres e-mail lub numer telefonu.",
+  errFormat:"Sprawdź wpis - to nie wygląda na adres e-mail ani numer telefonu.",
+  errLock:"Za dużo prób. Odczekaj {sec} s, zanim wyślesz kolejny link.",
+  okSentTpl:"Wysłaliśmy link na {id}. Otwórz go na tym urządzeniu w ciągu 15 minut.",
+  okExists:"Na ten adres jest już konto. Wysłaliśmy link logowania zamiast zakładać drugie.",
+  okBio:"Tożsamość potwierdzona. Przechodzę do pulpitu.",okOtherAcct:"Wróciliśmy do logowania linkiem.",
+  okRecover:"Wysłaliśmy instrukcję odzyskania dostępu.",okHelp:"Otwarto pomoc.",
+  expiredHint:"Poprzedni link wygasł. Wyślij nowy - trafi na ten sam adres."},
+ "en-GB":{title:"Sign in",langLabel:"Language",online:"online",offline:"offline - first sign-in needs a connection",
+  orgKicker:"event registration",secureNote:"encrypted connection",
+  segLogin:"Sign in",segDevice:"Saved device",
+  loginLead:"Sign in or create an account",loginSub:"No password. Give an address or number and we'll send a link that signs you in or sets up an account.",
+  idLabel:"Email or phone",familyNote:"<b>One family account.</b> The same sign-in registers your own race and, as a parent, registers your child. Don't create a second account.",
+  orContinue:"or continue with",idpGoogle:"Continue with Google",idpApple:"Continue with Apple",
+  rememberLabel:"Remember this device",rememberHint:"next time you'll sign in with a fingerprint or face scan",
+  helpLink:"Help and account recovery",
+  bioHeading:"Sign in with a fingerprint",bioBody:"This device is remembered on this account. Confirm your identity to go straight to the dashboard.",
+  lastLoginTpl:"Last successful sign-in: {date}",
+  ctaSendLink:"Send sign-in link",ctaBio:"Sign in with a fingerprint",processingSend:"Sending…",processingBio:"Checking…",
+  secNewLink:"Send a new link",secRecover:"Recover access",secOtherAcct:"Use another account",secUseLink:"Sign in with a link instead",
+  errEmpty:"Enter an email address or phone number.",
+  errFormat:"Check the entry - that doesn't look like an email or phone number.",
+  errLock:"Too many attempts. Wait {sec} s before sending another link.",
+  okSentTpl:"We've sent a link to {id}. Open it on this device within 15 minutes.",
+  okExists:"This address already has an account. We sent a sign-in link instead of creating a second one.",
+  okBio:"Identity confirmed. Going to the dashboard.",okOtherAcct:"Back to link sign-in.",
+  okRecover:"We've sent recovery instructions.",okHelp:"Help opened.",
+  expiredHint:"The previous link expired. Send a new one - it goes to the same address."}
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL",online:true,lastLogin:new Date("2026-05-12T21:14:00"),knownEmail:"kasia@przyklad.pl"};
+const UI={view:"login",attempts:0,lockUntil:0};
+const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function t(k){const L=I18N[DATA.locale]||{},F=I18N["en-GB"];return (k in L)?L[k]:(F[k]??k);}
+function tpl(k,m){let s=t(k);for(const x in m)s=s.replace(new RegExp("{"+x+"}","g"),m[x]);return s;}
+function applyStatic(){$$("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-i18n");const v=t(k);if(v.includes("<"))e.innerHTML=v;else e.textContent=v;});}
+const fmtDT=(d)=>new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}).format(d);
+function renderSys(){const d=$("#netDot");d.classList.toggle("off",!DATA.online);d.querySelector("span").textContent=DATA.online?t("online"):t("offline");}
+function renderDevice(){$("#lastLogin").textContent=tpl("lastLoginTpl",{date:fmtDT(DATA.lastLogin)});}
+function renderCta(){const l=$("#ctaLabel");l.textContent=UI.view==="login"?t("ctaSendLink"):t("ctaBio");}
+function clearErr(){$("#idField").classList.remove("bad");}
+function showErr(txt){$("#idMsgText").textContent=txt;$("#idField").classList.add("bad");}
+let st=null;
+function showStatus(x,lock){const s=$("#statusLine");$("#statusText").textContent=x;s.classList.add("show");s.classList.toggle("lock",!!lock);}
+function hideStatus(){$("#statusLine").classList.remove("show");}
+function runProcessing(key,done){const c=$("#mainCta"),l=$("#ctaLabel");c.disabled=true;c.classList.add("processing");l.textContent=t(key);clearTimeout(st);st=setTimeout(()=>{c.classList.remove("processing");c.disabled=false;renderCta();done();},950);}
+function validId(v){v=v.trim();if(!v)return"empty";const email=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);const phone=/^\+?[0-9 ()-]{9,}$/.test(v);return(email||phone)?"ok":"format";}
+function submitLink(){
+  clearErr();hideStatus();
+  const now=Date.now();
+  if(now<UI.lockUntil){showStatus(tpl("errLock",{sec:Math.ceil((UI.lockUntil-now)/1000)}),true);return;}
+  const v=$("#idInput").value;const r=validId(v);
+  if(r==="empty"){showErr(t("errEmpty"));return;}
+  if(r==="format"){showErr(t("errFormat"));return;}
+  UI.attempts++;
+  if(UI.attempts>=4){UI.lockUntil=now+30000;runProcessing("processingSend",()=>showStatus(tpl("errLock",{sec:30}),true));return;}
+  runProcessing("processingSend",()=>{
+    const id=v.trim();
+    if(id.toLowerCase()===DATA.knownEmail){showStatus(t("okExists"));}
+    else{showStatus(tpl("okSentTpl",{id}));}
+  });
+}
+function setView(v){UI.view=v;$("#segLogin").setAttribute("aria-pressed",v==="login");$("#segDevice").setAttribute("aria-pressed",v==="device");
+  $("#viewLogin").classList.toggle("hidden",v!=="login");$("#viewDevice").classList.toggle("hidden",v!=="device");
+  $("#secLogin").classList.toggle("hidden",v!=="login");$("#secDevice").classList.toggle("hidden",v!=="device");
+  hideStatus();clearErr();renderCta();}
+function setLocale(loc){DATA.locale=loc;document.documentElement.lang=loc;document.documentElement.dir=RTL.has(loc.split("-")[0])?"rtl":"ltr";applyStatic();renderSys();renderDevice();renderCta();}
+document.addEventListener("DOMContentLoaded",()=>{
+  setLocale("pl-PL");$("#langSel").value="pl-PL";
+  $("#langSel").addEventListener("change",e=>setLocale(e.target.value));
+  $("#segLogin").addEventListener("click",()=>setView("login"));
+  $("#segDevice").addEventListener("click",()=>setView("device"));
+  $("#idInput").addEventListener("input",clearErr);
+  $("#mainCta").addEventListener("click",()=>{if(UI.view==="login")submitLink();else runProcessing("processingBio",()=>showStatus(t("okBio")));});
+  $("#secNewLink").addEventListener("click",()=>{showStatus(t("expiredHint"));});
+  $("#secRecover").addEventListener("click",()=>{hideStatus();runProcessing("processingSend",()=>showStatus(t("okRecover")));});
+  $("#secOtherAcct").addEventListener("click",()=>{setView("login");showStatus(t("okOtherAcct"));});
+  $("#secUseLink").addEventListener("click",()=>setView("login"));
+  $("#rememberSw").addEventListener("click",e=>{const on=e.currentTarget.getAttribute("aria-checked")==="true";e.currentTarget.setAttribute("aria-checked",String(!on));});
+  $("#idpGoogle").addEventListener("click",()=>runProcessing("processingSend",()=>showStatus(t("okBio"))));
+  $("#idpApple").addEventListener("click",()=>runProcessing("processingSend",()=>showStatus(t("okBio"))));
+  $("#helpLink").addEventListener("click",e=>{e.preventDefault();showStatus(t("okHelp"));});
+});
+</script>
+</body>
+</html>

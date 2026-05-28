@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCL-03 · Grafik zajęć</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500..700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#1a1f2e;--accent:#4f46e5;
+  --color-success:#15803d;--color-warning:#b45309;--color-error:#dc2626;--color-info:#2563eb;
+  --paper:#f6f8fc;--surface-1:#ffffff;--surface-2:#eef1f8;--surface-3:#e3e7f1;--hairline:#d5dae6;
+  --text-strong:#1a1f2e;--text:#3b4252;--text-muted:#6b7385;--on-accent:#ffffff;
+  --font-display:"Space Grotesk", system-ui, sans-serif;--font-body:"Source Sans 3", system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:12px;--shadow:0 8px 24px -16px rgba(26,31,46,.30);--tap:44px;--rail-w:228px;
+  /* level hues (cool palette) */
+  --lv1:#3b82f6;--lv1-bg:#e8f0ff;--lv2:#4f46e5;--lv2-bg:#ebe9fe;--lv3:#7c3aed;--lv3-bg:#f1e9fd;--camp:#0e7490;--camp-bg:#e0f2f5;
+}
+*{box-sizing:border-box;}html,body{margin:0;padding:0;}
+body{font-family:var(--font-body);background:var(--paper);color:var(--text);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;}
+.tnum{font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-family:var(--font-display);color:var(--text-strong);margin:0;font-weight:600;letter-spacing:-.01em;}
+button{font-family:var(--font-body);cursor:pointer;}
+
+.topbar{position:sticky;top:0;z-index:40;background:var(--surface-1);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--s4);padding:var(--s3) var(--s5);min-height:60px;}
+.logo{display:flex;align-items:center;gap:var(--s3);font-family:var(--font-display);font-weight:700;color:var(--text-strong);white-space:nowrap;}
+.logo .mark{width:30px;height:30px;border-radius:8px;flex:0 0 auto;background:linear-gradient(150deg,var(--accent),#3730a3);display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;}
+.logo small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--text-muted);letter-spacing:.02em;}
+.topbar .spacer{flex:1;}
+.ctx{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;}
+.field{display:flex;flex-direction:column;gap:2px;}
+.field label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600;}
+select{font-family:var(--font-body);font-size:14px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:7px 28px 7px 10px;min-height:36px;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7385' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 9px center;}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.acct{width:36px;height:36px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface-3);display:grid;place-items:center;font-weight:600;color:var(--text-strong);font-size:13px;}
+
+.shell{display:flex;min-height:calc(100vh - 60px);}
+.rail{width:var(--rail-w);flex:0 0 var(--rail-w);background:var(--surface-1);border-right:1px solid var(--hairline);padding:var(--s4) var(--s3);position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;}
+.rail .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700;padding:var(--s3) var(--s3) var(--s2);}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:9px;color:var(--text);text-decoration:none;font-weight:500;font-size:14.5px;margin-bottom:2px;min-height:40px;position:relative;}
+.nav-item:hover{background:var(--surface-2);}
+.nav-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600;}
+.nav-item .badge{margin-left:auto;background:var(--color-error);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center;}
+
+.main{flex:1;min-width:0;}
+.wrap{max-width:1280px;margin:0 auto;padding:var(--s6) var(--s6) var(--s10);}
+
+.demobar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--hairline);border-radius:10px;padding:var(--s2) var(--s3);margin-bottom:var(--s5);}
+.demobar .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:700;}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:8px;padding:2px;}
+.seg button{border:0;background:transparent;color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;min-height:32px;}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);}
+
+.pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s4);margin-bottom:var(--s4);flex-wrap:wrap;}
+.pagehead h1{font-size:24px;}
+.pagehead .sub{color:var(--text-muted);font-size:13.5px;margin-top:2px;}
+.viewseg{display:inline-flex;background:var(--surface-2);border:1px solid var(--hairline);border-radius:9px;padding:2px;}
+.viewseg button{border:0;background:transparent;color:var(--text);padding:8px 14px;border-radius:7px;font-size:13.5px;font-weight:600;min-height:38px;}
+.viewseg button[aria-pressed="true"]{background:var(--surface-1);color:var(--accent);box-shadow:var(--shadow);}
+
+.toolbar{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s4);flex-wrap:wrap;}
+.toolbar .legend{margin-left:auto;display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap;}
+.lg{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);}
+.lg .sw{width:12px;height:12px;border-radius:4px;}
+
+/* offline banner */
+.offline{display:none;align-items:center;gap:10px;background:color-mix(in srgb,var(--color-warning) 12%,transparent);border:1px solid color-mix(in srgb,var(--color-warning) 35%,transparent);color:var(--color-warning);border-radius:10px;padding:10px 14px;margin-bottom:var(--s4);font-size:13.5px;font-weight:600;}
+body[data-net="offline"] .offline{display:flex;}
+
+.gridwrap{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.gtop{display:flex;align-items:center;justify-content:space-between;padding:var(--s4);border-bottom:1px solid var(--hairline);}
+.gtop h2{font-size:15px;}
+.ghint{font-size:12px;color:var(--text-muted);}
+.cal{display:grid;grid-template-columns:58px repeat(6,1fr);}
+.cal .ch{background:var(--surface-2);border-bottom:1px solid var(--hairline);border-right:1px solid var(--surface-2);padding:10px 6px;text-align:center;font-size:12.5px;font-weight:700;color:var(--text-strong);}
+.cal .ch.holiday{color:var(--color-warning);}
+.cal .ch.holiday small{display:block;font-weight:600;font-size:10px;}
+.cal .corner{background:var(--surface-2);border-bottom:1px solid var(--hairline);}
+.cal .rowh{grid-column:1;border-right:1px solid var(--hairline);border-bottom:1px solid var(--surface-2);padding:8px 6px;text-align:right;font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums;font-weight:600;}
+.cell{border-right:1px solid var(--surface-2);border-bottom:1px solid var(--surface-2);min-height:74px;padding:5px;display:flex;flex-direction:column;gap:5px;position:relative;}
+.cell.holiday{background:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 7px,transparent 7px,transparent 14px);}
+.cell.dragover{outline:2px dashed var(--accent);outline-offset:-3px;background:color-mix(in srgb,var(--accent) 6%,transparent);}
+.cell.collision{outline:2px dashed var(--color-error);outline-offset:-3px;background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--color-error) 10%,transparent),color-mix(in srgb,var(--color-error) 10%,transparent) 8px,transparent 8px,transparent 16px);}
+
+.block{border-radius:9px;padding:7px 8px;font-size:12.5px;cursor:grab;border-left:4px solid;background:var(--surface-2);user-select:none;}
+.block:active{cursor:grabbing;}
+.block[draggable="true"]:hover{filter:brightness(.98);}
+.block .bn{font-weight:700;color:var(--text-strong);font-family:var(--font-display);}
+.block .bm{color:var(--text-muted);font-size:11px;margin-top:1px;}
+.block.p1{background:var(--lv1-bg);border-color:var(--lv1);}
+.block.p2{background:var(--lv2-bg);border-color:var(--lv2);}
+.block.p3{background:var(--lv3-bg);border-color:var(--lv3);}
+.block.camp{background:var(--camp-bg);border-color:var(--camp);}
+.block.cancelled{opacity:.55;text-decoration:line-through;}
+.block.dim{opacity:.28;filter:grayscale(.5);}
+.block .tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.6);color:var(--text-strong);margin-top:3px;}
+.block.selected{outline:2px solid var(--accent);outline-offset:1px;}
+.block .sub-flag{font-size:10px;font-weight:700;color:var(--color-info);}
+
+/* collision tooltip */
+.ctip{position:absolute;z-index:30;left:50%;top:-6px;transform:translate(-50%,-100%);background:var(--brand-ink);color:#fff;border-radius:10px;padding:9px 12px;font-size:12.5px;width:max-content;max-width:240px;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);}
+.ctip:after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--brand-ink);}
+.ctip b{color:#fff;}
+.ctip .free{display:block;margin-top:4px;color:#c7d2fe;font-weight:600;}
+
+/* block detail panel */
+.detail{margin-top:var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);padding:var(--s4);display:none;}
+.detail.show{display:block;}
+.detail .d-head{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;margin-bottom:var(--s3);}
+.detail .d-head h3{font-size:16px;}
+.detail .meta{color:var(--text-muted);font-size:13.5px;}
+.actions{display:flex;gap:var(--s2);flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;font-weight:600;font-size:14px;min-height:var(--tap);padding:0 16px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);}
+.btn:hover{background:var(--surface-2);}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.btn-sm{min-height:38px;font-size:13px;padding:0 12px;}
+.btn-primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 16px -8px var(--accent);}
+.btn-primary:hover{background:#4338ca;}
+.btn-danger{color:var(--color-error);border-color:color-mix(in srgb,var(--color-error) 45%,transparent);background:transparent;}
+.btn-danger:hover{background:color-mix(in srgb,var(--color-error) 8%,transparent);}
+
+.actionbar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s4);}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(26,31,46,.45);display:none;align-items:center;justify-content:center;z-index:70;padding:var(--s4);}
+.scrim.show{display:flex;}
+.modal{background:var(--surface-1);border-radius:var(--radius);box-shadow:0 24px 60px -20px rgba(0,0,0,.5);max-width:440px;width:100%;padding:var(--s6);}
+.modal h3{font-size:18px;margin-bottom:var(--s2);}
+.modal p{color:var(--text-muted);margin:0 0 var(--s4);}
+.choice{display:flex;flex-direction:column;gap:var(--s2);margin-bottom:var(--s4);}
+.choice label{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--hairline);border-radius:10px;cursor:pointer;font-size:14px;}
+.choice label:hover{background:var(--surface-2);}
+.choice input{margin-top:3px;accent-color:var(--accent);}
+.modal .m-actions{display:flex;gap:var(--s3);justify-content:flex-end;}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--brand-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);transition:opacity .25s,transform .25s;z-index:80;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{background:var(--color-success);}
+.toast.err{background:var(--color-error);}
+
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+@media (max-width:1080px){
+  :root{--rail-w:64px;}
+  .nav-item span.t{display:none;}.nav-item{justify-content:center;}.rail .grp{display:none;}
+  .nav-item .badge{position:absolute;margin:0;transform:translate(14px,-12px);}
+}
+@media (max-width:640px){.rail{display:none;}.ctx .field.hide-sm{display:none;}.cal{font-size:11px;}}
+</style>
+</head>
+<body data-view="filled" data-net="online">
+
+<header class="topbar">
+  <div class="logo"><span class="mark">D</span><span data-i18n="brand.name">Klub Pływacki Delfin<small data-i18n="brand.role">Panel organizatora</small></span></div>
+  <div class="spacer"></div>
+  <div class="ctx">
+    <div class="field"><label for="mode" data-i18n="ctx.mode">Tryb</label><select id="mode"><option data-i18n="mode.classes">Zajęcia</option><option data-i18n="mode.events">Zawody</option></select></div>
+    <div class="field hide-sm"><label for="facility" data-i18n="ctx.facility">Placówka</label><select id="facility"><option>Klub Pływacki Delfin</option><option>Szkoła Pływania Nurek</option></select></div>
+    <div class="field"><label for="lang" data-i18n="ctx.lang">Język</label><select id="lang"><option value="pl-PL">Polski</option><option value="en-GB">English</option></select></div>
+    <div class="acct">JN</div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Nawigacja panelu">
+    <div class="grp" data-i18n="nav.section">Zajęcia</div>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="t" data-i18n="nav.dashboard">Pulpit</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="18" cy="9" r="2"/></svg><span class="t" data-i18n="nav.groups">Grupy</span></a>
+    <a class="nav-item active" href="#" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span class="t" data-i18n="nav.schedule">Grafik</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8M5 12v7h14"/></svg><span class="t" data-i18n="nav.enrol">Zapisy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="t" data-i18n="nav.participants">Uczestnicy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span class="t" data-i18n="nav.payments">Płatności</span><span class="badge tnum">4</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-3"/></svg><span class="t" data-i18n="nav.reports">Raporty</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><span class="t" data-i18n="nav.settings">Ustawienia</span></a>
+  </nav>
+
+  <main class="main">
+    <div class="wrap">
+      <div class="demobar" role="group" aria-label="Podgląd stanu makiety">
+        <span class="lbl" data-i18n="demo.label">Podgląd stanu</span>
+        <div class="seg">
+          <button id="st-filled" aria-pressed="true" data-i18n="demo.filled">Wypełniony</button>
+          <button id="st-collision" aria-pressed="false" data-i18n="demo.collision">Kolizja sali</button>
+        </div>
+        <span style="margin-left:auto"></span>
+        <span class="lbl" data-i18n="demo.net">Sieć</span>
+        <div class="seg">
+          <button id="net-on" aria-pressed="true" data-i18n="net.online">Online</button>
+          <button id="net-off" aria-pressed="false" data-i18n="net.offline">Offline</button>
+        </div>
+      </div>
+
+      <div class="pagehead">
+        <div>
+          <h1 data-i18n="page.title">Grafik zajęć</h1>
+          <div class="sub" id="weekLine">tydzień 12-17 maja 2026</div>
+        </div>
+        <div class="viewseg" role="group" aria-label="Widok">
+          <button data-i18n="view.day">Dzień</button>
+          <button aria-pressed="true" data-i18n="view.week">Tydzień</button>
+          <button data-i18n="view.month">Miesiąc</button>
+        </div>
+      </div>
+
+      <div class="offline" role="status">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M16.7 11.7A6 6 0 0 0 8 8M5 12a8 8 0 0 1 2-2M12 20h.01"/></svg>
+        <span data-i18n="offline.msg">Pokazuję ostatni wczytany grafik. Zmiany są wstrzymane do powrotu sieci.</span>
+      </div>
+
+      <div class="toolbar">
+        <select id="fRoom" aria-label="Filtr sali"><option value="" data-i18n="filter.allrooms">Wszystkie sale</option><option>sala A</option><option>tor 1</option><option>tor 2</option></select>
+        <select id="fInstr" aria-label="Filtr instruktora"><option value="" data-i18n="filter.allinstr">Wszyscy instruktorzy</option><option>Nowak</option><option>Mazur</option></select>
+        <select id="fLevel" aria-label="Filtr poziomu"><option value="" data-i18n="filter.alllevels">Wszystkie poziomy</option><option>P1</option><option>P2</option><option>P3</option></select>
+        <div class="legend" aria-hidden="true">
+          <span class="lg"><span class="sw" style="background:var(--lv1)"></span>P1</span>
+          <span class="lg"><span class="sw" style="background:var(--lv2)"></span>P2</span>
+          <span class="lg"><span class="sw" style="background:var(--lv3)"></span>P3</span>
+          <span class="lg"><span class="sw" style="background:var(--camp)"></span><span data-i18n="legend.camp">obóz</span></span>
+        </div>
+      </div>
+
+      <div class="gridwrap">
+        <div class="gtop">
+          <h2 data-i18n="grid.title">Tydzień placówki</h2>
+          <span class="ghint" data-i18n="grid.hint">Przeciągnij blok, aby zmienić termin</span>
+        </div>
+        <div class="cal" id="cal"><!-- generated --></div>
+      </div>
+
+      <div class="actionbar">
+        <button class="btn btn-primary" id="addClass" data-i18n="action.add">+ Dodaj zajęcia</button>
+      </div>
+
+      <!-- block detail -->
+      <div class="detail" id="detail" aria-live="polite">
+        <div class="d-head">
+          <h3 id="d-name">Delfiny</h3>
+          <span class="meta" id="d-meta">P2 · wt 17:00 · tor 2 · Nowak</span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary btn-sm" id="d-save" data-i18n="action.savemove">Zapisz przesunięcie</button>
+          <button class="btn btn-sm" data-act="cancel" data-i18n="action.cancel">Odwołaj</button>
+          <button class="btn btn-sm" data-act="sub" data-i18n="action.sub">Zastępstwo</button>
+          <button class="btn btn-sm" data-act="dup" data-i18n="action.dup">Powiel na semestr</button>
+          <button class="btn btn-sm" data-act="print" data-i18n="action.print">Drukuj</button>
+          <button class="btn btn-danger btn-sm" id="d-del" data-i18n="action.delseries">Usuń termin z serii</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- cancel modal -->
+<div class="scrim" id="cancelScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cm-t">
+    <h3 id="cm-t" data-i18n="cancel.title">Odwołać te zajęcia?</h3>
+    <p data-i18n="cancel.body">Delfiny, wtorek 17:00. Wybierz, co zrobić po odwołaniu.</p>
+    <div class="choice">
+      <label><input type="checkbox" id="cm-notify" checked><span data-i18n="cancel.notify">Powiadom rodziców (wymaga zgody na kanał kontaktu)</span></label>
+      <label><input type="checkbox" id="cm-makeup" checked><span data-i18n="cancel.makeup">Otwórz odrabianie według reguł (OCL-04)</span></label>
+    </div>
+    <div class="m-actions">
+      <button class="btn btn-sm" id="cm-close" data-i18n="action.back">Wróć</button>
+      <button class="btn btn-primary btn-sm" id="cm-confirm" data-i18n="cancel.confirm">Odwołaj zajęcia</button>
+    </div>
+  </div>
+</div>
+
+<!-- delete series modal -->
+<div class="scrim" id="delScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dm-t">
+    <h3 id="dm-t" data-i18n="delseries.title">Usunąć termin z serii?</h3>
+    <p data-i18n="delseries.body">To zajęcia powtarzalne. Czego ma dotyczyć usunięcie?</p>
+    <div class="choice">
+      <label><input type="radio" name="delscope" value="one" checked><span data-i18n="delseries.one">Tylko to jedno wystąpienie</span></label>
+      <label><input type="radio" name="delscope" value="all"><span data-i18n="delseries.all">Cała seria do końca semestru</span></label>
+    </div>
+    <div class="m-actions">
+      <button class="btn btn-sm" id="dm-close" data-i18n="action.back">Wróć</button>
+      <button class="btn btn-danger btn-sm" id="dm-confirm" data-i18n="delseries.confirm">Usuń</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "brand.name":"Klub Pływacki Delfin","brand.role":"Panel organizatora",
+  "ctx.mode":"Tryb","ctx.facility":"Placówka","ctx.lang":"Język","mode.classes":"Zajęcia","mode.events":"Zawody",
+  "nav.section":"Zajęcia","nav.dashboard":"Pulpit","nav.groups":"Grupy","nav.schedule":"Grafik","nav.enrol":"Zapisy","nav.participants":"Uczestnicy","nav.payments":"Płatności","nav.reports":"Raporty","nav.settings":"Ustawienia",
+  "demo.label":"Podgląd stanu","demo.filled":"Wypełniony","demo.collision":"Kolizja sali","demo.net":"Sieć","net.online":"Online","net.offline":"Offline",
+  "page.title":"Grafik zajęć","view.day":"Dzień","view.week":"Tydzień","view.month":"Miesiąc",
+  "offline.msg":"Pokazuję ostatni wczytany grafik. Zmiany są wstrzymane do powrotu sieci.",
+  "filter.allrooms":"Wszystkie sale","filter.allinstr":"Wszyscy instruktorzy","filter.alllevels":"Wszystkie poziomy","legend.camp":"obóz",
+  "grid.title":"Tydzień placówki","grid.hint":"Przeciągnij blok, aby zmienić termin",
+  "action.add":"+ Dodaj zajęcia","action.savemove":"Zapisz przesunięcie","action.cancel":"Odwołaj","action.sub":"Zastępstwo","action.dup":"Powiel na semestr","action.print":"Drukuj","action.delseries":"Usuń termin z serii","action.back":"Wróć",
+  "cancel.title":"Odwołać te zajęcia?","cancel.body":"Delfiny, wtorek 17:00. Wybierz, co zrobić po odwołaniu.","cancel.notify":"Powiadom rodziców (wymaga zgody na kanał kontaktu)","cancel.makeup":"Otwórz odrabianie według reguł (OCL-04)","cancel.confirm":"Odwołaj zajęcia",
+  "delseries.title":"Usunąć termin z serii?","delseries.body":"To zajęcia powtarzalne. Czego ma dotyczyć usunięcie?","delseries.one":"Tylko to jedno wystąpienie","delseries.all":"Cała seria do końca semestru","delseries.confirm":"Usuń",
+  "toast.moved":"Zapisano przesunięcie","toast.collision":"Termin zajęty — {room} prowadzi już „{class}”. Blok wrócił na miejsce.","toast.cancelled":"Odwołano zajęcia i wysłano powiadomienie","toast.offline":"Offline — zmiany wstrzymane do powrotu sieci","toast.sub":"Ustawiono zastępstwo","toast.dup":"Powielono termin na semestr","toast.print":"Przygotowano grafik do druku","toast.del.one":"Usunięto pojedyncze wystąpienie","toast.del.all":"Usunięto całą serię","toast.add":"Nowe zajęcia — wybierz wolną komórkę",
+  "sub.flag":"zastępstwo","cancelled.flag":"odwołane",
+  "free":"Wolne okno:",
+  "tip.occupied":"zajęty przez",
+  "day.mon":"pon","day.tue":"wt","day.wed":"śr","day.thu":"czw","day.fri":"pt","day.sat":"sob",
+  "holiday":"święto"
+ },
+ "en-GB":{
+  "brand.name":"Delfin Swim Club","brand.role":"Organiser panel",
+  "ctx.mode":"Mode","ctx.facility":"Facility","ctx.lang":"Language","mode.classes":"Classes","mode.events":"Events",
+  "nav.section":"Classes","nav.dashboard":"Dashboard","nav.groups":"Groups","nav.schedule":"Schedule","nav.enrol":"Enrolment","nav.participants":"Participants","nav.payments":"Payments","nav.reports":"Reports","nav.settings":"Settings",
+  "demo.label":"State preview","demo.filled":"Populated","demo.collision":"Room conflict","demo.net":"Network","net.online":"Online","net.offline":"Offline",
+  "page.title":"Class schedule","view.day":"Day","view.week":"Week","view.month":"Month",
+  "offline.msg":"Showing the last loaded schedule. Changes are paused until the network is back.",
+  "filter.allrooms":"All rooms","filter.allinstr":"All instructors","filter.alllevels":"All levels","legend.camp":"camp",
+  "grid.title":"Facility week","grid.hint":"Drag a block to change its slot",
+  "action.add":"+ Add class","action.savemove":"Save move","action.cancel":"Cancel","action.sub":"Substitute","action.dup":"Repeat for term","action.print":"Print","action.delseries":"Remove from series","action.back":"Back",
+  "cancel.title":"Cancel this class?","cancel.body":"Delfiny, Tuesday 17:00. Choose what to do after cancelling.","cancel.notify":"Notify parents (requires consent for the contact channel)","cancel.makeup":"Open make-up by the rules (OCL-04)","cancel.confirm":"Cancel class",
+  "delseries.title":"Remove this slot from the series?","delseries.body":"This is a recurring class. What should the removal cover?","delseries.one":"Only this single occurrence","delseries.all":"The whole series to term end","delseries.confirm":"Remove",
+  "toast.moved":"Move saved","toast.collision":"Slot taken — {room} already runs “{class}”. Block returned.","toast.cancelled":"Class cancelled and notification sent","toast.offline":"Offline — changes paused until the network is back","toast.sub":"Substitute set","toast.dup":"Slot repeated for the term","toast.print":"Schedule prepared for print","toast.del.one":"Single occurrence removed","toast.del.all":"Whole series removed","toast.add":"New class — pick a free cell",
+  "sub.flag":"substitute","cancelled.flag":"cancelled",
+  "free":"Free slot:",
+  "tip.occupied":"taken by",
+  "day.mon":"Mon","day.tue":"Tue","day.wed":"Wed","day.thu":"Thu","day.fri":"Fri","day.sat":"Sat",
+  "holiday":"holiday"
+ }
+};
+const FALLBACK="en-GB",FACILITY_REGION="pl-PL";let lang="pl-PL";
+const RTL=new Set(["ar","he","fa","ur"]);
+function t(k){const d=I18N[lang]||{};if(k in d)return d[k];const f=I18N[FALLBACK]||{};return (k in f)?f[k]:k;}
+
+const DAYS=["day.mon","day.tue","day.wed","day.thu","day.fri","day.sat"];
+const HOLIDAY=3; // czw index
+const HOURS=[16,17,18,19];
+// blocks: d=day index, h=hour, room, group, level, instr, flags
+let BLOCKS=[
+ {id:1,d:0,h:17,room:"tor 2",g:"Delfiny",lv:"p2",lvl:"P2",instr:"Nowak"},
+ {id:2,d:1,h:17,room:"tor 2",g:"Delfiny",lv:"p2",lvl:"P2",instr:"Nowak"},
+ {id:3,d:2,h:16,room:"sala A",g:"Żabki",lv:"p1",lvl:"P1",instr:"Mazur"},
+ {id:4,d:4,h:18,room:"tor 1",g:"Rekiny",lv:"p3",lvl:"P3",instr:"Mazur"},
+ {id:5,d:5,h:16,room:"sala A",g:"Obóz Lato I",lv:"camp",lvl:"",instr:"—",camp:true},
+ {id:6,d:1,h:18,room:"tor 2",g:"Rekiny",lv:"p3",lvl:"P3",instr:"Mazur"}
+];
+let selectedBlock=null,dragId=null;
+
+function fmtTime(h){return new Intl.DateTimeFormat(FACILITY_REGION,{hour:"2-digit",minute:"2-digit"}).format(new Date(2026,4,12,h,0));}
+function roomLabel(r){return r;}
+
+function buildGrid(){
+  const cal=document.getElementById("cal");
+  const fRoom=document.getElementById("fRoom").value;
+  const fInstr=document.getElementById("fInstr").value;
+  const fLevel=document.getElementById("fLevel").value;
+  let html=`<div class="corner"></div>`;
+  DAYS.forEach((d,i)=>{
+    const hol=i===HOLIDAY;
+    html+=`<div class="ch${hol?' holiday':''}">${t(d)}${hol?`<small>${t("holiday")}</small>`:''}</div>`;
+  });
+  HOURS.forEach(h=>{
+    html+=`<div class="rowh">${fmtTime(h)}</div>`;
+    DAYS.forEach((d,i)=>{
+      const hol=i===HOLIDAY;
+      const cellBlocks=BLOCKS.filter(b=>b.d===i&&b.h===h);
+      let inner=cellBlocks.map(b=>{
+        const dim=(fRoom&&b.room!==fRoom)||(fInstr&&b.instr!==fInstr)||(fLevel&&b.lvl!==fLevel);
+        const cls=`block ${b.lv}${b.cancelled?' cancelled':''}${dim?' dim':''}${selectedBlock&&selectedBlock.id===b.id?' selected':''}`;
+        const sub=b.sub?`<span class="sub-flag">${t("sub.flag")}: ${b.sub}</span>`:'';
+        return `<div class="${cls}" draggable="${document.body.dataset.net==='online'}" data-id="${b.id}">
+          <div class="bn">${b.g}</div>
+          <div class="bm">${b.room}${b.lvl?' · '+b.lvl:''} · ${b.instr}</div>${sub}</div>`;
+      }).join("");
+      html+=`<div class="cell${hol?' holiday':''}" data-d="${i}" data-h="${h}">${inner}</div>`;
+    });
+  });
+  cal.innerHTML=html;
+  wireGrid();
+}
+
+function wireGrid(){
+  document.querySelectorAll(".block").forEach(el=>{
+    el.addEventListener("click",e=>{e.stopPropagation();selectBlock(+el.dataset.id);});
+    el.addEventListener("dragstart",e=>{
+      if(document.body.dataset.net!=="online"){e.preventDefault();toast(t("toast.offline"),"err");return;}
+      dragId=+el.dataset.id;e.dataTransfer.effectAllowed="move";
+    });
+  });
+  document.querySelectorAll(".cell").forEach(cell=>{
+    cell.addEventListener("dragover",e=>{e.preventDefault();cell.classList.add("dragover");});
+    cell.addEventListener("dragleave",()=>cell.classList.remove("dragover"));
+    cell.addEventListener("drop",e=>{e.preventDefault();cell.classList.remove("dragover");onDrop(cell);});
+  });
+}
+
+function freeWindow(room,d){
+  for(const h of HOURS){
+    if(!BLOCKS.some(b=>b.d===d&&b.h===h&&b.room===room)) return h;
+  }
+  return null;
+}
+
+function onDrop(cell){
+  const b=BLOCKS.find(x=>x.id===dragId);if(!b)return;
+  const d=+cell.dataset.d,h=+cell.dataset.h;
+  if(d===b.d&&h===b.h)return;
+  const clash=BLOCKS.find(x=>x.d===d&&x.h===h&&x.room===b.room&&x.id!==b.id);
+  if(clash){
+    showCollision(cell,clash,b);
+    toast(t("toast.collision").replace("{class}", clash.g).replace("{room}", b.room),"err");
+    return;
+  }
+  b.d=d;b.h=h;buildGrid();selectBlock(b.id);
+  toast(t("toast.moved"),"ok");
+}
+
+function showCollision(cell,clash,moving){
+  cell.classList.add("collision");
+  const fw=freeWindow(moving.room,clash.d);
+  const tip=document.createElement("div");
+  tip.className="ctip";
+  tip.innerHTML=`<b>${moving.room}</b> ${t("tip.occupied")} <b>${clash.g}</b>`
+    +(fw!==null?`<span class="free">${t("free")} ${t(DAYS[clash.d])} ${fmtTime(fw)}</span>`:"");
+  cell.appendChild(tip);
+  setTimeout(()=>{cell.classList.remove("collision");tip.remove();},3200);
+}
+
+function selectBlock(id){
+  selectedBlock=BLOCKS.find(b=>b.id===id);
+  if(!selectedBlock)return;
+  const b=selectedBlock;
+  document.getElementById("d-name").textContent=b.g;
+  document.getElementById("d-meta").textContent=`${b.lvl||t("legend.camp")} · ${t(DAYS[b.d])} ${fmtTime(b.h)} · ${b.room} · ${b.instr}`;
+  document.getElementById("detail").classList.add("show");
+  buildGrid();
+}
+
+function applyLang(){
+  document.documentElement.lang=lang.split("-")[0];
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(n=>{
+    const k=n.getAttribute("data-i18n");
+    if(k==="brand.name"){n.firstChild.textContent=t(k);return;}
+    n.textContent=t(k);
+  });
+  const wk=new Intl.DateTimeFormat(FACILITY_REGION,{day:"numeric",month:"long"});
+  document.getElementById("weekLine").textContent=
+    (lang==="pl-PL"?"tydzień ":"week ")+wk.format(new Date(2026,4,12))+" – "+wk.format(new Date(2026,4,17))+" 2026";
+  buildGrid();
+  if(selectedBlock)selectBlock(selectedBlock.id);
+}
+
+function toast(msg,kind){const el=document.getElementById("toast");el.textContent=msg;el.className="toast show"+(kind?" "+kind:"");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2600);}
+
+// filters
+["fRoom","fInstr","fLevel"].forEach(id=>document.getElementById(id).addEventListener("change",buildGrid));
+document.getElementById("lang").addEventListener("change",e=>{lang=e.target.value;applyLang();});
+
+// add / save / secondary
+document.getElementById("addClass").addEventListener("click",()=>toast(t("toast.add")));
+document.getElementById("d-save").addEventListener("click",()=>toast(t("toast.moved"),"ok"));
+document.querySelectorAll('.detail [data-act]').forEach(b=>b.addEventListener("click",()=>{
+  const a=b.dataset.act;
+  if(a==="cancel"){openModal("cancelScrim");}
+  else if(a==="sub"){if(selectedBlock){selectedBlock.sub="Nowak";buildGrid();selectBlock(selectedBlock.id);}toast(t("toast.sub"),"ok");}
+  else if(a==="dup"){toast(t("toast.dup"),"ok");}
+  else if(a==="print"){toast(t("toast.print"));}
+}));
+document.getElementById("d-del").addEventListener("click",()=>openModal("delScrim"));
+
+// modals
+function openModal(id){document.getElementById(id).classList.add("show");}
+function closeModal(id){document.getElementById(id).classList.remove("show");}
+document.getElementById("cm-close").addEventListener("click",()=>closeModal("cancelScrim"));
+document.getElementById("cm-confirm").addEventListener("click",()=>{
+  if(selectedBlock){selectedBlock.cancelled=true;buildGrid();selectBlock(selectedBlock.id);}
+  closeModal("cancelScrim");toast(t("toast.cancelled"),"ok");
+});
+document.getElementById("dm-close").addEventListener("click",()=>closeModal("delScrim"));
+document.getElementById("dm-confirm").addEventListener("click",()=>{
+  const scope=document.querySelector('input[name="delscope"]:checked').value;
+  if(selectedBlock){
+    if(scope==="one"){BLOCKS=BLOCKS.filter(b=>b.id!==selectedBlock.id);}
+    else{BLOCKS=BLOCKS.filter(b=>b.g!==selectedBlock.g);}
+    selectedBlock=null;document.getElementById("detail").classList.remove("show");buildGrid();
+  }
+  closeModal("delScrim");toast(t(scope==="one"?"toast.del.one":"toast.del.all"),"ok");
+});
+document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s)s.classList.remove("show");}));
+
+// network toggle
+document.getElementById("net-on").addEventListener("click",()=>setNet("online"));
+document.getElementById("net-off").addEventListener("click",()=>setNet("offline"));
+function setNet(v){document.body.dataset.net=v;document.getElementById("net-on").setAttribute("aria-pressed",v==="online");document.getElementById("net-off").setAttribute("aria-pressed",v==="offline");buildGrid();if(v==="offline")toast(t("toast.offline"),"err");}
+
+// state toggle: filled vs staged collision
+document.getElementById("st-filled").addEventListener("click",()=>setView("filled"));
+document.getElementById("st-collision").addEventListener("click",()=>setView("collision"));
+function setView(v){
+  document.getElementById("st-filled").setAttribute("aria-pressed",v==="filled");
+  document.getElementById("st-collision").setAttribute("aria-pressed",v==="collision");
+  buildGrid();
+  if(v==="collision"){
+    // stage: drag Delfiny (Wt 17:00, tor 2, id 2) onto Wt 18:00 where Rekiny holds tor 2 (id 6)
+    dragId=2;
+    const cell=document.querySelector('.cell[data-d="1"][data-h="18"]');
+    const clash=BLOCKS.find(b=>b.id===6),moving=BLOCKS.find(b=>b.id===2);
+    selectBlock(2);
+    showCollision(cell,clash,moving);
+    cell.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+
+// init
+applyLang();
+selectBlock(1);
+</script>
+</body>
+</html>

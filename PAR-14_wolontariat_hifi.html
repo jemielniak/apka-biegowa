@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR-14 · Wolontariat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;--accent:#ef5a3c;
+  --color-success:#1f9d57;--color-warning:#c47d0a;--color-error:#d6402a;--color-info:#2f72d6;
+  --paper:#faf5ee;--surface-1:#ffffff;--surface-2:#fff9f2;--surface-3:#f3ebe0;--hairline:#e7ddcf;
+  --text-strong:#241c17;--text:#4a4039;--text-muted:#8a7d70;--on-accent:#fff7f3;
+  --kid-1:#ef5a3c;--kid-2:#1f9d8f;--kid-3:#7a5cd6;--kid-4:#c47d0a;
+  --font-display:"Fraunces", Georgia, serif;--font-body:"Hanken Grotesk", system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:20px;--shadow:0 14px 34px -16px rgba(60,40,30,.28);--tap:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);color:var(--text);
+  background:radial-gradient(120% 80% at 85% -8%,#fff 0%,transparent 52%),radial-gradient(90% 70% at -10% 108%,#fff4ea 0%,transparent 60%),var(--paper);
+  min-height:100%;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+.appbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s4) var(--s5) var(--s3);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline)}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.iconbtn{width:36px;height:36px;flex:none;border-radius:11px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);display:grid;place-items:center;font-size:17px;cursor:pointer}
+.title-h{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:18px}
+.rolepill{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);background:#fdeae4;border:1px solid #f3c9bd;border-radius:999px;padding:3px 9px;margin-left:var(--s2)}
+.lang{display:inline-flex;gap:var(--s1);flex:none}
+.lang button{font-weight:600;font-size:12px;min-height:32px;padding:0 var(--s3);border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-muted);border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.lang button:focus-visible,.seg button:focus-visible,.btn:focus-visible,.link:focus-visible,.shift:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.modmark{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s5);font-size:11px;color:var(--text-muted)}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-3);border:1px solid var(--hairline);border-radius:999px;padding:3px 10px;font-weight:600;font-size:11px;color:var(--text)}
+.chip i{width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--accent)}
+
+.statebar{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);background:var(--surface-3);border-bottom:1px dashed var(--hairline);font-size:12px;color:var(--text-muted)}
+.statebar .lbl{font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:10.5px}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;cursor:pointer;border-radius:999px;font-weight:600;font-size:12px;color:var(--text-muted);min-height:30px;padding:0 var(--s3);font-family:var(--font-body)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+
+main{flex:1;padding:var(--s4) var(--s5) calc(var(--s10) + 120px)}
+
+.event{background:linear-gradient(160deg,#fff,var(--surface-2));border:1px solid var(--hairline);border-radius:16px;padding:var(--s4);box-shadow:var(--shadow);margin:var(--s3) 0 var(--s4)}
+.event .e{font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text-strong)}
+.event .m{font-size:12.5px;color:var(--text-muted);margin-top:2px}
+.event .need{display:inline-flex;align-items:center;gap:6px;margin-top:var(--s3);font-size:12.5px;font-weight:600;color:var(--color-warning)}
+
+h2.sec{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--text-muted);font-weight:700;margin:var(--s4) 0 var(--s3)}
+
+.shift{display:block;width:100%;text-align:left;cursor:pointer;background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:16px;padding:var(--s4);margin-bottom:var(--s3);box-shadow:var(--shadow);font-family:var(--font-body)}
+.shift[aria-pressed="true"]{border-color:var(--accent)}
+.shift.taken{opacity:.6}
+.shift .row1{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s3)}
+.shift .role{font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--text-strong)}
+.shift .time{font-size:12.5px;color:var(--text-muted);margin-top:2px}
+.shift .cap{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.shift .cap.open{background:#e6f6ec;color:var(--color-success)}
+.shift .cap.full{background:var(--surface-3);color:var(--text-muted)}
+.shift .clash{display:inline-flex;align-items:center;gap:6px;margin-top:var(--s3);font-size:12px;font-weight:700;color:var(--color-error)}
+.shift .radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--hairline);flex:none}
+.shift[aria-pressed="true"] .radio{border-color:var(--accent);box-shadow:inset 0 0 0 4px var(--accent)}
+
+.perks{background:var(--surface-2);border:1px dashed var(--hairline);border-radius:14px;padding:var(--s4);margin-top:var(--s4);font-size:13px;color:var(--text)}
+.perks strong{color:var(--text-strong)}
+
+.contact{margin-top:var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:14px;padding:var(--s4);box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s3)}
+.contact .ck{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+.contact .cn{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:15.5px;margin-top:2px}
+.contact .cp{font-variant-numeric:tabular-nums;font-size:14px;color:var(--text);margin-top:2px}
+.contact .editLink{background:none;border:0;color:var(--accent);font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-body)}
+
+/* ALT collision detail */
+.collision{display:none;margin-top:var(--s4);border:1px solid #f3c9bd;background:#fdeee9;border-radius:16px;padding:var(--s5)}
+body[data-state="alt"] .collision{display:block}
+.collision .h{display:flex;gap:var(--s3);align-items:flex-start}
+.collision .ico{flex:none;width:26px;height:26px;border-radius:8px;background:var(--color-error);color:#fff;display:grid;place-items:center;font-weight:700}
+.collision .ttl{font-family:var(--font-display);font-weight:600;font-size:17px;color:#8f2c1c}
+.collision p{font-size:13.5px;color:#7a2c1c;margin-top:var(--s2)}
+
+.actionbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:30;background:color-mix(in srgb,var(--surface-1) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--hairline);padding:var(--s3) var(--s5) calc(var(--s4)+env(safe-area-inset-bottom))}
+.status{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s2)}
+.status .dot{width:8px;height:8px;border-radius:50%}
+.second{display:flex;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s3)}
+.link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body)}
+.btn{width:100%;min-height:var(--tap);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:16px;border-radius:14px;border:1.5px solid transparent}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 22px -12px rgba(239,90,60,.9)}
+.btn-warn{background:var(--color-warning);color:#fff}
+
+[data-when]{display:none}
+body[data-state="default"] [data-when="default"]{display:revert}
+body[data-state="alt"] [data-when="alt"]{display:revert}
+.reveal{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}}
+[dir="rtl"] .shift .row1,[dir="rtl"] .collision .h,[dir="rtl"] .status,[dir="rtl"] .event .need,[dir="rtl"] .shift .clash{flex-direction:row-reverse}
+</style>
+</head>
+<body data-state="default">
+<div class="app">
+  <header class="appbar">
+    <div class="brand"><button class="iconbtn" aria-label="Menu">☰</button><span class="title-h" data-i18n="par14.h1">Wolontariat</span><span class="rolepill" data-i18n="par14.role">rola: wolontariusz</span></div>
+    <div class="lang" role="group" aria-label="Język"><button data-lang="pl-PL" aria-pressed="true">PL</button><button data-lang="en-GB" aria-pressed="false">EN</button></div>
+  </header>
+
+  <div class="modmark"><span class="chip"><i></i><span data-i18n="mod.comp">zawody</span></span><span data-i18n="par14.org">· Stołeczny Klub Biegacza</span></div>
+
+  <div class="statebar">
+    <span class="lbl" data-i18n="state.label">Stan makiety</span>
+    <div class="seg" role="group" aria-label="Stan ekranu">
+      <button data-state-btn="default" aria-pressed="true" data-i18n="state.default">wolne zmiany</button>
+      <button data-state-btn="alt" aria-pressed="false" data-i18n="state.alt14">kolizja ze startem dziecka</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="event reveal">
+      <div class="e">Bieg Wiosenny</div>
+      <div class="m" id="evMeta">08.06.2025 · Park Miejski</div>
+      <div class="need"><span aria-hidden="true">⚠</span><span id="needLbl"></span></div>
+    </div>
+
+    <h2 class="sec" data-i18n="par14.secShifts">Dostępne zmiany</h2>
+
+    <button class="shift reveal" data-shift="water" aria-pressed="true">
+      <div class="row1">
+        <div><div class="role" data-i18n="par14.s.water">Punkt wody</div><div class="time">08:00–11:00 · <span data-i18n="par14.km3">3. km trasy</span></div></div>
+        <div style="display:flex;align-items:center;gap:var(--s3)"><span class="cap open"><span data-i18n="par14.spots">miejsca:</span> 2/4</span><span class="radio" aria-hidden="true"></span></div>
+      </div>
+      <div class="clash" data-when="alt"><span aria-hidden="true">⚠</span><span data-i18n="par14.clashTag">koliduje ze startem Jana 09:30</span></div>
+    </button>
+
+    <button class="shift reveal" data-shift="finish" aria-pressed="false">
+      <div class="row1">
+        <div><div class="role" data-i18n="par14.s.finish">Meta · pomiar</div><div class="time">10:30–12:30 · <span data-i18n="par14.finishLine">linia mety</span></div></div>
+        <div style="display:flex;align-items:center;gap:var(--s3)"><span class="cap open"><span data-i18n="par14.spots">miejsca:</span> 1/3</span><span class="radio" aria-hidden="true"></span></div>
+      </div>
+    </button>
+
+    <button class="shift reveal taken" data-shift="reg" aria-pressed="false" aria-disabled="true">
+      <div class="row1">
+        <div><div class="role" data-i18n="par14.s.reg">Biuro zawodów</div><div class="time">07:00–09:00 · <span data-i18n="par14.tent">namiot startowy</span></div></div>
+        <span class="cap full" data-i18n="par14.fullCap">obsadzone</span>
+      </div>
+    </button>
+
+    <div class="perks">
+      <strong data-i18n="par14.perksT">Co daje zmiana:</strong>
+      <span data-i18n="par14.perksB"> koszulka wolontariusza, ciepły posiłek i wpis do paszportu rodzica. Instruktaż BHP na miejscu, 30 min przed startem zmiany.</span>
+    </div>
+
+    <div class="contact" aria-labelledby="ckLbl">
+      <div>
+        <div class="ck" id="ckLbl" data-i18n="par14.contactLbl">Dane kontaktowe (z konta)</div>
+        <div class="cn">Anna Kowalska</div>
+        <div class="cp" id="contactPhone"></div>
+      </div>
+      <button class="editLink" data-i18n="par14.editContact">Popraw</button>
+    </div>
+
+    <!-- ALT collision -->
+    <div class="collision" role="alert">
+      <div class="h">
+        <span class="ico" aria-hidden="true">⚠</span>
+        <div>
+          <div class="ttl" data-i18n="par14.col.title">Ta zmiana zasłoni start Jana</div>
+          <p data-i18n="par14.col.body">Jan startuje o 09:30 na 1 km, a zmiana przy punkcie wody trwa 08:00–11:00. Weź zmianę na mecie (10:30) albo poproś o krótszy dyżur, żeby zdążyć na bieg dziecka.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="status">
+      <span class="dot" id="barDot" style="background:var(--color-success)" aria-hidden="true"></span>
+      <span data-when="default" data-i18n="par14.barDefault">Wybrana zmiana: <b style="color:var(--text-strong)">Punkt wody · 08:00</b></span>
+      <span data-when="alt" data-i18n="par14.barAlt">Wybrana zmiana koliduje ze startem dziecka</span>
+    </div>
+    <div class="second">
+      <button class="link" data-i18n="par14.myShifts">Moje zmiany</button>
+      <button class="link" data-i18n="par14.brief">Instruktaż BHP</button>
+      <button class="link" data-i18n="par14.contact">Kontakt koordynatora</button>
+    </div>
+    <button class="btn btn-primary" data-when="default" data-i18n="par14.cta">Zapisz się na zmianę</button>
+    <button class="btn btn-warn" data-when="alt" data-i18n="par14.ctaSwitch">Weź zmianę na mecie (10:30)</button>
+  </div>
+</div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "state.label":"Stan makiety","state.default":"wolne zmiany","state.alt14":"kolizja ze startem dziecka","mod.comp":"zawody",
+  "par14.h1":"Wolontariat","par14.role":"rola: wolontariusz","par14.org":"· Stołeczny Klub Biegacza",
+  "par14.need.tpl":"{n,plural,one{Brakuje # wolontariusza}few{Brakują # wolontariuszy}many{Brakuje # wolontariuszy}other{Brakuje # wolontariuszy}} do obsadzenia biegu",
+  "par14.secShifts":"Dostępne zmiany",
+  "par14.s.water":"Punkt wody","par14.km3":"3. km trasy","par14.s.finish":"Meta · pomiar","par14.finishLine":"linia mety","par14.s.reg":"Biuro zawodów","par14.tent":"namiot startowy",
+  "par14.spots":"miejsca:","par14.fullCap":"obsadzone","par14.clashTag":"koliduje ze startem Jana 09:30",
+  "par14.perksT":"Co daje zmiana:","par14.perksB":" koszulka wolontariusza, ciepły posiłek i wpis do paszportu rodzica. Instruktaż BHP na miejscu, 30 min przed startem zmiany.",
+  "par14.col.title":"Ta zmiana zasłoni start Jana","par14.col.body":"Jan startuje o 09:30 na 1 km, a zmiana przy punkcie wody trwa 08:00–11:00. Weź zmianę na mecie (10:30) albo poproś o krótszy dyżur, żeby zdążyć na bieg dziecka.",
+  "par14.barDefault":"Wybrana zmiana:","par14.barAlt":"Wybrana zmiana koliduje ze startem dziecka",
+  "par14.myShifts":"Moje zmiany","par14.brief":"Instruktaż BHP","par14.contact":"Kontakt koordynatora",
+  "par14.cta":"Zapisz się na zmianę","par14.ctaSwitch":"Weź zmianę na mecie (10:30)",
+  "par14.contactLbl":"Dane kontaktowe (z konta)","par14.editContact":"Popraw"
+ },
+ "en-GB":{
+  "state.label":"Mockup state","state.default":"open shifts","state.alt14":"clash with child's start","mod.comp":"competitions",
+  "par14.h1":"Volunteering","par14.role":"role: volunteer","par14.org":"· Stołeczny Running Club",
+  "par14.need.tpl":"{n,plural,one{# volunteer still needed}other{# volunteers still needed}} to staff the race",
+  "par14.secShifts":"Available shifts",
+  "par14.s.water":"Water point","par14.km3":"3rd km of the route","par14.s.finish":"Finish · timing","par14.finishLine":"finish line","par14.s.reg":"Race office","par14.tent":"start tent",
+  "par14.spots":"spots:","par14.fullCap":"staffed","par14.clashTag":"clashes with Jan's 09:30 start",
+  "par14.perksT":"What the shift gives you:","par14.perksB":" a volunteer T-shirt, a warm meal and an entry in the parent passport. Safety briefing on site, 30 min before the shift starts.",
+  "par14.col.title":"This shift will hide Jan's start","par14.col.body":"Jan starts at 09:30 over 1 km, while the water-point shift runs 08:00–11:00. Take the finish-line shift (10:30) or ask for a shorter duty so you make your child's run.",
+  "par14.barDefault":"Selected shift:","par14.barAlt":"The selected shift clashes with your child's start",
+  "par14.myShifts":"My shifts","par14.brief":"Safety briefing","par14.contact":"Coordinator contact",
+  "par14.cta":"Sign up for the shift","par14.ctaSwitch":"Take the finish-line shift (10:30)",
+  "par14.contactLbl":"Contact details (from account)","par14.editContact":"Edit"
+ }
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+let lang="pl-PL";
+const NEEDED=6;
+const PARENT_PHONE="48600123456"; // E.164-like, bez "+"
+const t=k=>(I18N[lang]&&I18N[lang][k])??(I18N["en-GB"]&&I18N["en-GB"][k])??k;
+function tPlural(key,vars){
+  let s=t(key);
+  for(const [n,v] of Object.entries(vars)){
+    s=s.replace(new RegExp(`\\{${n}\\}`,"g"),v);
+    /* parsowanie {name,plural,...} z balansowaniem klamr */
+    const start=`{${n},plural,`;
+    let i;
+    while((i=s.indexOf(start))>=0){
+      let depth=1,j=i+start.length;
+      while(j<s.length&&depth>0){
+        if(s[j]==="{")depth++;
+        else if(s[j]==="}"){depth--;if(depth===0)break;}
+        j++;
+      }
+      const inner=s.slice(i+start.length,j);
+      const cat=new Intl.PluralRules(lang).select(v);
+      const m={};inner.replace(/(zero|one|two|few|many|other)\{([^{}]*)\}/g,(_,k,vv)=>{m[k]=vv;});
+      const out=(m[cat]??m.other??"").replace(/#/g,v);
+      s=s.slice(0,i)+out+s.slice(j+1);
+    }
+  }
+  return s;
+}
+/* własny formater telefonu - prefiks kraju i grupy regionalne */
+function fmtPhone(num){
+  const s=String(num).replace(/\D/g,"");
+  /* PL: +48 600 123 456 */
+  if(s.startsWith("48")&&s.length===11){
+    return `+48 ${s.slice(2,5)} ${s.slice(5,8)} ${s.slice(8,11)}`;
+  }
+  /* GB i inne: +<kraj> <reszta> */
+  return "+"+s;
+}
+function render(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"));});
+  document.getElementById("evMeta").textContent=new Intl.DateTimeFormat(lang,{day:"2-digit",month:"long",year:"numeric"}).format(new Date(2025,5,8))+" · "+(lang==="pl-PL"?"Park Miejski":"City Park");
+  /* "Brakuje N wolontariuszy" z plurałami */
+  document.getElementById("needLbl").textContent=tPlural("par14.need.tpl",{n:NEEDED});
+  /* telefon przez własny formater - prefiks kraju, grupy 3-3-3 */
+  document.getElementById("contactPhone").textContent=fmtPhone(PARENT_PHONE);
+}
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();}));
+document.querySelectorAll(".shift").forEach(b=>b.addEventListener("click",()=>{if(b.getAttribute("aria-disabled")==="true")return;document.querySelectorAll(".shift").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+document.querySelectorAll("[data-state-btn]").forEach(b=>b.addEventListener("click",()=>{document.body.dataset.state=b.dataset.stateBtn;document.querySelectorAll("[data-state-btn]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+render();
+</script>
+</body>
+</html>

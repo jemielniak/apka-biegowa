@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR-10 · Płatności, portfel i faktury</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;--accent:#ef5a3c;
+  --color-success:#1f9d57;--color-warning:#c47d0a;--color-error:#d6402a;--color-info:#2f72d6;
+  --paper:#faf5ee;--surface-1:#ffffff;--surface-2:#fff9f2;--surface-3:#f3ebe0;--hairline:#e7ddcf;
+  --text-strong:#241c17;--text:#4a4039;--text-muted:#8a7d70;--on-accent:#fff7f3;
+  --kid-1:#ef5a3c;--kid-2:#1f9d8f;--kid-3:#7a5cd6;--kid-4:#c47d0a;
+  --font-display:"Fraunces", Georgia, serif;--font-body:"Hanken Grotesk", system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:20px;--shadow:0 14px 34px -16px rgba(60,40,30,.28);--tap:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);color:var(--text);
+  background:radial-gradient(120% 80% at 85% -8%,#fff 0%,transparent 52%),radial-gradient(90% 70% at -10% 108%,#fff4ea 0%,transparent 60%),var(--paper);
+  min-height:100%;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+.appbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s4) var(--s5) var(--s3);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline)}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.iconbtn{width:36px;height:36px;flex:none;border-radius:11px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);display:grid;place-items:center;font-size:17px;cursor:pointer}
+.title-h{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:18px}
+.lang{display:inline-flex;gap:var(--s1);flex:none}
+.lang button{font-weight:600;font-size:12px;min-height:32px;padding:0 var(--s3);border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-muted);border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.lang button:focus-visible,.kid:focus-visible,.seg button:focus-visible,.btn:focus-visible,.link:focus-visible,.due:focus-visible,.method:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.kidbar{position:sticky;top:57px;z-index:29;display:flex;gap:var(--s3);align-items:center;overflow-x:auto;padding:var(--s3) var(--s5);background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--hairline);scrollbar-width:none}
+.kidbar::-webkit-scrollbar{display:none}
+.kid{display:inline-flex;align-items:center;gap:var(--s2);flex:none;cursor:pointer;min-height:38px;padding:0 var(--s3) 0 5px;border-radius:999px;background:var(--surface-1);border:1.5px solid var(--hairline);font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text)}
+.kid .tok{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:none}
+.kid[aria-pressed="true"]{border-color:var(--brand-ink);background:var(--surface-2)}
+.kid.all .tok{background:var(--brand-ink)} .kid[data-kid="zofia"] .tok{background:var(--kid-2)} .kid[data-kid="jan"] .tok{background:var(--kid-1)}
+
+.modmark{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s5);font-size:11px;color:var(--text-muted)}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-3);border:1px solid var(--hairline);border-radius:999px;padding:3px 10px;font-weight:600;font-size:11px;color:var(--text)}
+.chip i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.chip.z i{background:var(--color-info)} .chip.c i{background:var(--accent)}
+
+.statebar{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);background:var(--surface-3);border-bottom:1px dashed var(--hairline);font-size:12px;color:var(--text-muted)}
+.statebar .lbl{font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:10.5px}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;cursor:pointer;border-radius:999px;font-weight:600;font-size:12px;color:var(--text-muted);min-height:30px;padding:0 var(--s3);font-family:var(--font-body)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+
+main{flex:1;padding:var(--s4) var(--s5) calc(var(--s10) + 132px)}
+
+.wallet{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(160deg,#fff,var(--surface-2));border:1px solid var(--hairline);border-radius:16px;padding:var(--s4);box-shadow:var(--shadow);margin:var(--s3) 0 var(--s5)}
+.wallet .v{font-family:var(--font-display);font-weight:700;font-size:22px;color:var(--color-success)}
+.wallet .k{font-size:12px;color:var(--text-muted);margin-top:2px}
+.wallet .hist{font-size:12.5px;color:var(--accent);font-weight:600;background:none;border:0;cursor:pointer;font-family:var(--font-body)}
+
+h2.sec{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--text-muted);font-weight:700;margin:var(--s4) 0 var(--s3)}
+
+.due{display:flex;gap:var(--s3);align-items:center;width:100%;text-align:left;background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:14px;padding:var(--s4);margin-bottom:var(--s3);box-shadow:var(--shadow);cursor:pointer;font-family:var(--font-body)}
+.due[aria-pressed="true"]{border-color:var(--accent)}
+.due .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--hairline);flex:none;display:grid;place-items:center;color:#fff}
+.due[aria-pressed="true"] .box{background:var(--accent);border-color:var(--accent)}
+.due .info{flex:1;min-width:0}
+.due .ttl{font-weight:600;color:var(--text-strong)}
+.due .who{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);margin-top:2px}
+.due .who .tok{width:16px;height:16px;border-radius:50%;color:#fff;font-weight:700;font-size:9px;display:grid;place-items:center}
+.due .who .tok.zofia{background:var(--kid-2)} .due .who .tok.jan{background:var(--kid-1)}
+.due .amt{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--text-strong);white-space:nowrap}
+
+.summary{background:var(--surface-2);border:1px solid var(--hairline);border-radius:16px;padding:var(--s4);margin-top:var(--s4)}
+.summary .l{display:flex;justify-content:space-between;padding:var(--s2) 0;font-size:14.5px}
+.summary .l span:last-child{font-variant-numeric:tabular-nums}
+.summary .l.credit span:last-child{color:var(--color-success)}
+.summary .total{border-top:1px solid var(--hairline);margin-top:var(--s2);padding-top:var(--s3);font-weight:700;font-family:var(--font-display);font-size:18px;color:var(--text-strong)}
+
+.methods{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s4)}
+.method{flex:1 1 30%;min-height:46px;border:1.5px solid var(--hairline);background:var(--surface-1);border-radius:12px;cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text)}
+.method[aria-pressed="true"]{border-color:var(--accent);background:var(--surface-2);color:var(--text-strong)}
+
+.rejected{display:none;gap:var(--s3);align-items:flex-start;background:#fdeee9;border:1px solid #f3c9bd;color:#8f2c1c;border-radius:14px;padding:var(--s4);margin-top:var(--s4);font-size:13.5px}
+.rejected .ico{flex:none;width:22px;height:22px;border-radius:6px;background:var(--color-error);color:#fff;display:grid;place-items:center;font-weight:700}
+body[data-state="alt"] .rejected{display:flex}
+.rejected ul{margin:var(--s2) 0 0;padding-left:18px}
+.rejected li{padding:1px 0}
+
+.invoices{margin-top:var(--s5)}
+.inv{display:flex;justify-content:space-between;align-items:center;background:var(--surface-1);border:1px solid var(--hairline);border-radius:12px;padding:var(--s3) var(--s4);margin-bottom:var(--s2);font-size:14px}
+.inv .f{font-weight:600;color:var(--text-strong)}
+.inv .d{font-size:12px;color:var(--text-muted)}
+.inv button{background:none;border:0;color:var(--accent);font-weight:600;cursor:pointer;font-family:var(--font-body);font-size:13.5px}
+
+.actionbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:30;background:color-mix(in srgb,var(--surface-1) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--hairline);padding:var(--s3) var(--s5) calc(var(--s4)+env(safe-area-inset-bottom))}
+.status{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s2)}
+.status b{color:var(--text-strong);font-variant-numeric:tabular-nums;font-family:var(--font-display);font-size:15px}
+.second{display:flex;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s3)}
+.link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body)}
+.btn{width:100%;min-height:var(--tap);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:16px;border-radius:14px;border:1.5px solid transparent}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 22px -12px rgba(239,90,60,.9)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+
+.reveal{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}}
+[dir="rtl"] .wallet,[dir="rtl"] .due,[dir="rtl"] .summary .l,[dir="rtl"] .inv,[dir="rtl"] .status,[dir="rtl"] .rejected{flex-direction:row-reverse}
+</style>
+</head>
+<body data-state="default">
+<div class="app">
+  <header class="appbar">
+    <div class="brand"><button class="iconbtn" aria-label="Menu">☰</button><span class="title-h" data-i18n="par10.h1">Płatności</span></div>
+    <div class="lang" role="group" aria-label="Język"><button data-lang="pl-PL" aria-pressed="true">PL</button><button data-lang="en-GB" aria-pressed="false">EN</button></div>
+  </header>
+
+  <div class="kidbar" role="group" aria-label="Wybór dziecka">
+    <button class="kid all" data-kid="all" aria-pressed="true"><span class="tok">∗</span><span data-i18n="kid.all">Cała rodzina</span></button>
+    <button class="kid" data-kid="zofia" aria-pressed="false"><span class="tok">Z</span>Zofia</button>
+    <button class="kid" data-kid="jan" aria-pressed="false"><span class="tok">J</span>Jan</button>
+  </div>
+
+  <div class="modmark"><span class="chip"><i></i><span data-i18n="par10.org">Klub Pływacki Delfin · jeden portfel na oba moduły</span></span></div>
+
+  <div class="statebar">
+    <span class="lbl" data-i18n="state.label">Stan makiety</span>
+    <div class="seg" role="group" aria-label="Stan ekranu">
+      <button data-state-btn="default" aria-pressed="true" data-i18n="state.default">należności i portfel</button>
+      <button data-state-btn="alt" aria-pressed="false" data-i18n="state.alt10">płatność odrzucona</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="wallet reveal">
+      <div>
+        <div class="v" id="walletVal">+40,00 zł</div>
+        <div class="k" data-i18n="par10.walletK">Kredyt w portfelu · zwrot za odwołane zajęcia</div>
+      </div>
+      <button class="hist" data-i18n="par10.walletHist">Historia ruchów</button>
+    </div>
+
+    <h2 class="sec" data-i18n="par10.secDue">Do zapłaty</h2>
+    <div id="dues"></div>
+
+    <div class="summary">
+      <div class="l"><span data-i18n="par10.sAmount">Zaznaczone należności</span><span id="sAmount">89,00 zł</span></div>
+      <div class="l credit"><span data-i18n="par10.sCredit">Kredyt portfela</span><span id="sCredit">−40,00 zł</span></div>
+      <div class="l total"><span data-i18n="par10.sTotal">Do dopłaty</span><span id="sTotal">49,00 zł</span></div>
+    </div>
+
+    <h2 class="sec" data-i18n="par10.secMethod">Metoda płatności</h2>
+    <div class="methods" role="group" aria-label="Metoda">
+      <button class="method" data-m="blik" aria-pressed="true">BLIK</button>
+      <button class="method" data-m="card" aria-pressed="false" data-i18n="par10.card">karta</button>
+      <button class="method" data-m="p24" aria-pressed="false">Przelewy24</button>
+      <button class="method" data-m="payu" aria-pressed="false">PayU</button>
+      <button class="method" data-m="stripe" aria-pressed="false">Stripe</button>
+    </div>
+
+    <!-- ALT rejected -->
+    <div class="rejected" role="alert">
+      <span class="ico" aria-hidden="true">!</span>
+      <div>
+        <strong data-i18n="par10.rej.title">Płatność została odrzucona.</strong>
+        <div data-i18n="par10.rej.body" style="margin-top:3px">Najczęstsze przyczyny:</div>
+        <ul>
+          <li data-i18n="par10.rej.c1">brak środków lub przekroczony limit</li>
+          <li data-i18n="par10.rej.c2">odrzucenie przez bank — spróbuj BLIK lub innej karty</li>
+          <li data-i18n="par10.rej.c3">przerwana sesja w bramce</li>
+        </ul>
+        <div style="margin-top:var(--s2)" data-i18n="par10.rej.note">Wybór został zachowany. Nie przechowujemy danych karty — wpisujesz je w bramce.</div>
+      </div>
+    </div>
+
+    <div class="invoices">
+      <h2 class="sec" data-i18n="par10.secInv">Faktury</h2>
+      <div class="inv"><div><div class="f">FV 2025/04/118</div><div class="d" data-i18n="par10.inv1">Pływanie · Zofia · kwiecień</div></div><button data-i18n="par10.download">Pobierz</button></div>
+      <div class="inv"><div><div class="f">FV 2025/03/072</div><div class="d" data-i18n="par10.inv2">Abonament · Jan · marzec</div></div><button data-i18n="par10.download">Pobierz</button></div>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="status">
+      <span data-i18n="par10.barLbl">Do dopłaty:</span> <b id="barDue">49,00 zł</b>
+    </div>
+    <div class="second">
+      <button class="link" data-i18n="par10.recurring">Płatność cykliczna</button>
+      <button class="link" data-i18n="par10.schedule">Harmonogram abonamentu</button>
+    </div>
+    <button class="btn btn-primary" id="payBtn" data-i18n="par10.pay">Zapłać zaznaczone · 49 zł</button>
+  </div>
+</div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "state.label":"Stan makiety","state.default":"należności i portfel","state.alt10":"płatność odrzucona","kid.all":"Cała rodzina",
+  "par10.h1":"Płatności","par10.org":"Klub Pływacki Delfin · jeden portfel na oba moduły",
+  "par10.walletK":"Kredyt w portfelu · zwrot za odwołane zajęcia","par10.walletHist":"Historia ruchów",
+  "par10.secDue":"Do zapłaty","par10.sAmount":"Zaznaczone należności","par10.sCredit":"Kredyt portfela","par10.sTotal":"Do dopłaty",
+  "par10.secMethod":"Metoda płatności","par10.card":"karta",
+  "par10.rej.title":"Płatność została odrzucona.","par10.rej.body":"Najczęstsze przyczyny:",
+  "par10.rej.c1":"brak środków lub przekroczony limit","par10.rej.c2":"odrzucenie przez bank — spróbuj BLIK lub innej karty","par10.rej.c3":"przerwana sesja w bramce",
+  "par10.rej.note":"Wybór został zachowany. Nie przechowujemy danych karty — wpisujesz je w bramce.",
+  "par10.secInv":"Faktury","par10.inv1":"Pływanie · Zofia · kwiecień","par10.inv2":"Abonament · Jan · marzec","par10.download":"Pobierz",
+  "par10.barLbl":"Do dopłaty:","par10.recurring":"Płatność cykliczna","par10.schedule":"Harmonogram abonamentu","par10.pay":"Zapłać zaznaczone",
+  "due.swim":"Pływanie","due.swimWhen.tpl":"termin minął {d}","due.sub":"Abonament","due.subWhen.tpl":"termin {d}","par10.walletPay":"Rozlicz z portfela"
+ },
+ "en-GB":{
+  "state.label":"Mockup state","state.default":"dues and wallet","state.alt10":"payment rejected","kid.all":"Whole family",
+  "par10.h1":"Payments","par10.org":"Delfin Swimming Club · one wallet for both modules",
+  "par10.walletK":"Wallet credit · refund for a cancelled class","par10.walletHist":"Movement history",
+  "par10.secDue":"To pay","par10.sAmount":"Selected dues","par10.sCredit":"Wallet credit","par10.sTotal":"To pay",
+  "par10.secMethod":"Payment method","par10.card":"card",
+  "par10.rej.title":"The payment was rejected.","par10.rej.body":"Most common causes:",
+  "par10.rej.c1":"insufficient funds or limit exceeded","par10.rej.c2":"declined by the bank — try BLIK or another card","par10.rej.c3":"interrupted gateway session",
+  "par10.rej.note":"Your choices are kept. We don't store card data — you enter it in the gateway.",
+  "par10.secInv":"Invoices","par10.inv1":"Swimming · Zofia · April","par10.inv2":"Subscription · Jan · March","par10.download":"Download",
+  "par10.barLbl":"To pay:","par10.recurring":"Recurring payment","par10.schedule":"Subscription schedule","par10.pay":"Pay selected",
+  "due.swim":"Swimming","due.swimWhen.tpl":"due {d} (overdue)","due.sub":"Subscription","due.subWhen.tpl":"due {d}","par10.walletPay":"Settle from wallet"
+ }
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+let lang="pl-PL", kid="all";
+const WALLET=40;
+const DUES=[
+ {id:"swim",owner:"zofia",ttl:"due.swim",whenTpl:"due.swimWhen.tpl",dueDate:"2025-05-14",amt:89,checked:true},
+ {id:"sub",owner:"jan",ttl:"due.sub",whenTpl:"due.subWhen.tpl",dueDate:"2025-06-01",amt:120,checked:false}
+];
+const t=k=>(I18N[lang]&&I18N[lang][k])??(I18N["en-GB"]&&I18N["en-GB"][k])??k;
+const money=v=>new Intl.NumberFormat(lang,{style:"currency",currency:"PLN"}).format(v);
+const moneySigned=v=>new Intl.NumberFormat(lang,{style:"currency",currency:"PLN",signDisplay:"exceptZero"}).format(v);
+const fmtDueDate=d=>new Intl.DateTimeFormat(lang,{day:"2-digit",month:"long"}).format(new Date(d));
+
+function renderDues(){
+  const box=document.getElementById("dues");box.innerHTML="";
+  DUES.filter(d=>kid==="all"||d.owner===kid).forEach(d=>{
+    const b=document.createElement("button");b.className="due";b.dataset.id=d.id;b.setAttribute("aria-pressed",String(d.checked));
+    const nm=d.owner==="zofia"?"Zofia":"Jan";const tk=d.owner;
+    const whenLabel=t(d.whenTpl).replace("{d}",fmtDueDate(d.dueDate));
+    b.innerHTML=`<span class="box" aria-hidden="true">${d.checked?"✓":""}</span>
+      <span class="info"><span class="ttl">${t(d.ttl)}</span><span class="who"><span class="tok ${tk}">${nm[0]}</span>${nm} · ${whenLabel}</span></span>
+      <span class="amt">${money(d.amt)}</span>`;
+    b.addEventListener("click",()=>{d.checked=!d.checked;renderDues();recalc();});
+    box.appendChild(b);
+  });
+}
+function recalc(){
+  const sel=DUES.filter(d=>(kid==="all"||d.owner===kid)&&d.checked);
+  const amount=sel.reduce((s,d)=>s+d.amt,0);
+  const credit=Math.min(WALLET,amount);
+  const total=Math.max(0,amount-credit);
+  document.getElementById("sAmount").textContent=money(amount);
+  document.getElementById("sCredit").textContent="−"+money(credit);
+  document.getElementById("sTotal").textContent=money(total);
+  document.getElementById("barDue").textContent=money(total);
+  const pay=document.getElementById("payBtn");
+  if(amount>0 && total===0){pay.textContent=`${t("par10.walletPay")} · ${money(amount)}`;pay.disabled=false;}
+  else if(amount===0){pay.textContent=t("par10.pay");pay.disabled=true;}
+  else {pay.textContent=`${t("par10.pay")} · ${money(total)}`;pay.disabled=false;}
+}
+function render(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"));});
+  document.getElementById("walletVal").textContent=moneySigned(WALLET);
+  renderDues();recalc();
+}
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();}));
+document.querySelectorAll(".kid").forEach(b=>b.addEventListener("click",()=>{kid=b.dataset.kid;document.querySelectorAll(".kid").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderDues();recalc();}));
+document.querySelectorAll(".method").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".method").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+document.querySelectorAll("[data-state-btn]").forEach(b=>b.addEventListener("click",()=>{document.body.dataset.state=b.dataset.stateBtn;document.querySelectorAll("[data-state-btn]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+render();
+</script>
+</body>
+</html>

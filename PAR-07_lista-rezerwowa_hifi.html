@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR-07 · Lista rezerwowa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;--accent:#ef5a3c;
+  --color-success:#1f9d57;--color-warning:#c47d0a;--color-error:#d6402a;--color-info:#2f72d6;
+  --paper:#faf5ee;--surface-1:#ffffff;--surface-2:#fff9f2;--surface-3:#f3ebe0;--hairline:#e7ddcf;
+  --text-strong:#241c17;--text:#4a4039;--text-muted:#8a7d70;--on-accent:#fff7f3;
+  --kid-1:#ef5a3c;--kid-2:#1f9d8f;--kid-3:#7a5cd6;--kid-4:#c47d0a;
+  --font-display:"Fraunces", Georgia, serif;--font-body:"Hanken Grotesk", system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:20px;--shadow:0 14px 34px -16px rgba(60,40,30,.28);--tap:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);color:var(--text);
+  background:radial-gradient(120% 80% at 85% -8%,#fff 0%,transparent 52%),radial-gradient(90% 70% at -10% 108%,#fff4ea 0%,transparent 60%),var(--paper);
+  min-height:100%;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+.appbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s4) var(--s5) var(--s3);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline)}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.iconbtn{width:36px;height:36px;flex:none;border-radius:11px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);display:grid;place-items:center;font-size:17px;cursor:pointer}
+.title-h{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:18px}
+.lang{display:inline-flex;gap:var(--s1);flex:none}
+.lang button{font-weight:600;font-size:12px;min-height:32px;padding:0 var(--s3);border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-muted);border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.lang button:focus-visible,.kid:focus-visible,.seg button:focus-visible,.btn:focus-visible,.link:focus-visible,.alt-grp:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.kidbar{position:sticky;top:57px;z-index:29;display:flex;gap:var(--s3);align-items:center;overflow-x:auto;padding:var(--s3) var(--s5);background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--hairline);scrollbar-width:none}
+.kidbar::-webkit-scrollbar{display:none}
+.kid{display:inline-flex;align-items:center;gap:var(--s2);flex:none;cursor:pointer;min-height:38px;padding:0 var(--s3) 0 5px;border-radius:999px;background:var(--surface-1);border:1.5px solid var(--hairline);font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text)}
+.kid .tok{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:none}
+.kid[aria-pressed="true"]{border-color:var(--brand-ink);background:var(--surface-2)}
+.kid[data-kid="zofia"] .tok{background:var(--kid-2)} .kid[data-kid="jan"] .tok{background:var(--kid-1)}
+
+.modmark{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s5);font-size:11px;color:var(--text-muted)}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-3);border:1px solid var(--hairline);border-radius:999px;padding:3px 10px;font-weight:600;font-size:11px;color:var(--text)}
+.chip i{width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--color-info)}
+
+.statebar{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);background:var(--surface-3);border-bottom:1px dashed var(--hairline);font-size:12px;color:var(--text-muted)}
+.statebar .lbl{font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:10.5px}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;cursor:pointer;border-radius:999px;font-weight:600;font-size:12px;color:var(--text-muted);min-height:30px;padding:0 var(--s3);font-family:var(--font-body)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+
+main{flex:1;padding:var(--s5) var(--s5) calc(var(--s10) + 120px)}
+
+/* offer card */
+.offer{border-radius:20px;padding:var(--s6);text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+body[data-state="default"] .offer{background:linear-gradient(160deg,#fff,var(--surface-2));border:1.5px solid var(--accent)}
+body[data-state="alt"] .offer{background:var(--surface-1);border:1.5px solid var(--hairline)}
+.offer .pill{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:999px;background:var(--accent);color:var(--on-accent)}
+body[data-state="alt"] .offer .pill{background:var(--surface-3);color:var(--text-muted)}
+.offer .poslbl{font-size:13px;color:var(--text-muted);margin-top:var(--s4)}
+.offer .pos{font-family:var(--font-display);font-weight:700;font-size:64px;line-height:1;color:var(--text-strong);margin-top:var(--s1)}
+.countdown{margin-top:var(--s4);display:inline-flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:700;font-size:26px;color:var(--accent)}
+.countdown .clk{font-variant-numeric:tabular-nums}
+.cdlbl{font-size:12px;color:var(--text-muted);margin-top:var(--s1)}
+.expired{margin-top:var(--s4);font-weight:600;color:var(--color-error)}
+
+.grpline{margin-top:var(--s5);background:var(--surface-1);border:1px solid var(--hairline);border-radius:14px;padding:var(--s4);text-align:left}
+.grpline .g{font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--text-strong)}
+.grpline .r{font-size:12.5px;color:var(--text-muted);margin-top:2px}
+
+.expExplain{display:none;margin-top:var(--s4);background:#fdeee9;border:1px solid #f3c9bd;border-radius:14px;padding:var(--s4);text-align:left;color:#8f2c1c;font-size:13.5px;display:none}
+body[data-state="alt"] .expExplain{display:block}
+
+h2.sec{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--text-muted);font-weight:700;margin:var(--s6) 0 var(--s3)}
+.alt-grp{display:flex;width:100%;justify-content:space-between;align-items:center;text-align:left;cursor:pointer;background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:14px;padding:var(--s4);font-family:var(--font-body)}
+.alt-grp .g{font-weight:600;color:var(--text-strong)}
+.alt-grp .free{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;background:#e6f6ec;color:var(--color-success)}
+
+.offlineNote{display:flex;gap:var(--s2);align-items:center;background:#fff4e4;border:1px solid #f0d49a;color:#7a5410;border-radius:12px;padding:var(--s3) var(--s4);font-size:12.5px;font-weight:600;margin-top:var(--s5)}
+
+.actionbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:30;background:color-mix(in srgb,var(--surface-1) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--hairline);padding:var(--s3) var(--s5) calc(var(--s4)+env(safe-area-inset-bottom))}
+.status{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s2)}
+.status .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.second{display:flex;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s3)}
+.link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body)}
+.danger{color:var(--color-error)}
+.btn{width:100%;min-height:var(--tap);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:16px;border-radius:14px;border:1.5px solid transparent}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 22px -12px rgba(239,90,60,.9)}
+.btn-ghost{background:var(--surface-1);color:var(--text-strong);border-color:var(--hairline)}
+
+[data-when]{display:none}
+body[data-state="default"] [data-when="default"]{display:revert}
+body[data-state="alt"] [data-when="alt"]{display:revert}
+.reveal{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}.pulse{animation:none}}
+.pulse{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+[dir="rtl"] .alt-grp,[dir="rtl"] .offlineNote,[dir="rtl"] .status{flex-direction:row-reverse}
+</style>
+</head>
+<body data-state="default">
+<div class="app">
+  <header class="appbar">
+    <div class="brand"><button class="iconbtn" aria-label="Menu">☰</button><span class="title-h" data-i18n="par07.h1">Lista rezerwowa</span></div>
+    <div class="lang" role="group" aria-label="Język"><button data-lang="pl-PL" aria-pressed="true">PL</button><button data-lang="en-GB" aria-pressed="false">EN</button></div>
+  </header>
+
+  <div class="kidbar" role="group" aria-label="Wybór dziecka">
+    <button class="kid" data-kid="jan" aria-pressed="true"><span class="tok">J</span>Jan</button>
+    <button class="kid" data-kid="zofia" aria-pressed="false"><span class="tok">Z</span>Zofia</button>
+  </div>
+
+  <div class="modmark"><span class="chip"><i></i><span data-i18n="mod.classes">zajęcia</span></span><span data-i18n="par07.org">· grupa Żabki</span></div>
+
+  <div class="statebar">
+    <span class="lbl" data-i18n="state.label">Stan makiety</span>
+    <div class="seg" role="group" aria-label="Stan ekranu">
+      <button data-state-btn="default" aria-pressed="true" data-i18n="state.alt07def">oferta (okno otwarte)</button>
+      <button data-state-btn="alt" aria-pressed="false" data-i18n="state.alt07">oferta wygasła</button>
+    </div>
+  </div>
+
+  <main>
+    <section class="offer reveal" aria-live="polite">
+      <span class="pill" data-when="default" data-i18n="par07.pillOffer">Zwolniło się miejsce</span>
+      <span class="pill" data-when="alt" data-i18n="par07.pillExpired">Oferta zakończona</span>
+
+      <div class="poslbl" data-i18n="par07.poslbl">Twoja pozycja w kolejce</div>
+      <div class="pos">1</div>
+
+      <div class="countdown pulse" data-when="default"><span aria-hidden="true">⏱</span><span class="clk" id="clk">04:58</span></div>
+      <div class="cdlbl" data-when="default" data-i18n="par07.cdlbl">do potwierdzenia, zanim miejsce przejdzie dalej</div>
+
+      <div class="expired" data-when="alt" data-i18n="par07.expiredShort">Okno potwierdzenia się zamknęło</div>
+
+      <div class="grpline">
+        <div class="g">Żabki</div>
+        <div class="r"><span data-i18n="par07.when">wt/czw 16:00 · Klub Pływacki Delfin</span> · <span data-i18n="par07.rule">reguła: kolejność zgłoszeń</span></div>
+      </div>
+
+      <!-- ALT: expired explanation -->
+      <div class="expExplain" role="alert">
+        <strong data-i18n="par07.exp.title">Miejsce przeszło do kolejnej osoby.</strong>
+        <div style="margin-top:3px" data-i18n="par07.exp.body">Okno na potwierdzenie minęło. Zostajesz w kolejce na pozycji 1 — przy następnym zwolnieniu znów dostaniesz powiadomienie z czasem na decyzję.</div>
+      </div>
+    </section>
+
+    <h2 class="sec" data-i18n="par07.secAlt">Alternatywy (ten sam poziom)</h2>
+    <button class="alt-grp"><span><span class="g">Żabki</span><span style="display:block;font-size:12.5px;color:var(--text-muted)" data-i18n="par07.altWhen">czw 17:00 · Klub Pływacki Delfin</span></span><span class="free"><span data-i18n="par07.free">wolne:</span> 1</span></button>
+
+    <div class="offlineNote"><span aria-hidden="true">⚠</span><span data-i18n="par07.offline">Potwierdzenie oferty wymaga sieci — przy basenie bez zasięgu nie zdążysz z lokalnej kolejki.</span></div>
+  </main>
+
+  <div class="actionbar">
+    <div class="status"><span class="dot" aria-hidden="true"></span><span data-i18n="par07.barStatus">Kolejka dla: <b style="color:var(--text-strong)">Jan · Żabki</b></span></div>
+    <div class="second">
+      <button class="link" data-i18n="par07.channel">Kanał powiadomień</button>
+      <button class="link" data-i18n="par07.altView">Zobacz alternatywy</button>
+      <button class="link danger" data-i18n="par07.leave">Opuść kolejkę</button>
+    </div>
+    <button class="btn btn-primary" data-when="default" id="confirmBtn" data-i18n="par07.confirm">Potwierdź zwolnione miejsce</button>
+    <button class="btn btn-ghost" data-when="alt" data-i18n="par07.stay">Pozostań w kolejce (pozycja 1)</button>
+  </div>
+</div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "state.label":"Stan makiety","state.alt07def":"oferta (okno otwarte)","state.alt07":"oferta wygasła",
+  "mod.classes":"zajęcia",
+  "par07.h1":"Lista rezerwowa","par07.org":"· grupa Żabki",
+  "par07.pillOffer":"Zwolniło się miejsce","par07.pillExpired":"Oferta zakończona",
+  "par07.poslbl":"Twoja pozycja w kolejce",
+  "par07.cdlbl":"do potwierdzenia, zanim miejsce przejdzie dalej","par07.expiredShort":"Okno potwierdzenia się zamknęło",
+  "par07.when":"wt/czw 16:00 · Klub Pływacki Delfin","par07.rule":"reguła: kolejność zgłoszeń",
+  "par07.exp.title":"Miejsce przeszło do kolejnej osoby.","par07.exp.body":"Okno na potwierdzenie minęło. Zostajesz w kolejce na pozycji 1 — przy następnym zwolnieniu znów dostaniesz powiadomienie z czasem na decyzję.",
+  "par07.secAlt":"Alternatywy (ten sam poziom)","par07.altWhen":"czw 17:00 · Klub Pływacki Delfin","par07.free":"wolne:",
+  "par07.offline":"Potwierdzenie oferty wymaga sieci — przy basenie bez zasięgu nie zdążysz z lokalnej kolejki.",
+  "par07.barStatus":"Kolejka dla:",
+  "par07.channel":"Kanał powiadomień","par07.altView":"Zobacz alternatywy","par07.leave":"Opuść kolejkę",
+  "par07.confirm":"Potwierdź zwolnione miejsce","par07.stay":"Pozostań w kolejce (pozycja 1)"
+ },
+ "en-GB":{
+  "state.label":"Mockup state","state.alt07def":"offer (window open)","state.alt07":"offer expired",
+  "mod.classes":"classes",
+  "par07.h1":"Waiting list","par07.org":"· Żabki group",
+  "par07.pillOffer":"A spot opened up","par07.pillExpired":"Offer closed",
+  "par07.poslbl":"Your position in the queue",
+  "par07.cdlbl":"to confirm before the spot moves on","par07.expiredShort":"The confirmation window closed",
+  "par07.when":"Tue/Thu 16:00 · Delfin Swimming Club","par07.rule":"rule: order of sign-ups",
+  "par07.exp.title":"The spot went to the next person.","par07.exp.body":"The confirmation window passed. You stay in the queue at position 1 — when a place next opens, you'll get another notification with time to decide.",
+  "par07.secAlt":"Alternatives (same level)","par07.altWhen":"Thu 17:00 · Delfin Swimming Club","par07.free":"free:",
+  "par07.offline":"Confirming an offer needs a connection — with no signal at the pool a local queue won't make it in time.",
+  "par07.barStatus":"Queue for:",
+  "par07.channel":"Notification channel","par07.altView":"See alternatives","par07.leave":"Leave queue",
+  "par07.confirm":"Confirm the freed spot","par07.stay":"Stay in the queue (position 1)"
+ }
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+let lang="pl-PL";
+const t=k=>(I18N[lang]&&I18N[lang][k])??(I18N["en-GB"]&&I18N["en-GB"][k])??k;
+let timer=null,remain=298;
+function clock(){
+  clearInterval(timer);
+  const el=document.getElementById("clk");if(!el)return;
+  const paint=()=>{el.textContent=String(Math.floor(remain/60)).padStart(2,"0")+":"+String(remain%60).padStart(2,"0");};
+  paint();
+  if(document.body.dataset.state!=="default")return;
+  timer=setInterval(()=>{remain=Math.max(0,remain-1);paint();if(remain===0)clearInterval(timer);},1000);
+}
+function render(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"));});
+  clock();
+}
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();}));
+document.querySelectorAll(".kid").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".kid").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+document.querySelectorAll("[data-state-btn]").forEach(b=>b.addEventListener("click",()=>{document.body.dataset.state=b.dataset.stateBtn;document.querySelectorAll("[data-state-btn]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));clock();}));
+render();
+</script>
+</body>
+</html>

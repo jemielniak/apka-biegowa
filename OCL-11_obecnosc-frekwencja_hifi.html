@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OCL-11 · Obecność i frekwencja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500..700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#1a1f2e; --accent:#4f46e5;
+  --color-success:#15803d; --color-warning:#b45309; --color-error:#dc2626; --color-info:#2563eb;
+  --paper:#f6f8fc; --surface-1:#ffffff; --surface-2:#eef1f8; --surface-3:#e3e7f1; --hairline:#d5dae6;
+  --text-strong:#1a1f2e; --text:#3b4252; --text-muted:#6b7385; --on-accent:#ffffff;
+  --font-display:"Space Grotesk", system-ui, sans-serif; --font-body:"Source Sans 3", system-ui;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:12px; --shadow:0 8px 24px -16px rgba(26,31,46,.30); --tap:44px;
+}
+*{box-sizing:border-box} html,body{margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--paper);color:var(--text);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.kpi-num,.nav-label,th{font-family:var(--font-display)}
+.tnum{font-variant-numeric:tabular-nums}
+
+.topbar{position:sticky;top:0;z-index:40;background:var(--surface-1);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--s4);padding:var(--s3) var(--s5);min-height:60px;}
+.logo{display:flex;align-items:center;gap:var(--s3);font-family:var(--font-display);font-weight:700;color:var(--text-strong);white-space:nowrap;}
+.logo .mark{width:30px;height:30px;border-radius:8px;flex:0 0 auto;background:linear-gradient(150deg,var(--accent),#3730a3);display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;}
+.logo small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--text-muted);letter-spacing:.02em;}
+.topbar .spacer{flex:1;}
+.ctx{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;}
+.ctxfield{display:flex;flex-direction:column;gap:2px;}
+.ctxfield label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600;}
+.ctxfield select{font-family:var(--font-body);font-size:14px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:7px 28px 7px 10px;min-height:36px;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7385' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 9px center;}
+.ctxfield select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.acct{width:36px;height:36px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface-3);display:grid;place-items:center;font-weight:600;color:var(--text-strong);font-size:13px;}
+
+.shell{display:flex;min-height:calc(100vh - 60px);}
+.rail{width:228px;flex:0 0 228px;background:var(--surface-1);border-right:1px solid var(--hairline);padding:var(--s4) var(--s3);position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;}
+.rail .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700;padding:var(--s3) var(--s3) var(--s2);}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:9px;color:var(--text);text-decoration:none;font-weight:500;font-size:14.5px;margin-bottom:2px;min-height:40px;}
+.nav-item svg{flex:0 0 auto;}
+.nav-item:hover{background:var(--surface-2);}
+.nav-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600;}
+.nav-item .badge{margin-left:auto;background:var(--color-error);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center;}
+.main{flex:1;min-width:0;}
+.wrap{max-width:1280px;margin:0 auto;padding:var(--s6) var(--s6) var(--s10);display:flex;flex-direction:column;gap:var(--s4);}
+
+.demobar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--hairline);border-radius:10px;padding:var(--s2) var(--s3);margin-bottom:var(--s5);}
+.demobar .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:700;}
+.seg-toggle{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:8px;padding:2px;}
+.seg-toggle button{border:0;background:transparent;color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;min-height:32px;cursor:pointer;font-family:inherit;}
+.seg-toggle button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+.pagehead{display:flex;align-items:flex-end;gap:var(--s4);flex-wrap:wrap}
+.pagehead h1{font-size:23px;margin:0;color:var(--text-strong);font-weight:600}
+.crumb{font-size:12.5px;color:var(--text-muted);margin-bottom:2px}
+.pagehead .right{margin-left:auto;display:flex;gap:var(--s2);align-items:center}
+.sysclock{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--color-success);display:inline-block}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);height:40px;padding:0 var(--s4);border-radius:10px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);font:inherit;font-weight:600;font-size:14px;cursor:pointer}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);box-shadow:var(--shadow)}.btn-primary:hover{background:#4338ca}
+.btn-sm{height:34px;padding:0 var(--s3);font-size:13px}
+.btn:focus-visible,.ctrl:focus-visible,.acct:focus-visible,a:focus-visible,select:focus-visible,[tabindex]:focus-visible,button:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 55%,white);outline-offset:2px}
+
+.toolbar{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap}
+select{height:38px;padding:0 var(--s3);border:1px solid var(--hairline);border-radius:9px;background:var(--surface-1);font:inherit;font-size:13.5px;color:var(--text-strong)}
+.toolbar .grow{flex:1}
+
+.card{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;gap:var(--s3);padding:var(--s4);border-bottom:1px solid var(--hairline)}
+.card-h h2{font-size:15px;margin:0;color:var(--text-strong);font-weight:600}
+.card-h .sub{font-size:12.5px;color:var(--text-muted)}
+.card-b{padding:var(--s4)}
+
+/* group attendance chart */
+.chartwrap{display:flex;align-items:flex-end;gap:10px;height:120px;padding:var(--s2) 0}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.bar .col{width:100%;max-width:34px;background:linear-gradient(180deg,var(--accent),#7c75f0);border-radius:6px 6px 0 0;align-self:flex-end}
+.bar .lbl{font-size:11px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.chartmeta{display:flex;gap:var(--s5);font-size:13px;color:var(--text-muted);margin-top:var(--s2)}
+.chartmeta b{color:var(--text-strong);font-variant-numeric:tabular-nums}
+
+/* children table */
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th,.tbl td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--hairline)}
+.tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);font-weight:600;cursor:pointer;user-select:none}
+.tbl th .sortc{opacity:.4;font-size:10px}
+.tbl tbody tr:hover{background:var(--surface-2)}
+.tbl td.num{font-variant-numeric:tabular-nums}
+.flag{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:6px;font-size:13px}
+.flag.alert{background:#fbe0e0;color:var(--color-error)}
+.trend{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.trend.down{color:var(--color-error)}
+.trend.flat{color:var(--text-muted)}
+.trend.up{color:var(--color-success)}
+.makeup{font-size:13px;color:var(--text);font-variant-numeric:tabular-nums}
+.makeup .none{color:var(--text-muted)}
+.risk{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600}
+.risk.hi{background:#fbe0e0;color:var(--color-error)}
+.risk.mid{background:#fef0dc;color:var(--color-warning)}
+.risk.lo{background:#e6f4ea;color:var(--color-success)}
+.rowbtn{border:1px solid var(--hairline);background:var(--surface-1);border-radius:8px;height:32px;padding:0 10px;font:inherit;font-size:12.5px;cursor:pointer;color:var(--text)}
+.rowbtn:hover{background:var(--surface-2)}
+
+.note{display:flex;gap:var(--s2);padding:var(--s3);border-radius:9px;font-size:13px;line-height:1.45}
+.note .ic{flex:none}
+.note-warn{background:#fef6ec;border:1px solid #f3dcc0;color:#7c4a08}
+.note-info{background:#eef3fd;border:1px solid #cdddf6;color:#1c4a8a}
+
+.actionbar{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap;padding-top:var(--s2)}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(26,31,46,.45);display:grid;place-items:center;z-index:50;padding:20px}
+.modal{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:0 24px 60px -20px rgba(0,0,0,.5);width:min(520px,100%);overflow:hidden}
+.modal .m-h{padding:var(--s4);border-bottom:1px solid var(--hairline);display:flex;gap:var(--s2);align-items:center}
+.modal .m-h h2{margin:0;font-size:16px;color:var(--text-strong)}
+.modal .m-b{padding:var(--s4);font-size:14px}
+.modal .m-f{padding:var(--s3) var(--s4);border-top:1px solid var(--hairline);display:flex;gap:var(--s2);justify-content:flex-end;background:var(--surface-2)}
+.diff{display:flex;gap:var(--s3);margin:var(--s3) 0;font-variant-numeric:tabular-nums}
+.diff .pill{flex:1;border:1px solid var(--hairline);border-radius:9px;padding:var(--s3);background:var(--surface-2)}
+.diff .pill .k{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
+.diff .pill .v{font-size:15px;font-weight:700;color:var(--text-strong);margin-top:3px}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--brand-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 12px 30px -10px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.25s;z-index:60;display:flex;gap:10px;align-items:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast .ic{color:#86efac}
+
+.stateswitch{display:none;}
+.hidden{display:none !important}
+@media (max-width:880px){.rail{display:none}.wrap{padding:var(--s4)}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+.reveal{animation:rise .4s ease both}@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo"><span class="mark">D</span><span data-i18n="brand.name">Klub Pływacki Delfin<small data-i18n="brand.role">Panel organizatora</small></span></div>
+  <div class="spacer"></div>
+  <div class="ctx">
+    <div class="ctxfield">
+      <label for="mode" data-i18n="ctx.mode">Tryb</label>
+      <select id="mode" aria-label="Tryb">
+        <option value="zajecia" data-i18n="mode.classes">Zajęcia</option>
+        <option value="zawody" data-i18n="mode.events">Zawody</option>
+      </select>
+    </div>
+    <div class="ctxfield">
+      <label for="facility" data-i18n="ctx.facility">Placówka</label>
+      <select id="facility" aria-label="Placówka">
+        <option data-i18n="facility.all">Wszystkie</option>
+        <option selected>Klub Pływacki Delfin</option>
+        <option>Szkoła Pływania Nurek</option>
+      </select>
+    </div>
+    <div class="ctxfield">
+      <label for="lang" data-i18n="ctx.lang">Język</label>
+      <select id="lang" aria-label="Język / Language">
+        <option value="pl-PL">Polski</option>
+        <option value="en-GB">English</option>
+      </select>
+    </div>
+    <div class="acct" title="Konto" aria-label="Konto">JN</div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Nawigacja panelu">
+    <div class="grp" data-i18n="navSection">Zajęcia</div>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="t" data-i18n="navDash">Pulpit</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="18" cy="9" r="2"/></svg><span class="t" data-i18n="navGroups">Grupy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8"/><path d="M5 14c0-3.866 3.134-7 7-7s7 3.134 7 7"/><circle cx="5" cy="14" r="2"/><circle cx="19" cy="14" r="2"/><circle cx="12" cy="4" r="2"/></svg><span class="t" data-i18n="navSkills">Drzewo umiejętności</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span class="t" data-i18n="navSchedule">Grafik</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8M5 12v7h14"/></svg><span class="t" data-i18n="navEnrol">Zapisy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="t" data-i18n="navParticipants">Uczestnicy</span></a>
+    <a class="nav-item active" href="#" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="14" width="3" height="3"/></svg><span class="t" data-i18n="navAttendance">Frekwencja</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4l3 3-9 9-3-3z"/><path d="M5 19l-1 3 3-1"/><circle cx="18" cy="6" r="2"/></svg><span class="t" data-i18n="navStaff">Kadra</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span class="t" data-i18n="navPayments">Płatności</span><span class="badge tnum">4</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-3"/></svg><span class="t" data-i18n="navReports">Raporty</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><span class="t" data-i18n="navSettings">Ustawienia</span></a>
+  </nav>
+
+  <main class="main">
+    <div class="wrap">
+
+    <div class="demobar" role="group" aria-label="Podgląd stanu makiety">
+      <span class="lbl" data-i18n="stateLabel">Podgląd stanu</span>
+      <div class="seg-toggle">
+        <button id="btnFilled" aria-pressed="true" data-i18n="stFilled">Wypełniony</button>
+        <button id="btnEmpty" aria-pressed="false" data-i18n="stEmpty">Brak danych</button>
+      </div>
+    </div>
+
+    <div class="pagehead">
+      <div>
+        <div class="crumb" data-i18n="crumb">Zajęcia · Frekwencja</div>
+        <h1 data-i18n="pageTitle">Obecność i frekwencja</h1>
+      </div>
+      <div class="right"><span class="sysclock"><span class="dot"></span><span data-i18n="updated">Zaktualizowano</span> <span id="updTime" class="tnum">11:42</span></span></div>
+    </div>
+
+    <div class="toolbar">
+      <select aria-label="Grupa"><option data-i18n="grpDelfiny">Grupa: Delfiny (P2)</option><option data-i18n="grpAll">Wszystkie grupy</option><option data-i18n="grpRekiny">Rekiny (P3)</option></select>
+      <select aria-label="Okres"><option data-i18n="perSem">Okres: Semestr wiosenny</option><option data-i18n="perMonth">Ostatni miesiąc</option><option data-i18n="perCustom">Zakres własny…</option></select>
+      <span class="grow"></span>
+      <button class="btn btn-sm" data-i18n="export">Eksportuj</button>
+    </div>
+
+    <section class="card reveal" id="state-filled">
+      <div class="card-h"><h2 data-i18n="grpChartTitle">Frekwencja grupowa w czasie</h2><span class="sub" data-i18n="grpChartSub">Delfiny (P2) · 10 tygodni</span></div>
+      <div class="card-b">
+        <div class="chartwrap" id="chart" role="img" aria-labelledby="chartLabel" aria-describedby="chartData"></div>
+        <span id="chartLabel" class="sr-only" data-i18n="chartLabel">Wykres frekwencji grupy Delfiny w 10 kolejnych tygodniach semestru wiosennego</span>
+        <table id="chartData" class="sr-only">
+          <caption data-i18n="chartTableCap">Dane wykresu - frekwencja tygodniowa</caption>
+          <thead><tr><th data-i18n="chartWeek">Tydzień</th><th data-i18n="chartPct">Frekwencja</th></tr></thead>
+          <tbody id="chartDataBody"></tbody>
+        </table>
+        <div class="chartmeta">
+          <span data-i18n="avgLabel">Średnia frekwencja:</span> <b class="tnum" id="avg">78%</b>
+          <span data-i18n="cancelledLabel">Zajęcia odwołane przez placówkę:</span> <b class="tnum">2</b>
+          <span data-i18n="presentLabel">Dziś obecnych:</span> <b class="tnum">8 / 10</b>
+        </div>
+        <div class="note note-info" style="margin-top:12px"><span class="ic">ℹ</span><span data-i18n="cancelHint">Zajęcia odwołane przez placówkę liczone są osobno i nie obniżają trendu dziecka — to nie nieobecność uczestnika.</span></div>
+      </div>
+    </section>
+
+    <section class="card reveal">
+      <div class="card-h">
+        <h2 data-i18n="childTitle">Dzieci - trend i ryzyko rezygnacji</h2>
+        <span class="sub" data-i18n="childSub">Wskaźnik ryzyka liczony z trendu obecności</span>
+      </div>
+      <div class="card-b" style="padding:0">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="width:36px"></th>
+              <th data-i18n="thChild">Dziecko <span class="sortc">↕</span></th>
+              <th data-i18n="thTrend">Trend <span class="sortc">↕</span></th>
+              <th data-i18n="thAbsence">Nieobecności <span class="sortc">↕</span></th>
+              <th data-i18n="thMakeup">Prawo do odrobienia</th>
+              <th data-i18n="thRisk">Ryzyko <span class="sortc">↕</span></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="flag alert" title="Wymaga reakcji">!</span></td>
+              <td><b style="color:var(--text-strong)">Piotr Kowalski</b></td>
+              <td><span class="trend down">↘ <span data-i18n="trDown">spada</span></span></td>
+              <td class="num">4 <span style="color:var(--text-muted)">(2 <span data-i18n="excused">us.</span>)</span></td>
+              <td class="makeup">1 <span data-i18n="availTo">dostępne do</span> <span data-fmt-date="2026-06-04">04.06.2026</span></td>
+              <td><span class="risk hi" data-i18n="riskHi">wysokie</span></td>
+              <td><button class="rowbtn" data-i18n="correct">Korekta wpisu</button></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td><b style="color:var(--text-strong)">Anna Nowak</b></td>
+              <td><span class="trend flat">→ <span data-i18n="trFlat">stała</span></span></td>
+              <td class="num">1</td>
+              <td class="makeup"><span class="none">—</span></td>
+              <td><span class="risk lo" data-i18n="riskLo">niskie</span></td>
+              <td><button class="rowbtn" data-i18n="correct">Korekta wpisu</button></td>
+            </tr>
+            <tr>
+              <td><span class="flag alert" title="Wymaga reakcji">!</span></td>
+              <td><b style="color:var(--text-strong)">Maja Wójcik</b></td>
+              <td><span class="trend down">↘ <span data-i18n="trRisk">ryzyko</span></span></td>
+              <td class="num">5</td>
+              <td class="makeup">2 <span data-i18n="avail">dostępne</span></td>
+              <td><span class="risk hi" data-i18n="riskHi">wysokie</span></td>
+              <td><button class="rowbtn" data-i18n="correct">Korekta wpisu</button></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td><b style="color:var(--text-strong)">Zofia Kowalska</b></td>
+              <td><span class="trend up">↗ <span data-i18n="trUp">rośnie</span></span></td>
+              <td class="num">2 <span style="color:var(--text-muted)">(2 <span data-i18n="excused">us.</span>)</span></td>
+              <td class="makeup"><span class="none">—</span></td>
+              <td><span class="risk lo" data-i18n="riskLo">niskie</span></td>
+              <td><button class="rowbtn" data-i18n="correct">Korekta wpisu</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="actionbar">
+      <button class="btn btn-primary" id="openCase" data-i18n="openCase">Otwórz przypadek wymagający reakcji</button>
+      <button class="btn btn-sm" data-i18n="filter">Filtruj okres / grupę</button>
+      <button class="btn btn-sm" data-i18n="export">Eksportuj</button>
+      <button class="btn btn-sm" data-i18n="remind">Przypomnienie do rodzica</button>
+      <button class="btn btn-sm" data-i18n="markExcused">Oznacz usprawiedliwioną</button>
+    </div>
+    <div class="note note-info"><span class="ic">ℹ</span><span data-i18n="exportHint">Eksport bez zaznaczonego zakresu obejmie bieżący semestr — poinformujemy o tym przed pobraniem. Korekta wpisu odbywa się jako edycja z zapisem zmiany, nie kasowanie.</span></div>
+
+    <!-- STATE: EMPTY -->
+    <section id="state-empty" class="empty hidden reveal" style="text-align:center;padding:var(--s10) var(--s5);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);">
+      <div style="width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);display:grid;place-items:center;margin:0 auto var(--s4);">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/></svg>
+      </div>
+      <h2 style="font-size:20px;margin-bottom:var(--s2)" data-i18n="emptyTitle">Brak danych frekwencji dla tej grupy</h2>
+      <p style="color:var(--text-muted);max-width:520px;margin:0 auto var(--s4)" data-i18n="emptyBody">W wybranej grupie nie odbyły się jeszcze zajęcia w tym okresie. Wykres i trendy pojawią się po pierwszej liście obecności. Możesz przejść do grafiku albo wybrać inny okres.</p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" data-i18n="emptyGoSchedule">Przejdź do grafiku</button>
+        <button class="btn" data-i18n="emptyOtherPeriod">Wybierz inny okres</button>
+      </div>
+    </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ALT STATE: late correction warning modal -->
+<div class="scrim hidden" id="scrim">
+  <div class="modal reveal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="m-h"><span style="font-size:18px;color:var(--color-warning)">⚠</span><h2 id="mTitle" data-i18n="mTitle">Korekta obecności sprzed dłuższego czasu</h2></div>
+    <div class="m-b">
+      <p style="margin:0 0 4px"><b>Piotr Kowalski</b> · Delfiny (P2)</p>
+      <p style="margin:0;color:var(--text-muted)"><span data-i18n="mDate">Zajęcia z dnia</span> <span data-fmt-date="2026-04-09">09.04.2026</span> · 47 <span data-i18n="mDaysAgo">dni temu</span></p>
+      <div class="diff">
+        <div class="pill"><div class="k" data-i18n="mFrom">Z wpisu</div><div class="v" data-i18n="mAbsent">Nieobecny</div></div>
+        <div class="pill" style="border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,white)"><div class="k" data-i18n="mTo">Na</div><div class="v" data-i18n="mExcused">Usprawiedliwiony</div></div>
+      </div>
+      <div class="note note-warn"><span class="ic">⚠</span><span data-i18n="mWarn">Ta zmiana cofa się do statystyk frekwencji i może odblokować prawo do odrobienia. Wskaźnik ryzyka zostanie przeliczony. Operacja zostanie zapisana w historii zmian wraz z autorem.</span></div>
+      <div style="margin-top:var(--s3)">
+        <label for="mReason" style="display:block;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:4px" data-i18n="mReasonLabel">Powód korekty (zapisywany w audycie)</label>
+        <textarea id="mReason" rows="2" style="width:100%;padding:8px 10px;border:1px solid var(--hairline);border-radius:9px;background:var(--surface-1);font:inherit;font-size:13.5px;color:var(--text-strong);resize:vertical" data-i18n-ph="mReasonPh" placeholder="np. usprawiedliwienie od rodzica z 15.04.2026, choroba"></textarea>
+      </div>
+    </div>
+    <div class="m-f">
+      <button class="btn btn-sm" id="cancelM" data-i18n="cancel">Anuluj</button>
+      <button class="btn btn-sm btn-primary" id="confirmM" data-i18n="confirmCorrect">Potwierdzam korektę</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="ic">✓</span><span id="toastMsg">Zapisano</span></div>
+
+<script>
+const I18N={
+  "pl-PL":{
+    "brand.name":"Klub Pływacki Delfin","brand.role":"Panel organizatora",
+    "ctx.mode":"Tryb","ctx.facility":"Placówka","ctx.lang":"Język",
+    "mode.classes":"Zajęcia","mode.events":"Zawody","facility.all":"Wszystkie",
+    navSection:"Zajęcia",
+    navDash:"Pulpit",navGroups:"Grupy",navSchedule:"Grafik",navEnrol:"Zapisy",navParticipants:"Uczestnicy",
+    navSkills:"Drzewo umiejętności",navAttendance:"Frekwencja",navStaff:"Kadra",
+    navPayments:"Płatności",navReports:"Raporty",navSettings:"Ustawienia",
+    stateLabel:"Podgląd stanu",stFilled:"Wypełniony",stEmpty:"Brak danych",
+    crumb:"Zajęcia · Frekwencja",pageTitle:"Obecność i frekwencja",updated:"Zaktualizowano",
+    grpDelfiny:"Grupa: Delfiny (P2)",grpAll:"Wszystkie grupy",grpRekiny:"Rekiny (P3)",
+    perSem:"Okres: Semestr wiosenny",perMonth:"Ostatni miesiąc",perCustom:"Zakres własny…",export:"Eksportuj",
+    grpChartTitle:"Frekwencja grupowa w czasie",grpChartSub:"Delfiny (P2) · 10 tygodni",
+    chartLabel:"Wykres frekwencji grupy Delfiny w 10 kolejnych tygodniach semestru wiosennego",
+    chartTableCap:"Dane wykresu — frekwencja tygodniowa",chartWeek:"Tydzień",chartPct:"Frekwencja",
+    avgLabel:"Średnia frekwencja:",cancelledLabel:"Zajęcia odwołane przez placówkę:",presentLabel:"Dziś obecnych:",
+    cancelHint:"Zajęcia odwołane przez placówkę liczone są osobno i nie obniżają trendu dziecka — to nie nieobecność uczestnika.",
+    childTitle:"Dzieci — trend i ryzyko rezygnacji",childSub:"Wskaźnik ryzyka liczony z trendu obecności",
+    thChild:"Dziecko",thTrend:"Trend",thAbsence:"Nieobecności",thMakeup:"Prawo do odrobienia",thRisk:"Ryzyko",
+    trDown:"spada",trFlat:"stała",trRisk:"ryzyko",trUp:"rośnie",excused:"us.",availTo:"dostępne do",avail:"dostępne",
+    riskHi:"wysokie",riskMid:"średnie",riskLo:"niskie",correct:"Korekta wpisu",
+    openCase:"Otwórz przypadek wymagający reakcji",filter:"Filtruj okres / grupę",remind:"Przypomnienie do rodzica",markExcused:"Oznacz usprawiedliwioną",
+    exportHint:"Eksport bez zaznaczonego zakresu obejmie bieżący semestr — poinformujemy o tym przed pobraniem. Korekta wpisu odbywa się jako edycja z zapisem zmiany, nie kasowanie.",
+    emptyTitle:"Brak danych frekwencji dla tej grupy",
+    emptyBody:"W wybranej grupie nie odbyły się jeszcze zajęcia w tym okresie. Wykres i trendy pojawią się po pierwszej liście obecności. Możesz przejść do grafiku albo wybrać inny okres.",
+    emptyGoSchedule:"Przejdź do grafiku",emptyOtherPeriod:"Wybierz inny okres",
+    mTitle:"Korekta obecności sprzed dłuższego czasu",mDate:"Zajęcia z dnia",mDaysAgo:"dni temu",
+    mFrom:"Z wpisu",mAbsent:"Nieobecny",mTo:"Na",mExcused:"Usprawiedliwiony",
+    mWarn:"Ta zmiana cofa się do statystyk frekwencji i może odblokować prawo do odrobienia. Wskaźnik ryzyka zostanie przeliczony. Operacja zostanie zapisana w historii zmian wraz z autorem.",
+    mReasonLabel:"Powód korekty (zapisywany w audycie)",
+    mReasonPh:"np. usprawiedliwienie od rodzica z 15.04.2026, choroba",
+    cancel:"Anuluj",confirmCorrect:"Potwierdzam korektę",
+    toastCase:"Otwieram kartę: Piotr Kowalski",toastCorrected:"Zapisano korektę — przeliczam frekwencję i prawa do odrobienia"
+  },
+  "en-GB":{
+    "brand.name":"Delfin Swim Club","brand.role":"Organiser panel",
+    "ctx.mode":"Mode","ctx.facility":"Facility","ctx.lang":"Language",
+    "mode.classes":"Classes","mode.events":"Events","facility.all":"All",
+    navSection:"Classes",
+    navDash:"Dashboard",navGroups:"Groups",navSchedule:"Schedule",navEnrol:"Enrolment",navParticipants:"Participants",
+    navSkills:"Skill tree",navAttendance:"Attendance",navStaff:"Staff",
+    navPayments:"Payments",navReports:"Reports",navSettings:"Settings",
+    stateLabel:"State preview",stFilled:"Populated",stEmpty:"No data",
+    crumb:"Classes · Attendance",pageTitle:"Attendance & frequency",updated:"Updated",
+    grpDelfiny:"Group: Delfiny (P2)",grpAll:"All groups",grpRekiny:"Rekiny (P3)",
+    perSem:"Period: Spring term",perMonth:"Last month",perCustom:"Custom range…",export:"Export",
+    grpChartTitle:"Group attendance over time",grpChartSub:"Delfiny (P2) · 10 weeks",
+    chartLabel:"Attendance chart for the Delfiny group across 10 consecutive weeks of the spring term",
+    chartTableCap:"Chart data — weekly attendance",chartWeek:"Week",chartPct:"Attendance",
+    avgLabel:"Average attendance:",cancelledLabel:"Sessions cancelled by venue:",presentLabel:"Present today:",
+    cancelHint:"Sessions cancelled by the venue are counted separately and do not lower a child's trend — they are not the participant's absence.",
+    childTitle:"Children — trend and drop-out risk",childSub:"Risk score derived from attendance trend",
+    thChild:"Child",thTrend:"Trend",thAbsence:"Absences",thMakeup:"Make-up entitlement",thRisk:"Risk",
+    trDown:"falling",trFlat:"steady",trRisk:"at risk",trUp:"rising",excused:"exc.",availTo:"available until",avail:"available",
+    riskHi:"high",riskMid:"medium",riskLo:"low",correct:"Edit record",
+    openCase:"Open case needing action",filter:"Filter period / group",remind:"Reminder to parent",markExcused:"Mark as excused",
+    exportHint:"Export without a selected range covers the current term — we'll tell you before download. Record edits are saved as a change, not a deletion.",
+    emptyTitle:"No attendance data for this group",
+    emptyBody:"No sessions have taken place yet for this group in the chosen period. The chart and trends will appear after the first attendance list. You can switch to the schedule or pick a different period.",
+    emptyGoSchedule:"Go to schedule",emptyOtherPeriod:"Pick another period",
+    mTitle:"Editing an attendance record from a while ago",mDate:"Session of",mDaysAgo:"days ago",
+    mFrom:"From",mAbsent:"Absent",mTo:"To",mExcused:"Excused",
+    mWarn:"This change rolls back into attendance statistics and may unlock a make-up entitlement. The risk score will be recalculated. The action is saved to change history with its author.",
+    mReasonLabel:"Reason for edit (saved in audit log)",
+    mReasonPh:"e.g. parental note from 15/04/2026, illness",
+    cancel:"Cancel",confirmCorrect:"Confirm edit",
+    toastCase:"Opening profile: Piotr Kowalski",toastCorrected:"Edit saved — recalculating attendance and make-up entitlements"
+  }
+};
+const FALLBACK="en-GB";
+const FACILITY_REGION="pl-PL";
+const RTL=new Set(["ar","he","fa","ur"]);
+let lang="pl-PL";
+
+function t(k){const d=I18N[lang]||{};if(k in d)return d[k];const f=I18N[FALLBACK]||{};return (k in f)?f[k]:k;}
+function fmtDate(iso){const d=new Date(iso+"T00:00:00");return new Intl.DateTimeFormat(lang,{day:"2-digit",month:"2-digit",year:"numeric"}).format(d);}
+function fmtPct(v){return new Intl.NumberFormat(lang,{style:"percent",maximumFractionDigits:0}).format(v/100);}
+
+function applyLang(){
+  const dict=I18N[lang]||I18N[FALLBACK];
+  document.documentElement.lang=lang.split("-")[0];
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const k=el.getAttribute("data-i18n");
+    if(k==="brand.name"){el.firstChild.textContent=t(k);return;}
+    if(dict[k]!==undefined)el.textContent=dict[k];
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach(n=>n.setAttribute("placeholder",t(n.getAttribute("data-i18n-ph"))));
+  document.querySelectorAll("[data-fmt-date]").forEach(el=>{el.textContent=fmtDate(el.getAttribute("data-fmt-date"));});
+}
+function toast(key){const t=document.getElementById("toast");document.getElementById("toastMsg").textContent=I18N[lang][key]||key;t.classList.add("show");clearTimeout(window.__tt);window.__tt=setTimeout(()=>t.classList.remove("show"),2600);}
+
+// chart + sr-only data table
+const data=[72,80,76,84,68,88,79,90,74,82];
+const chart=document.getElementById("chart");
+const tbody=document.getElementById("chartDataBody");
+data.forEach((v,i)=>{
+  const b=document.createElement("div");b.className="bar";
+  const c=document.createElement("div");c.className="col";c.style.height=v+"%";
+  const l=document.createElement("div");l.className="lbl";l.textContent=v+"%";
+  b.appendChild(c);b.appendChild(l);chart.appendChild(b);
+  const tr=document.createElement("tr");
+  tr.innerHTML="<td>"+(i+1)+"</td><td>"+v+"%</td>";
+  tbody.appendChild(tr);
+});
+
+document.getElementById("lang").addEventListener("change",e=>{lang=e.target.value;applyLang();});
+document.getElementById("openCase").addEventListener("click",()=>toast("toastCase"));
+
+// state: filled / empty
+const stFilled=document.getElementById("state-filled");
+const stEmpty=document.getElementById("state-empty");
+const bF=document.getElementById("btnFilled"),bE=document.getElementById("btnEmpty");
+function setState(s){
+  stFilled.classList.toggle("hidden",s!=="filled");
+  stEmpty.classList.toggle("hidden",s!=="empty");
+  bF.setAttribute("aria-pressed",s==="filled");
+  bE.setAttribute("aria-pressed",s==="empty");
+}
+bF.addEventListener("click",()=>setState("filled"));
+bE.addEventListener("click",()=>setState("empty"));
+
+// late-correction modal triggered by row buttons
+const scrim=document.getElementById("scrim");
+document.querySelectorAll(".rowbtn").forEach(b=>b.addEventListener("click",()=>scrim.classList.remove("hidden")));
+document.getElementById("cancelM").addEventListener("click",()=>scrim.classList.add("hidden"));
+document.getElementById("confirmM").addEventListener("click",()=>{
+  scrim.classList.add("hidden");
+  toast("toastCorrected");
+});
+
+applyLang();
+</script>
+</body>
+</html>

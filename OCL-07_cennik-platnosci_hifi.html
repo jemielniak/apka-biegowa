@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCL-07 · Cennik i model płatności</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500..700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#1a1f2e;--accent:#4f46e5;
+  --color-success:#15803d;--color-warning:#b45309;--color-error:#dc2626;--color-info:#2563eb;
+  --paper:#f6f8fc;--surface-1:#ffffff;--surface-2:#eef1f8;--surface-3:#e3e7f1;--hairline:#d5dae6;
+  --text-strong:#1a1f2e;--text:#3b4252;--text-muted:#6b7385;--on-accent:#ffffff;
+  --font-display:"Space Grotesk", system-ui, sans-serif;--font-body:"Source Sans 3", system-ui;
+  --u:4px;--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:12px;--shadow:0 8px 24px -16px rgba(26,31,46,.30);--tap:44px;--rail-w:228px;
+}
+*{box-sizing:border-box;}html,body{margin:0;padding:0;}
+body{font-family:var(--font-body);background:var(--paper);color:var(--text);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;}
+.tnum{font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-family:var(--font-display);color:var(--text-strong);margin:0;font-weight:600;letter-spacing:-.01em;}
+button{font-family:var(--font-body);cursor:pointer;}
+
+.topbar{position:sticky;top:0;z-index:40;background:var(--surface-1);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--s4);padding:var(--s3) var(--s5);min-height:60px;}
+.logo{display:flex;align-items:center;gap:var(--s3);font-family:var(--font-display);font-weight:700;color:var(--text-strong);white-space:nowrap;}
+.logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(150deg,var(--accent),#3730a3);display:grid;place-items:center;color:#fff;font-weight:700;}
+.logo small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--text-muted);}
+.topbar .spacer{flex:1;}
+.ctx{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;}
+.field{display:flex;flex-direction:column;gap:2px;}
+.field label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600;}
+select{font-family:var(--font-body);font-size:14px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:7px 28px 7px 10px;min-height:36px;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7385' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 9px center;}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.acct{width:36px;height:36px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface-3);display:grid;place-items:center;font-weight:600;color:var(--text-strong);font-size:13px;}
+
+.shell{display:flex;min-height:calc(100vh - 60px);}
+.rail{width:var(--rail-w);flex:0 0 var(--rail-w);background:var(--surface-1);border-right:1px solid var(--hairline);padding:var(--s4) var(--s3);position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;}
+.rail .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700;padding:var(--s3) var(--s3) var(--s2);}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:9px;color:var(--text);text-decoration:none;font-weight:500;font-size:14.5px;margin-bottom:2px;min-height:40px;position:relative;}
+.nav-item:hover{background:var(--surface-2);}
+.nav-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600;}
+.nav-item .badge{margin-left:auto;background:var(--color-error);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center;}
+
+.main{flex:1;min-width:0;}
+.wrap{max-width:1280px;margin:0 auto;padding:var(--s6) var(--s6) var(--s10);}
+.demobar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--hairline);border-radius:10px;padding:var(--s2) var(--s3);margin-bottom:var(--s5);}
+.demobar .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:700;}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:8px;padding:2px;}
+.seg button{border:0;background:transparent;color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;min-height:32px;}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);}
+
+.pagehead{margin-bottom:var(--s4);}
+.pagehead h1{font-size:24px;}
+.pagehead .sub{color:var(--text-muted);font-size:13.5px;margin-top:2px;}
+
+.cols{display:grid;grid-template-columns:1fr 400px;gap:var(--s4);align-items:start;}
+.panel{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.p-head{display:flex;align-items:center;justify-content:space-between;padding:var(--s4);border-bottom:1px solid var(--hairline);}
+.p-head h2{font-size:15px;}
+.p-body{padding:var(--s4);}
+
+.plan{display:flex;align-items:center;gap:var(--s3);padding:var(--s3);border:1px solid var(--hairline);border-radius:10px;margin-bottom:var(--s3);cursor:pointer;}
+.plan:hover{background:var(--surface-2);}
+.plan.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent);}
+.plan.inactive{opacity:.6;}
+.plan .pmain{flex:1;min-width:0;}
+.plan .pn{font-weight:700;color:var(--text-strong);}
+.plan .pt{font-size:12.5px;color:var(--text-muted);}
+.plan .pp{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong);font-variant-numeric:tabular-nums;}
+.toggle input{width:42px;height:25px;appearance:none;background:var(--surface-3);border-radius:999px;position:relative;cursor:pointer;flex:0 0 auto;transition:background .15s;}
+.toggle input:checked{background:var(--color-success);}
+.toggle input::after{content:"";position:absolute;width:19px;height:19px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.toggle input:checked::after{left:20px;}
+.toggle input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.methods{margin-top:var(--s4);}
+.methods .ml{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;margin-bottom:8px;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.mchip{font-size:12.5px;font-weight:600;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:6px 11px;display:inline-flex;align-items:center;gap:6px;}
+.mchip .d{width:7px;height:7px;border-radius:50%;background:var(--color-success);}
+
+/* calculation card */
+.calc{margin-top:var(--s4);background:var(--surface-2);border-radius:10px;padding:var(--s4);}
+.calc .ct{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;margin-bottom:8px;}
+.calc .line{display:flex;justify-content:space-between;font-size:14px;padding:4px 0;}
+.calc .line .who{color:var(--text);}
+.calc .line .amt{font-weight:600;color:var(--text-strong);font-variant-numeric:tabular-nums;}
+.calc .line.neg .amt{color:var(--color-error);}
+.calc .total{display:flex;justify-content:space-between;border-top:1px solid var(--hairline);margin-top:8px;padding-top:8px;font-weight:700;}
+.calc .total .amt{font-family:var(--font-display);font-size:18px;color:var(--text-strong);font-variant-numeric:tabular-nums;}
+.calc .note{font-size:12px;color:var(--text-muted);margin-top:8px;}
+
+/* form */
+.f{display:flex;flex-direction:column;gap:6px;margin-bottom:var(--s4);}
+.f label{font-size:12.5px;font-weight:600;color:var(--text-strong);}
+.f .help{font-size:12px;color:var(--text-muted);}
+.f input[type=text],.f input[type=number],.f select{width:100%;font-family:var(--font-body);font-size:14.5px;color:var(--text-strong);background:var(--surface-1);border:1px solid var(--hairline);border-radius:9px;padding:10px 12px;min-height:var(--tap);}
+.f select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7385' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;}
+.f input:focus-visible,.f select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.f input[aria-invalid="true"]{border-color:var(--color-error);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);}
+.suffix{display:flex;align-items:center;gap:8px;}.suffix .u{font-size:13px;color:var(--text-muted);white-space:nowrap;}
+
+.disc{border:1px solid var(--hairline);border-radius:10px;padding:var(--s3);margin-bottom:var(--s4);}
+.disc .dt{font-size:12.5px;font-weight:700;color:var(--text-strong);margin-bottom:8px;}
+.drow{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.drow .dl{flex:1;font-size:14px;}
+.drow input{width:78px;text-align:center;font-variant-numeric:tabular-nums;border:1px solid var(--hairline);border-radius:8px;padding:8px;min-height:40px;font-family:var(--font-body);font-size:14px;}
+.drow input[aria-invalid="true"]{border-color:var(--color-error);}
+.drow .pc{color:var(--text-muted);}
+
+.vmsg{display:none;align-items:flex-start;gap:8px;font-size:13px;border-radius:9px;padding:10px 12px;margin-bottom:var(--s2);line-height:1.45;}
+.vmsg.show{display:flex;}
+.vmsg.err{background:color-mix(in srgb,var(--color-error) 9%,transparent);color:var(--color-error);border:1px solid color-mix(in srgb,var(--color-error) 35%,transparent);}
+.vmsg.warn{background:color-mix(in srgb,var(--color-warning) 11%,transparent);color:var(--color-warning);border:1px solid color-mix(in srgb,var(--color-warning) 35%,transparent);}
+
+.foot{display:flex;flex-direction:column;gap:var(--s3);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;font-weight:600;font-size:14px;min-height:var(--tap);padding:0 16px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);}
+.btn:hover{background:var(--surface-2);}.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 16px -8px var(--accent);}
+.btn-primary:hover{background:#4338ca;}.btn-block{width:100%;}.btn-sm{min-height:38px;font-size:13px;padding:0 12px;}
+.btn-danger{color:var(--color-error);border-color:color-mix(in srgb,var(--color-error) 45%,transparent);background:transparent;}
+.btn-danger:hover{background:color-mix(in srgb,var(--color-error) 8%,transparent);}
+.sec-actions{display:flex;gap:var(--s2);flex-wrap:wrap;}.sec-actions .btn{flex:1 1 auto;}
+.danger-note{font-size:11.5px;color:var(--text-muted);margin-top:6px;}
+
+/* modal for active price change */
+.scrim{position:fixed;inset:0;background:rgba(26,31,46,.45);display:none;align-items:center;justify-content:center;z-index:70;padding:var(--s4);}
+.scrim.show{display:flex;}
+.modal{background:var(--surface-1);border-radius:var(--radius);box-shadow:0 24px 60px -20px rgba(0,0,0,.5);max-width:460px;width:100%;padding:var(--s6);}
+.modal h3{font-size:18px;margin-bottom:var(--s2);}.modal p{color:var(--text-muted);margin:0 0 var(--s4);}
+.choice{display:flex;flex-direction:column;gap:var(--s2);margin-bottom:var(--s4);}
+.choice label{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--hairline);border-radius:10px;cursor:pointer;font-size:14px;}
+.choice label:hover{background:var(--surface-2);}.choice input{margin-top:3px;accent-color:var(--accent);}
+.m-actions{display:flex;gap:var(--s3);justify-content:flex-end;}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--brand-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);transition:opacity .25s,transform .25s;z-index:80;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}.toast.ok{background:var(--color-success);}
+
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+@media (max-width:1080px){:root{--rail-w:64px;}.nav-item span.t{display:none;}.nav-item{justify-content:center;}.rail .grp{display:none;}.nav-item .badge{position:absolute;margin:0;transform:translate(14px,-12px);}.cols{grid-template-columns:1fr;}}
+@media (max-width:640px){.rail{display:none;}.ctx .field.hide-sm{display:none;}}
+</style>
+</head>
+<body data-view="filled">
+
+<header class="topbar">
+  <div class="logo"><span class="mark">D</span><span data-i18n="brand.name">Klub Pływacki Delfin<small data-i18n="brand.role">Panel organizatora</small></span></div>
+  <div class="spacer"></div>
+  <div class="ctx">
+    <div class="field"><label for="mode" data-i18n="ctx.mode">Tryb</label><select id="mode"><option data-i18n="mode.classes">Zajęcia</option><option data-i18n="mode.events">Zawody</option></select></div>
+    <div class="field hide-sm"><label for="facility" data-i18n="ctx.facility">Placówka</label><select id="facility"><option>Klub Pływacki Delfin</option><option>Szkoła Pływania Nurek</option></select></div>
+    <div class="field"><label for="lang" data-i18n="ctx.lang">Język</label><select id="lang"><option value="pl-PL">Polski</option><option value="en-GB">English</option></select></div>
+    <div class="acct">JN</div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Nawigacja panelu">
+    <div class="grp" data-i18n="nav.section">Zajęcia</div>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="t" data-i18n="nav.dashboard">Pulpit</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="18" cy="9" r="2"/></svg><span class="t" data-i18n="nav.groups">Grupy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span class="t" data-i18n="nav.schedule">Grafik</span></a>
+    <a class="nav-item active" href="#" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span class="t" data-i18n="nav.pricing">Cennik</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="t" data-i18n="nav.participants">Uczestnicy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span class="t" data-i18n="nav.payments">Płatności</span><span class="badge tnum">4</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span class="t" data-i18n="nav.settings">Ustawienia</span></a>
+  </nav>
+
+  <main class="main">
+    <div class="wrap">
+      <div class="demobar" role="group" aria-label="Podgląd stanu makiety">
+        <span class="lbl" data-i18n="demo.label">Podgląd stanu</span>
+        <div class="seg">
+          <button id="st-filled" aria-pressed="true" data-i18n="demo.filled">Wypełniony</button>
+          <button id="st-belowzero" aria-pressed="false" data-i18n="demo.belowzero">Zniżki poniżej zera</button>
+        </div>
+      </div>
+
+      <div class="pagehead">
+        <h1 data-i18n="page.title">Cennik i model płatności</h1>
+        <div class="sub" data-i18n="page.sub">Ceny oderwane od liczby dzieci: abonament, karnet, semestr — ze zniżkami rodzinnymi. Rodzic od razu widzi kwotę brutto.</div>
+      </div>
+
+      <div class="cols">
+        <!-- LIST + methods + calc -->
+        <section class="panel">
+          <div class="p-head"><h2 data-i18n="list.title">Plany cenowe</h2><button class="btn btn-sm" id="addPlan" data-i18n="action.add">+ Dodaj plan</button></div>
+          <div class="p-body" id="planList"></div>
+          <div class="p-body" style="padding-top:0">
+            <div class="methods">
+              <div class="ml" data-i18n="methods.title">Metody płatności placówki</div>
+              <div class="chips">
+                <span class="mchip"><span class="d"></span>Przelewy24</span>
+                <span class="mchip"><span class="d"></span>PayU</span>
+                <span class="mchip"><span class="d"></span>Stripe</span>
+                <span class="mchip"><span class="d"></span>BLIK</span>
+                <span class="mchip"><span class="d"></span><span data-i18n="methods.cards">karty</span></span>
+              </div>
+            </div>
+            <div class="calc" aria-live="polite">
+              <div class="ct" data-i18n="calc.title">Kalkulacja: rodzina z dwójką dzieci</div>
+              <div class="line"><span class="who" data-i18n="calc.child1">1. dziecko</span><span class="amt" id="calc1">120,00 zł</span></div>
+              <div class="line" id="calc2row"><span class="who" id="calc2who">2. dziecko (−10%)</span><span class="amt" id="calc2">108,00 zł</span></div>
+              <div class="total"><span data-i18n="calc.total">Razem / mies.</span><span class="amt" id="calcTotal">228,00 zł</span></div>
+              <div class="note" data-i18n="calc.note">Koszt operatora nie rośnie z liczbą dzieci — to abonament placówki, nie opłata od główki.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- FORM -->
+        <section class="panel">
+          <div class="p-head"><h2 id="formTitle" data-i18n="form.title">Plan cenowy</h2></div>
+          <div class="p-body">
+            <div class="f">
+              <label for="f-name" data-i18n="f.name">Nazwa planu (widoczna dla rodzica)</label>
+              <input type="text" id="f-name" value="Abonament miesięczny">
+            </div>
+            <div class="f">
+              <label for="f-type" data-i18n="f.type">Typ rozliczenia</label>
+              <select id="f-type">
+                <option value="month" data-i18n="type.month">Abonament miesięczny</option>
+                <option value="pass" data-i18n="type.pass">Karnet na wejścia</option>
+                <option value="term" data-i18n="type.term">Opłata semestralna</option>
+              </select>
+            </div>
+            <div class="row2">
+              <div class="f"><label for="f-net" data-i18n="f.net">Cena netto</label><div class="suffix"><input type="number" id="f-net" min="0" value="97.56"><span class="u">zł</span></div></div>
+              <div class="f"><label for="f-vat" data-i18n="f.vat">VAT</label><div class="suffix"><input type="number" id="f-vat" min="0" value="23"><span class="u">%</span></div></div>
+            </div>
+            <div class="f"><label data-i18n="f.gross">Cena brutto (widoczna dla konsumenta)</label><div class="suffix"><span class="amt" id="grossVal" style="font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--text-strong)">120,00 zł</span></div></div>
+            <div class="f">
+              <label for="f-group" data-i18n="f.group">Przypisana grupa lub turnus</label>
+              <select id="f-group"><option value="all" data-i18n="group.all">Wszystkie grupy</option><option>Delfiny</option><option>Rekiny</option><option value="" data-i18n="group.none">— brak (plan ukryty) —</option></select>
+            </div>
+
+            <div class="disc">
+              <div class="dt" data-i18n="disc.title">Zniżki rodzinne</div>
+              <div class="drow"><span class="dl" data-i18n="disc.c2">2. dziecko</span><input type="number" id="d2" value="10" min="0"><span class="pc">%</span></div>
+              <div class="drow"><span class="dl" data-i18n="disc.c3">3. dziecko</span><input type="number" id="d3" value="20" min="0"><span class="pc">%</span></div>
+            </div>
+
+            <div class="vmsg err" id="v-net"><span>⚠</span><span data-i18n="v.net">Cena nie może być ujemna.</span></div>
+            <div class="vmsg err" id="v-belowzero"><span>⚠</span><span data-i18n="v.belowzero">Suma zniżek przekracza cenę — kwota końcowa byłaby poniżej zera. Zmniejsz zniżki, żeby zapisać plan.</span></div>
+            <div class="vmsg warn" id="v-nogroup"><span>⚠</span><span data-i18n="v.nogroup">Plan bez przypisanej grupy nie będzie widoczny przy zapisie dziecka.</span></div>
+
+            <div class="foot">
+              <button class="btn btn-primary btn-block" id="savePlan" data-i18n="action.save">Zapisz plan cenowy</button>
+              <div class="sec-actions">
+                <button class="btn btn-sm" data-act="clone" data-i18n="action.clone">Sklonuj plan</button>
+                <button class="btn btn-sm" data-act="calc" data-i18n="action.calc">Podgląd kalkulacji</button>
+                <button class="btn btn-sm" data-act="deact" data-i18n="action.deact">Dezaktywuj</button>
+              </div>
+              <div>
+                <button class="btn btn-danger btn-block btn-sm" id="delPlan" data-i18n="action.delete">Usuń plan</button>
+                <p class="danger-note" data-i18n="delete.note">Usunięcie tylko jeśli żaden aktywny zapis nie używa planu. W innym wypadku archiwizacja z zachowaniem historii rozliczeń.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- active price change modal -->
+<div class="scrim" id="priceScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pm-t">
+    <h3 id="pm-t" data-i18n="price.title">Zmieniasz cenę aktywnego planu</h3>
+    <p data-i18n="price.body">Plan „Abonament miesięczny" ma trwające abonamenty. Czego ma dotyczyć nowa cena?</p>
+    <div class="choice">
+      <label><input type="radio" name="pscope" value="new" checked><span data-i18n="price.new">Tylko nowe zapisy — trwające abonamenty bez zmian</span></label>
+      <label><input type="radio" name="pscope" value="all"><span data-i18n="price.all">Także trwające abonamenty od następnego cyklu</span></label>
+    </div>
+    <div class="m-actions">
+      <button class="btn btn-sm" id="pm-close" data-i18n="action.back">Wróć</button>
+      <button class="btn btn-primary btn-sm" id="pm-confirm" data-i18n="price.confirm">Zapisz cenę</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "brand.name":"Klub Pływacki Delfin","brand.role":"Panel organizatora",
+  "ctx.mode":"Tryb","ctx.facility":"Placówka","ctx.lang":"Język","mode.classes":"Zajęcia","mode.events":"Zawody",
+  "nav.section":"Zajęcia","nav.dashboard":"Pulpit","nav.groups":"Grupy","nav.schedule":"Grafik","nav.pricing":"Cennik","nav.participants":"Uczestnicy","nav.payments":"Płatności","nav.settings":"Ustawienia",
+  "demo.label":"Podgląd stanu","demo.filled":"Wypełniony","demo.belowzero":"Zniżki poniżej zera",
+  "page.title":"Cennik i model płatności","page.sub":"Ceny oderwane od liczby dzieci: abonament, karnet, semestr — ze zniżkami rodzinnymi. Rodzic od razu widzi kwotę brutto.",
+  "list.title":"Plany cenowe","action.add":"+ Dodaj plan",
+  "methods.title":"Metody płatności placówki","methods.cards":"karty",
+  "calc.title":"Kalkulacja: rodzina z dwójką dzieci","calc.child1":"1. dziecko","calc.total":"Razem / mies.","calc.note":"Koszt operatora nie rośnie z liczbą dzieci — to abonament placówki, nie opłata od główki.",
+  "form.title":"Plan cenowy","f.name":"Nazwa planu (widoczna dla rodzica)","f.type":"Typ rozliczenia",
+  "type.month":"Abonament miesięczny","type.pass":"Karnet na wejścia","type.term":"Opłata semestralna",
+  "f.net":"Cena netto","f.vat":"VAT","f.gross":"Cena brutto (widoczna dla konsumenta)","f.group":"Przypisana grupa lub turnus","group.all":"Wszystkie grupy","group.none":"— brak (plan ukryty) —",
+  "disc.title":"Zniżki rodzinne","disc.c2":"2. dziecko","disc.c3":"3. dziecko",
+  "v.net":"Cena nie może być ujemna.","v.belowzero":"Suma zniżek przekracza cenę — kwota końcowa byłaby poniżej zera. Zmniejsz zniżki, żeby zapisać plan.","v.nogroup":"Plan bez przypisanej grupy nie będzie widoczny przy zapisie dziecka.",
+  "action.save":"Zapisz plan cenowy","action.clone":"Sklonuj plan","action.calc":"Podgląd kalkulacji","action.deact":"Dezaktywuj","action.activate":"Aktywuj","action.delete":"Usuń plan","action.back":"Wróć",
+  "delete.note":"Usunięcie tylko jeśli żaden aktywny zapis nie używa planu. W innym wypadku archiwizacja z zachowaniem historii rozliczeń.",
+  "price.title":"Zmieniasz cenę aktywnego planu","price.body":"Plan „Abonament miesięczny” ma trwające abonamenty. Czego ma dotyczyć nowa cena?","price.new":"Tylko nowe zapisy — trwające abonamenty bez zmian","price.all":"Także trwające abonamenty od następnego cyklu","price.confirm":"Zapisz cenę",
+  "calc.c2who":"2. dziecko (−{p}%)",
+  "toast.saved":"Zapisano plan cenowy","toast.clone":"Sklonowano plan","toast.calc":"Podgląd kalkulacji dla rodziny","toast.deact":"Dezaktywowano plan","toast.act":"Aktywowano plan","toast.del":"Usunięto plan — historia rozliczeń zachowana","toast.pricenew":"Zapisano cenę dla nowych zapisów","toast.priceall":"Zapisano cenę dla nowych i trwających abonamentów",
+  "active":"aktywny","inactive":"nieaktywny"
+ },
+ "en-GB":{
+  "brand.name":"Delfin Swim Club","brand.role":"Organiser panel",
+  "ctx.mode":"Mode","ctx.facility":"Facility","ctx.lang":"Language","mode.classes":"Classes","mode.events":"Events",
+  "nav.section":"Classes","nav.dashboard":"Dashboard","nav.groups":"Groups","nav.schedule":"Schedule","nav.pricing":"Pricing","nav.participants":"Participants","nav.payments":"Payments","nav.settings":"Settings",
+  "demo.label":"State preview","demo.filled":"Populated","demo.belowzero":"Discounts below zero",
+  "page.title":"Pricing and payment model","page.sub":"Prices detached from the number of children: subscription, pass, term — with family discounts. Parents see the gross amount up front.",
+  "list.title":"Pricing plans","action.add":"+ Add plan",
+  "methods.title":"Facility payment methods","methods.cards":"cards",
+  "calc.title":"Calculation: a family with two children","calc.child1":"1st child","calc.total":"Total / month","calc.note":"Operator cost does not grow with the number of children — it's a facility subscription, not a per-head fee.",
+  "form.title":"Pricing plan","f.name":"Plan name (visible to parents)","f.type":"Billing type",
+  "type.month":"Monthly subscription","type.pass":"Entry pass","type.term":"Term fee",
+  "f.net":"Net price","f.vat":"VAT","f.gross":"Gross price (visible to the consumer)","f.group":"Assigned group or session","group.all":"All groups","group.none":"— none (plan hidden) —",
+  "disc.title":"Family discounts","disc.c2":"2nd child","disc.c3":"3rd child",
+  "v.net":"The price cannot be negative.","v.belowzero":"The discounts exceed the price — the final amount would fall below zero. Reduce the discounts to save the plan.","v.nogroup":"A plan with no assigned group will not be visible at enrolment.",
+  "action.save":"Save pricing plan","action.clone":"Clone plan","action.calc":"Calculation preview","action.deact":"Deactivate","action.activate":"Activate","action.delete":"Delete plan","action.back":"Back",
+  "delete.note":"Deletion only if no active enrolment uses the plan. Otherwise archiving with billing history kept.",
+  "price.title":"You are changing the price of an active plan","price.body":"The “Monthly subscription” plan has ongoing subscriptions. What should the new price cover?","price.new":"New enrolments only — ongoing subscriptions unchanged","price.all":"Also ongoing subscriptions from the next cycle","price.confirm":"Save price",
+  "calc.c2who":"2nd child (−{p}%)",
+  "toast.saved":"Pricing plan saved","toast.clone":"Plan cloned","toast.calc":"Calculation preview for a family","toast.deact":"Plan deactivated","toast.act":"Plan activated","toast.del":"Plan deleted — billing history kept","toast.pricenew":"Price saved for new enrolments","toast.priceall":"Price saved for new and ongoing subscriptions",
+  "active":"active","inactive":"inactive"
+ }
+};
+const FALLBACK="en-GB",FACILITY_REGION="pl-PL";let lang="pl-PL";
+const RTL=new Set(["ar","he","fa","ur"]);
+function t(k){const d=I18N[lang]||{};if(k in d)return d[k];const f=I18N[FALLBACK]||{};return (k in f)?f[k]:k;}
+function money(v){return new Intl.NumberFormat(FACILITY_REGION,{style:"currency",currency:"PLN"}).format(v);}
+
+let PLANS=[
+ {id:1,name:"Abonament miesięczny",type:"month",net:97.56,vat:23,group:"all",active:true,d2:10,d3:20},
+ {id:2,name:"Karnet 8 wejść",type:"pass",net:130.08,vat:23,group:"all",active:true,d2:10,d3:20},
+ {id:3,name:"Opłata semestralna",type:"term",net:447.15,vat:23,group:"",active:false,d2:10,d3:20}
+];
+let selId=1, belowZero=false;
+function gross(p){return p.net*(1+p.vat/100);}
+
+function renderList(){
+  document.getElementById("planList").innerHTML=PLANS.map(p=>
+    `<div class="plan ${p.active?'':'inactive'} ${p.id===selId?'selected':''}" data-id="${p.id}" tabindex="0">
+      <label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" ${p.active?'checked':''} data-tog="${p.id}" aria-label="Aktywny"></label>
+      <div class="pmain"><div class="pn">${p.name}</div><div class="pt">${t("type."+p.type)} · ${p.active?t("active"):t("inactive")}</div></div>
+      <div class="pp">${money(gross(p))}</div></div>`).join("");
+  document.querySelectorAll(".plan").forEach(el=>{
+    el.addEventListener("click",()=>selectPlan(+el.dataset.id));
+    el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectPlan(+el.dataset.id);}});
+  });
+  document.querySelectorAll("[data-tog]").forEach(c=>c.addEventListener("change",e=>{
+    const p=PLANS.find(x=>x.id===+c.dataset.tog);p.active=e.target.checked;renderList();toast(t(p.active?"toast.act":"toast.deact"),true);
+  }));
+}
+
+function selectPlan(id){
+  selId=id;const p=PLANS.find(x=>x.id===id);if(!p)return;
+  document.getElementById("formTitle").textContent=p.name;
+  document.getElementById("f-name").value=p.name;
+  document.getElementById("f-type").value=p.type;
+  document.getElementById("f-net").value=p.net;
+  document.getElementById("f-vat").value=p.vat;
+  document.getElementById("f-group").value=p.group;
+  document.getElementById("d2").value=p.d2;
+  document.getElementById("d3").value=p.d3;
+  renderList();validate();
+}
+
+function readForm(){
+  return {net:+document.getElementById("f-net").value,vat:+document.getElementById("f-vat").value,
+    group:document.getElementById("f-group").value,d2:+document.getElementById("d2").value,d3:+document.getElementById("d3").value};
+}
+
+function validate(){
+  const f=readForm();
+  const grossV=f.net*(1+f.vat/100);
+  document.getElementById("grossVal").textContent=money(isFinite(grossV)?grossV:0);
+  // calc family of 2
+  const c1=grossV, c2=grossV*(1-f.d2/100);
+  document.getElementById("calc1").textContent=money(c1);
+  document.getElementById("calc2who").textContent=t("calc.c2who").replace("{p}",f.d2);
+  document.getElementById("calc2").textContent=money(c2);
+  document.getElementById("calcTotal").textContent=money(c1+Math.max(c2,0));
+  document.getElementById("calc2row").classList.toggle("neg",c2<0);
+  // validations
+  const vNet=f.net<0;
+  const vBelow=(f.d2>100||f.d3>100)||(c2<0); // any discount drives a child below zero
+  const vNoGroup=f.group==="";
+  document.getElementById("v-net").classList.toggle("show",vNet);
+  document.getElementById("v-belowzero").classList.toggle("show",vBelow);
+  document.getElementById("v-nogroup").classList.toggle("show",vNoGroup&&!vBelow);
+  document.getElementById("f-net").setAttribute("aria-invalid",vNet);
+  document.getElementById("d2").setAttribute("aria-invalid",f.d2>100);
+  document.getElementById("d3").setAttribute("aria-invalid",f.d3>100);
+  document.getElementById("savePlan").disabled=(vNet||vBelow);
+  return {vNet,vBelow,vNoGroup};
+}
+
+function applyLang(){
+  document.documentElement.lang=lang.split("-")[0];
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(n=>{
+    const k=n.getAttribute("data-i18n");
+    if(k==="brand.name"){n.firstChild.textContent=t(k);return;}
+    n.textContent=t(k);
+  });
+  renderList();selectPlan(selId);
+}
+function toast(msg,ok){const el=document.getElementById("toast");el.textContent=msg;el.className="toast show"+(ok?" ok":"");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2500);}
+
+document.getElementById("lang").addEventListener("change",e=>{lang=e.target.value;applyLang();});
+["f-net","f-vat","f-group","d2","d3"].forEach(id=>document.getElementById(id).addEventListener("input",validate));
+document.getElementById("f-type").addEventListener("change",validate);
+
+document.getElementById("savePlan").addEventListener("click",()=>{
+  const v=validate();if(v.vNet||v.vBelow)return;
+  const p=PLANS.find(x=>x.id===selId);
+  // changing price of an active plan asks scope
+  if(p&&p.active){document.getElementById("priceScrim").classList.add("show");return;}
+  toast(t("toast.saved"),true);
+});
+document.getElementById("pm-close").addEventListener("click",()=>document.getElementById("priceScrim").classList.remove("show"));
+document.getElementById("pm-confirm").addEventListener("click",()=>{
+  const scope=document.querySelector('input[name="pscope"]:checked').value;
+  document.getElementById("priceScrim").classList.remove("show");
+  toast(t(scope==="new"?"toast.pricenew":"toast.priceall"),true);
+});
+document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s)s.classList.remove("show");}));
+
+document.getElementById("addPlan").addEventListener("click",()=>{
+  const id=Math.max(...PLANS.map(p=>p.id))+1;
+  PLANS.push({id,name:lang==="pl-PL"?"Nowy plan":"New plan",type:"month",net:0,vat:23,group:"all",active:false,d2:10,d3:20});
+  selectPlan(id);
+});
+document.querySelectorAll('.sec-actions [data-act]').forEach(b=>b.addEventListener("click",()=>{
+  const a=b.dataset.act;const p=PLANS.find(x=>x.id===selId);
+  if(a==="clone")toast(t("toast.clone"),true);
+  else if(a==="calc")toast(t("toast.calc"));
+  else if(a==="deact"){p.active=!p.active;renderList();toast(t(p.active?"toast.act":"toast.deact"),true);}
+}));
+document.getElementById("delPlan").addEventListener("click",()=>{
+  PLANS=PLANS.filter(p=>p.id!==selId);if(PLANS.length){selId=PLANS[0].id;selectPlan(selId);}renderList();toast(t("toast.del"),true);
+});
+
+document.getElementById("st-filled").addEventListener("click",()=>setView("filled"));
+document.getElementById("st-belowzero").addEventListener("click",()=>setView("belowzero"));
+function setView(v){
+  document.getElementById("st-filled").setAttribute("aria-pressed",v==="filled");
+  document.getElementById("st-belowzero").setAttribute("aria-pressed",v==="belowzero");
+  selectPlan(1);
+  if(v==="belowzero"){
+    // stage: discount drives the 2nd child below zero
+    document.getElementById("d2").value=110;
+    validate();
+    document.getElementById("v-belowzero").scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+
+// init
+applyLang();
+selectPlan(1);
+</script>
+</body>
+</html>

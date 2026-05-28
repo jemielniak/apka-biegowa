@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INS-04 · Obecność</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#0d1a1e; --accent:#21d8c4;
+  --color-success:#4ade80; --color-warning:#f6b73c; --color-error:#ff6b5e; --color-info:#5aa8ff;
+  --surface-1:#13242a; --surface-2:#1a313a; --surface-3:#234049; --hairline:#2c4b55;
+  --text-strong:#f0f6f5; --text:#c7d6d8; --text-muted:#83a0a5; --on-accent:#062420; --paper:#eef4f1;
+  --font-display:"Bricolage Grotesque", system-ui; --font-body:"IBM Plex Sans", system-ui;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:16px; --shadow:0 12px 32px -14px rgba(0,0,0,.7); --tap:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06100f;color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%}
+.num{font-variant-numeric:tabular-nums}
+.shell{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--brand-ink)}
+header.app{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border-bottom:1px solid var(--hairline)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);min-height:var(--tap)}
+.bar .back{width:40px;height:40px;border-radius:11px;border:1px solid var(--hairline);background:var(--surface-3);color:var(--text-strong);font-size:18px;cursor:pointer;flex:none}
+.bar .back:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.ttl{flex:1;min-width:0}
+.ttl b{display:block;font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:17px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ttl small{color:var(--text-muted);font-size:12.5px}
+.lang{display:flex;align-items:center;gap:var(--s1);background:var(--surface-3);border:1px solid var(--hairline);color:var(--text-strong);border-radius:999px;padding:0 var(--s3);height:40px;font:600 14px/1 var(--font-body);cursor:pointer;flex:none}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);font-size:13px;border-top:1px solid var(--hairline);background:var(--surface-1)}
+.count{font-family:var(--font-display);font-weight:800;color:var(--text-strong);font-size:15px}
+.count b{color:var(--accent)}
+.spacer{flex:1}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.on{background:var(--color-success);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-success) 25%,transparent)}
+.netnote{color:var(--text-muted);font-size:12.5px}
+.netnote .off{display:none;color:var(--color-warning);font-weight:600}
+body.is-offline .netnote .on{display:none} body.is-offline .netnote .off{display:inline} body.is-offline .dot.on{background:var(--color-warning);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-warning) 25%,transparent)}
+.offline-banner{display:none;align-items:center;gap:var(--s3);margin:var(--s4) var(--s4) 0;padding:var(--s3) var(--s4);
+  border:1px solid color-mix(in srgb,var(--color-warning) 55%,var(--hairline));border-left:4px solid var(--color-warning);
+  border-radius:var(--radius);background:color-mix(in srgb,var(--color-warning) 13%,var(--surface-1));color:var(--text-strong);font-size:13px}
+body.is-offline .offline-banner{display:flex}
+.offline-banner .q{margin-left:auto;font-family:var(--font-display);font-weight:800;background:var(--color-warning);color:#3a2700;border-radius:999px;padding:3px 11px;font-size:13px}
+.offline-banner small{display:block;color:var(--text-muted);font-size:11.5px;font-weight:400}
+.seg{display:flex;gap:var(--s1);margin:var(--s4) var(--s4) 0;padding:var(--s1);background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px}
+.seg button{flex:1;border:0;background:transparent;color:var(--text-muted);font:600 13.5px/1 var(--font-body);height:40px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected=true]{background:var(--surface-3);color:var(--text-strong)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{flex:1;padding:var(--s4) var(--s4) calc(var(--s10)*2)}
+.search{position:relative;margin:var(--s3) 0}
+.search input{width:100%;height:48px;background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:var(--radius);color:var(--text-strong);font:500 16px/1 var(--font-body);padding:0 var(--s4) 0 44px}
+.search input:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-color:var(--accent)}
+.search::before{content:"⌕";position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:20px}
+.row{display:flex;align-items:center;gap:var(--s3);min-height:var(--tap);padding:var(--s3) var(--s3);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);margin-bottom:var(--s2);animation:rise .4s both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.row .who{flex:1;min-width:0}
+.row .nm{font-weight:600;color:var(--text-strong);font-size:16.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px}
+.tag{font-size:11px;font-weight:600;height:20px;padding:0 8px;border-radius:999px;display:inline-flex;align-items:center;border:1px solid var(--hairline);color:var(--text-muted)}
+.tag.late{color:var(--color-warning);border-color:color-mix(in srgb,var(--color-warning) 45%,transparent)}
+.tag.sib{color:var(--color-info);border-color:color-mix(in srgb,var(--color-info) 45%,transparent)}
+.tag.reported{color:var(--text);border-color:var(--hairline);background:var(--surface-3)}
+.tag.guest{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.toggle{display:flex;gap:6px;flex:none}
+.toggle button{width:48px;height:48px;border-radius:13px;border:1.5px solid var(--hairline);background:var(--surface-2);color:var(--text-muted);font-family:var(--font-display);font-weight:800;font-size:15px;cursor:pointer}
+.toggle button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row[data-state=present] .ob{background:var(--color-success);color:#06280f;border-color:var(--color-success)}
+.row[data-state=absent] .ab{background:var(--color-error);color:#3a0d09;border-color:var(--color-error)}
+.row[data-state=none]{border-color:color-mix(in srgb,var(--color-warning) 40%,var(--hairline))}
+.validate{display:none;gap:var(--s3);margin-top:var(--s4);padding:var(--s3) var(--s4);border-radius:12px;font-size:13.5px;line-height:1.4;
+  background:color-mix(in srgb,var(--color-warning) 13%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-warning) 50%,transparent);color:#ffe9c2}
+.validate.show{display:flex}
+.validate b{color:#fff;font-weight:600}
+.secondary{display:flex;gap:var(--s2);margin-top:var(--s5)}
+.secondary button{flex:1;min-height:48px;border-radius:13px;border:1.5px solid var(--hairline);background:var(--surface-1);color:var(--text);font:600 13.5px/1.1 var(--font-body);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.secondary button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.secondary .ic{font-size:18px;color:var(--accent)}
+footer.app{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:20;background:linear-gradient(0deg,var(--surface-2),var(--surface-1));border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom))}
+.saveline{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s3)}
+.saveline .off{display:none;color:var(--color-warning);font-weight:600} body.is-offline .saveline .on{display:none} body.is-offline .saveline .off{display:inline}
+.cta{width:100%;min-height:var(--tap);border:0;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.2px;cursor:pointer;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;gap:var(--s3)}
+.cta:focus-visible{outline:3px solid var(--text-strong);outline-offset:3px}
+.cta .badge{background:var(--on-accent);color:var(--accent);border-radius:999px;font-size:13px;padding:2px 10px}
+@media(prefers-reduced-motion:reduce){.row{animation:none}}
+</style>
+</head>
+<body class="pl-PL">
+<div class="shell">
+  <header class="app">
+    <div class="bar">
+      <button class="back" aria-label="Wróć">←</button>
+      <div class="ttl"><b id="grpTitle" data-i="grpTitle">Delfinki · poziom 3</b><small><span class="num">16:00</span> · <span data-i="lane">Tor 2</span></small></div>
+      <button class="lang" id="langBtn" aria-label="Zmień język"><span id="langLabel">PL</span> ▾</button>
+    </div>
+    <div class="sys">
+      <span class="count"><span data-i="presentLbl">Obecni</span> <b id="cPresent" class="num">7</b>/<span id="cTotal" class="num">11</span></span>
+      <span class="spacer"></span>
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="netnote"><span class="on" data-i="synced">Sync ok</span><span class="off" data-i="offShort">Offline</span></span>
+    </div>
+  </header>
+
+  <div class="offline-banner" role="status">
+    <span aria-hidden="true">⚠</span>
+    <span><b data-i="offTitle">Tryb offline</b><small data-i="offSub">Ostatnia synchronizacja: 16:02. Dane są bezpieczne na tym urządzeniu.</small></span>
+    <span class="q"><span data-i="qLbl">w kolejce</span> <span id="qCount" class="num">4</span></span>
+  </div>
+
+  <div class="seg" role="tablist" aria-label="Podgląd stanu ekranu">
+    <button role="tab" aria-selected="true" data-state="default" data-i="stDefault">Online</button>
+    <button role="tab" aria-selected="false" data-state="offline" data-i="stOffline">Offline</button>
+  </div>
+
+  <main>
+    <div class="search"><input type="text" id="q" inputmode="search" placeholder="Wpisz imię…" aria-label="Szukaj dziecka"></div>
+
+    <div id="list">
+      <div class="row" data-state="present" data-key="kowalska">
+        <div class="who"><div class="nm">Kowalska, Zofia</div></div>
+        <div class="toggle"><button class="ob" aria-pressed="true" data-i-aria="present">OB</button><button class="ab" aria-pressed="false" data-i-aria="absent">N</button></div>
+      </div>
+      <div class="row" data-state="present" data-key="nowak-j">
+        <div class="who"><div class="nm">Nowak, Jan</div><div class="tags"><span class="tag late" data-i="tLate">spóźnienie</span></div></div>
+        <div class="toggle"><button class="ob" aria-pressed="true" data-i-aria="present">OB</button><button class="ab" aria-pressed="false" data-i-aria="absent">N</button></div>
+      </div>
+      <div class="row" data-state="none" data-key="nowak-jb">
+        <div class="who"><div class="nm">Nowak, Jan B.</div><div class="tags"><span class="tag sib" data-i="tSib">rodzeństwo</span></div></div>
+        <div class="toggle"><button class="ob" aria-pressed="false" data-i-aria="present">OB</button><button class="ab" aria-pressed="false" data-i-aria="absent">N</button></div>
+      </div>
+      <div class="row" data-state="absent" data-key="wisniewski">
+        <div class="who"><div class="nm">Wiśniewski, Antoni</div><div class="tags"><span class="tag reported" data-i="tReported">rodzic zgłosił nieobecność</span></div></div>
+        <div class="toggle"><button class="ob" aria-pressed="false" data-i-aria="present">OB</button><button class="ab" aria-pressed="true" data-i-aria="absent">N</button></div>
+      </div>
+      <div class="row" data-state="none" data-key="lewy">
+        <div class="who"><div class="nm">Lewy, Maja</div><div class="tags"><span class="tag guest" data-i="tGuest">gość · odrabia</span></div></div>
+        <div class="toggle"><button class="ob" aria-pressed="false" data-i-aria="present">OB</button><button class="ab" aria-pressed="false" data-i-aria="absent">N</button></div>
+      </div>
+    </div>
+
+    <div class="validate" id="validate" role="alert">
+      <span aria-hidden="true">?</span>
+      <span><b><span id="vCount" class="num">2</span> <span data-i="vChildren">dzieci bez oznaczenia.</span></b> <span data-i="vAsk">Zostawić je jako nieobecne przy zamknięciu?</span></span>
+    </div>
+
+    <div class="secondary">
+      <button><span class="ic" aria-hidden="true">▦</span><span data-i="aScan">Skanuj QR</span></button>
+      <button><span class="ic" aria-hidden="true">＋</span><span data-i="aGuest">Dopisz gościa</span></button>
+      <button><span class="ic" aria-hidden="true">✎</span><span data-i="aNote">Notatka</span></button>
+    </div>
+  </main>
+
+  <footer class="app">
+    <div class="saveline">
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="on" data-i="autosave">Zapisywane na bieżąco</span>
+      <span class="off" data-i="localSafe">Dane bezpieczne lokalnie · pójdą po sieci</span>
+    </div>
+    <button class="cta" id="closeBtn"><span data-i="ctaClose">Zamknij i zsynchronizuj</span><span class="badge num" id="ctaBadge">7/11</span></button>
+  </footer>
+</div>
+
+<script>
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL"};
+
+const I18N={
+ "pl-PL":{
+  lane:"Tor 2", grpTitle:"Delfinki · poziom 3", presentLbl:"Obecni", synced:"Sync ok", offShort:"Offline",
+  obShort:"OB", abShort:"N", searchPh:"Wpisz imię…", searchAria:"Szukaj dziecka",
+  offTitle:"Tryb offline", offSub:"Ostatnia synchronizacja: 16:02. Dane są bezpieczne na tym urządzeniu.", qLbl:"w kolejce",
+  stDefault:"Online", stOffline:"Offline",
+  tLate:"spóźnienie", tSib:"rodzeństwo", tReported:"rodzic zgłosił nieobecność", tGuest:"gość · odrabia",
+  vChildren:"dzieci bez oznaczenia.", vAsk:"Zostawić je jako nieobecne przy zamknięciu?",
+  aScan:"Skanuj QR", aGuest:"Dopisz gościa", aNote:"Notatka",
+  autosave:"Zapisywane na bieżąco", localSafe:"Dane bezpieczne lokalnie · pójdą po sieci",
+  ctaClose:"Zamknij i zsynchronizuj",
+  present:"obecny", absent:"nieobecny"
+ },
+ "en-GB":{
+  lane:"Lane 2", grpTitle:"Dolphins · level 3", presentLbl:"Present", synced:"Synced", offShort:"Offline",
+  obShort:"P", abShort:"A", searchPh:"Type a name…", searchAria:"Search for a child",
+  offTitle:"Offline mode", offSub:"Last sync: 16:02. Your data is safe on this device.", qLbl:"queued",
+  stDefault:"Online", stOffline:"Offline",
+  tLate:"late", tSib:"sibling", tReported:"parent reported absence", tGuest:"guest · make-up",
+  vChildren:"children unmarked.", vAsk:"Leave them as absent when you close?",
+  aScan:"Scan QR", aGuest:"Add guest", aNote:"Note",
+  autosave:"Saving as you go", localSafe:"Safe locally · will send when online",
+  ctaClose:"Close & sync",
+  present:"present", absent:"absent"
+ }
+};
+const FALLBACK="en-GB";
+function t(k){const l=I18N[DATA.locale]||{};return (k in l)?l[k]:(I18N[FALLBACK][k]??k);}
+
+function applyLang(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i);});
+  document.querySelectorAll("[data-i-aria]").forEach(el=>{el.setAttribute("aria-label",t(el.dataset.iAria));});
+  document.querySelectorAll(".toggle .ob").forEach(b=>b.textContent=t("obShort"));
+  document.querySelectorAll(".toggle .ab").forEach(b=>b.textContent=t("abShort"));
+  const q=document.getElementById("q");
+  q.placeholder=t("searchPh"); q.setAttribute("aria-label",t("searchAria"));
+  document.getElementById("langLabel").textContent=DATA.locale.split("-")[0].toUpperCase();
+  document.documentElement.lang=DATA.locale;
+  document.documentElement.dir=RTL.has(DATA.locale.split("-")[0])?"rtl":"ltr";
+}
+function toggleLang(){DATA.locale=DATA.locale==="pl-PL"?"en-GB":"pl-PL";applyLang();}
+document.getElementById("langBtn").addEventListener("click",toggleLang);
+
+const rows=[...document.querySelectorAll(".row")];
+function recount(){
+  const total=rows.length;
+  const present=rows.filter(r=>r.dataset.state==="present").length;
+  const none=rows.filter(r=>r.dataset.state==="none").length;
+  document.getElementById("cPresent").textContent=present;
+  document.getElementById("cTotal").textContent=total;
+  document.getElementById("ctaBadge").textContent=present+"/"+total;
+  document.getElementById("vCount").textContent=none;
+  document.getElementById("validate").classList.toggle("show", none>0);
+}
+rows.forEach(r=>{
+  const ob=r.querySelector(".ob"), ab=r.querySelector(".ab");
+  ob.addEventListener("click",()=>{const np=r.dataset.state!=="present";r.dataset.state=np?"present":"none";ob.setAttribute("aria-pressed",np);ab.setAttribute("aria-pressed","false");recount();});
+  ab.addEventListener("click",()=>{const na=r.dataset.state!=="absent";r.dataset.state=na?"absent":"none";ab.setAttribute("aria-pressed",na);ob.setAttribute("aria-pressed","false");recount();});
+});
+
+const tabs=document.querySelectorAll('[role=tab]');
+tabs.forEach(tb=>tb.addEventListener("click",()=>{
+  tabs.forEach(x=>x.setAttribute("aria-selected",x===tb));
+  document.body.classList.toggle("is-offline", tb.dataset.state==="offline");
+}));
+
+document.getElementById("q").addEventListener("input",e=>{
+  const v=e.target.value.trim().toLowerCase();
+  rows.forEach(r=>{r.style.display = r.querySelector(".nm").textContent.toLowerCase().includes(v)?"":"none";});
+});
+
+applyLang();
+recount();
+</script>
+</body>
+</html>

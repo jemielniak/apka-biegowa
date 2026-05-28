@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR-13 · Paszport sportowy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;--accent:#ef5a3c;
+  --color-success:#1f9d57;--color-warning:#c47d0a;--color-error:#d6402a;--color-info:#2f72d6;
+  --paper:#faf5ee;--surface-1:#ffffff;--surface-2:#fff9f2;--surface-3:#f3ebe0;--hairline:#e7ddcf;
+  --text-strong:#241c17;--text:#4a4039;--text-muted:#8a7d70;--on-accent:#fff7f3;
+  --kid-1:#ef5a3c;--kid-2:#1f9d8f;--kid-3:#7a5cd6;--kid-4:#c47d0a;
+  --font-display:"Fraunces", Georgia, serif;--font-body:"Hanken Grotesk", system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:20px;--shadow:0 14px 34px -16px rgba(60,40,30,.28);--tap:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);color:var(--text);
+  background:radial-gradient(120% 80% at 85% -8%,#fff 0%,transparent 52%),radial-gradient(90% 70% at -10% 108%,#fff4ea 0%,transparent 60%),var(--paper);
+  min-height:100%;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+.appbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s4) var(--s5) var(--s3);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline)}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.iconbtn{width:36px;height:36px;flex:none;border-radius:11px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);display:grid;place-items:center;font-size:17px;cursor:pointer}
+.title-h{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:18px}
+.lang{display:inline-flex;gap:var(--s1);flex:none}
+.lang button{font-weight:600;font-size:12px;min-height:32px;padding:0 var(--s3);border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-muted);border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.lang button:focus-visible,.kid:focus-visible,.seg button:focus-visible,.btn:focus-visible,.link:focus-visible,.tabbtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.kidbar{position:sticky;top:57px;z-index:29;display:flex;gap:var(--s3);align-items:center;overflow-x:auto;padding:var(--s3) var(--s5);background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--hairline);scrollbar-width:none}
+.kidbar::-webkit-scrollbar{display:none}
+.kid{display:inline-flex;align-items:center;gap:var(--s2);flex:none;cursor:pointer;min-height:38px;padding:0 var(--s3) 0 5px;border-radius:999px;background:var(--surface-1);border:1.5px solid var(--hairline);font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text)}
+.kid .tok{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:none}
+.kid[aria-pressed="true"]{border-color:var(--brand-ink);background:var(--surface-2)}
+.kid[data-kid="zofia"] .tok{background:var(--kid-2)} .kid[data-kid="jan"] .tok{background:var(--kid-1)}
+body[data-state="alt"] .kidbar{display:none}
+
+.modmark{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s5);font-size:11px;color:var(--text-muted)}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-3);border:1px solid var(--hairline);border-radius:999px;padding:3px 10px;font-weight:600;font-size:11px;color:var(--text)}
+.chip i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.chip.z i{background:var(--color-info)} .chip.c i{background:var(--accent)}
+body[data-state="alt"] .modmark{display:none}
+
+.statebar{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);background:var(--surface-3);border-bottom:1px dashed var(--hairline);font-size:12px;color:var(--text-muted)}
+.statebar .lbl{font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:10.5px}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;cursor:pointer;border-radius:999px;font-weight:600;font-size:12px;color:var(--text-muted);min-height:30px;padding:0 var(--s3);font-family:var(--font-body)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+
+main{flex:1;padding:var(--s4) var(--s5) calc(var(--s10) + 120px)}
+
+/* public verify banner (alt) */
+.verify{display:none;gap:var(--s3);align-items:center;background:#e6f6ec;border:1px solid #bfe6cc;color:#136b3a;border-radius:14px;padding:var(--s4);margin-bottom:var(--s4);font-size:13.5px}
+.verify .ico{flex:none;width:30px;height:30px;border-radius:8px;background:var(--color-success);color:#fff;display:grid;place-items:center;font-weight:700}
+body[data-state="alt"] .verify{display:flex}
+
+.passport{background:linear-gradient(165deg,#fff,var(--surface-2));border:1px solid var(--hairline);border-radius:20px;padding:var(--s6);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.passport::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(239,90,60,.12),transparent 70%)}
+.pp-head{display:flex;align-items:center;gap:var(--s4)}
+.pp-av{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--font-display);font-weight:700;font-size:26px;background:var(--kid-2);flex:none}
+.pp-name{font-family:var(--font-display);font-weight:700;font-size:22px;color:var(--text-strong)}
+.pp-sub{font-size:12.5px;color:var(--text-muted)}
+.pp-id{margin-top:var(--s4);display:flex;align-items:center;gap:var(--s2);font-size:11px;color:var(--text-muted)}
+.pp-id code{font-family:var(--font-body);font-weight:700;letter-spacing:.05em;color:var(--text)}
+
+.modtabs{display:flex;gap:var(--s2);margin:var(--s5) 0 var(--s4)}
+.tabbtn{flex:1;min-height:40px;border:1.5px solid var(--hairline);background:var(--surface-1);border-radius:11px;cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:13.5px;color:var(--text-muted)}
+.tabbtn[aria-pressed="true"]{border-color:var(--accent);background:var(--surface-2);color:var(--text-strong)}
+
+.section{margin-top:var(--s4)}
+.section h3{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.07em;font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:var(--s3)}
+.ach{display:flex;gap:var(--s3);align-items:center;background:var(--surface-1);border:1px solid var(--hairline);border-radius:12px;padding:var(--s3) var(--s4);margin-bottom:var(--s2)}
+.ach .medal{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:16px;flex:none;background:var(--surface-3)}
+.ach .t{font-weight:600;color:var(--text-strong);font-size:14.5px}
+.ach .d{font-size:12px;color:var(--text-muted)}
+.ach .badge{margin-left:auto;font-family:var(--font-display);font-weight:700;color:var(--accent);font-size:14px;white-space:nowrap}
+.sensitive{display:flex;gap:var(--s2);align-items:center;font-size:12px;color:var(--text-muted);margin-top:var(--s3);background:var(--surface-2);border:1px dashed var(--hairline);border-radius:10px;padding:var(--s3)}
+body[data-state="alt"] .sensitive{display:none}
+
+.actionbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:30;background:color-mix(in srgb,var(--surface-1) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--hairline);padding:var(--s3) var(--s5) calc(var(--s4)+env(safe-area-inset-bottom))}
+.status{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s2)}
+.status .dot{width:8px;height:8px;border-radius:50%;background:var(--color-success)}
+.second{display:flex;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s3)}
+.link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body)}
+.btn{width:100%;min-height:var(--tap);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:16px;border-radius:14px;border:1.5px solid transparent}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 22px -12px rgba(239,90,60,.9)}
+.btn-ghost{background:var(--surface-1);color:var(--text-strong);border-color:var(--hairline)}
+
+[data-when]{display:none}
+body[data-state="default"] [data-when="default"]{display:revert}
+body[data-state="alt"] [data-when="alt"]{display:revert}
+.reveal{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}}
+[dir="rtl"] .pp-head,[dir="rtl"] .ach,[dir="rtl"] .verify,[dir="rtl"] .status,[dir="rtl"] .sensitive{flex-direction:row-reverse}
+[dir="rtl"] .ach .badge{margin-left:0;margin-right:auto}
+</style>
+</head>
+<body data-state="default">
+<div class="app">
+  <header class="appbar">
+    <div class="brand"><button class="iconbtn" aria-label="Menu">☰</button><span class="title-h" data-i18n="par13.h1">Paszport sportowy</span></div>
+    <div class="lang" role="group" aria-label="Język"><button data-lang="pl-PL" aria-pressed="true">PL</button><button data-lang="en-GB" aria-pressed="false">EN</button></div>
+  </header>
+
+  <div class="kidbar" role="group" aria-label="Wybór dziecka">
+    <button class="kid" data-kid="zofia" aria-pressed="true"><span class="tok">Z</span>Zofia</button>
+    <button class="kid" data-kid="jan" aria-pressed="false"><span class="tok">J</span>Jan</button>
+  </div>
+
+  <div class="modmark"><span data-i18n="par13.cover">Paszport spina oba moduły:</span><span class="chip z"><i></i><span data-i18n="mod.classes">zajęcia</span></span><span class="chip c"><i></i><span data-i18n="mod.comp">zawody</span></span></div>
+
+  <div class="statebar">
+    <span class="lbl" data-i18n="state.label">Stan makiety</span>
+    <div class="seg" role="group" aria-label="Stan ekranu">
+      <button data-state-btn="default" aria-pressed="true" data-i18n="state.default">widok rodzica</button>
+      <button data-state-btn="alt" aria-pressed="false" data-i18n="state.alt13">weryfikacja linku</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- ALT public verify -->
+    <div class="verify" role="status">
+      <span class="ico" aria-hidden="true">✓</span>
+      <div><strong data-i18n="par13.verify.title">Zweryfikowany paszport</strong><div data-i18n="par13.verify.body">Widok publiczny dla Klubu Pływackiego Orka. Bez danych kontaktowych i dokumentów — tylko osiągnięcia.</div></div>
+    </div>
+
+    <section class="passport reveal">
+      <div class="pp-head">
+        <div class="pp-av">Z</div>
+        <div><div class="pp-name">Zofia Kowalska</div><div class="pp-sub" data-when="default" id="ppSub">9 lat · pływanie i bieganie</div><div class="pp-sub" data-when="alt" data-i18n="par13.ppSubPublic">poziom 3 · pływanie</div></div>
+      </div>
+      <div class="pp-id"><span data-i18n="par13.idLbl">ID paszportu:</span> <code>PSP-2025-ZK-0481</code></div>
+
+      <div class="modtabs" role="group" aria-label="Moduł">
+        <button class="tabbtn" data-tab="all" aria-pressed="true" data-i18n="par13.tabAll">wszystko</button>
+        <button class="tabbtn" data-tab="swim" aria-pressed="false" data-i18n="par13.tabSwim">pływanie</button>
+        <button class="tabbtn" data-tab="run" aria-pressed="false" data-i18n="par13.tabRun">bieganie</button>
+      </div>
+
+      <div class="section" data-cat="swim">
+        <h3 data-i18n="par13.swimSec">Pływanie · Klub Pływacki Delfin</h3>
+        <div class="ach"><span class="medal" aria-hidden="true">🥇</span><div><div class="t" data-i18n="par13.a1">Poziom 3 zaliczony</div><div class="d" data-i18n="par13.a1d">4 z 8 umiejętności · w trakcie awansu</div></div></div>
+        <div class="ach"><span class="medal" aria-hidden="true">🏊</span><div><div class="t" data-i18n="par13.a2">50 m stylem grzbietowym</div><div class="d" id="a2d"></div></div></div>
+      </div>
+
+      <div class="section" data-cat="run">
+        <h3 data-i18n="par13.runSec">Bieganie · Stołeczny Klub Biegacza</h3>
+        <div class="ach"><span class="medal" aria-hidden="true">🏅</span><div><div class="t" data-i18n="par13.a3">Bieg Zimowy · 1 km</div><div class="d" id="a3d">ukończony · 12.01.2025</div></div><span class="badge">06:12</span></div>
+      </div>
+
+      <div class="sensitive"><span aria-hidden="true">🔒</span><span data-i18n="par13.sensitive">Orzeczenia i dane zdrowotne nie wchodzą do paszportu ani do eksportu publicznego.</span></div>
+    </section>
+  </main>
+
+  <div class="actionbar">
+    <div class="status"><span class="dot" aria-hidden="true"></span>
+      <span data-when="default" id="barDefault"></span>
+      <span data-when="alt" id="barAlt"></span>
+    </div>
+    <div class="second" data-when="default">
+      <button class="link" data-i18n="par13.share">Udostępnij link weryfikacyjny</button>
+      <button class="link" data-i18n="par13.history">Pełna historia</button>
+    </div>
+    <button class="btn btn-primary" data-when="default" data-i18n="par13.export">Eksportuj paszport do PDF</button>
+    <button class="btn btn-ghost" data-when="alt" data-i18n="par13.openApp">Otwórz w aplikacji</button>
+  </div>
+</div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "state.label":"Stan makiety","state.default":"widok rodzica","state.alt13":"weryfikacja linku","mod.classes":"zajęcia","mod.comp":"zawody",
+  "par13.h1":"Paszport sportowy","par13.cover":"Paszport spina oba moduły:",
+  "par13.verify.title":"Zweryfikowany paszport","par13.verify.body":"Widok publiczny dla Klubu Pływackiego Orka. Bez danych kontaktowych i dokumentów — tylko osiągnięcia.",
+  "par13.ppSubPublic":"poziom 3 · pływanie","par13.idLbl":"ID paszportu:",
+  "par13.tabAll":"wszystko","par13.tabSwim":"pływanie","par13.tabRun":"bieganie",
+  "par13.swimSec":"Pływanie · Klub Pływacki Delfin","par13.a1":"Poziom 3 zaliczony","par13.a1d":"4 z 8 umiejętności · w trakcie awansu","par13.a2":"50 m stylem grzbietowym",
+  "par13.runSec":"Bieganie · Stołeczny Klub Biegacza","par13.a3":"Bieg Zimowy · 1 km",
+  "par13.sensitive":"Orzeczenia i dane zdrowotne nie wchodzą do paszportu ani do eksportu publicznego.",
+  "par13.barDefault.tpl":"Paszport Zofii · {n,plural,one{# osiągnięcie}few{# osiągnięcia}many{# osiągnięć}other{# osiągnięć}}","par13.barAlt.tpl":"Link ważny do {d} · tylko odczyt",
+  "par13.share":"Udostępnij link weryfikacyjny","par13.history":"Pełna historia","par13.export":"Eksportuj paszport do PDF","par13.openApp":"Otwórz w aplikacji",
+  "par13.sub.tpl":"{age} · pływanie i bieganie","par13.a2d.tpl":"test sprawności · {d}","par13.a3d.tpl":"ukończony · {d}",
+  "age.years.tpl":"{n,plural,one{# rok}few{# lata}many{# lat}other{# lat}}"
+ },
+ "en-GB":{
+  "state.label":"Mockup state","state.default":"parent view","state.alt13":"link verification","mod.classes":"classes","mod.comp":"competitions",
+  "par13.h1":"Sports passport","par13.cover":"The passport ties both modules together:",
+  "par13.verify.title":"Verified passport","par13.verify.body":"Public view for Orka Swimming Club. No contact details or documents — achievements only.",
+  "par13.ppSubPublic":"level 3 · swimming","par13.idLbl":"Passport ID:",
+  "par13.tabAll":"all","par13.tabSwim":"swimming","par13.tabRun":"running",
+  "par13.swimSec":"Swimming · Delfin Swimming Club","par13.a1":"Level 3 passed","par13.a1d":"4 of 8 skills · advancing","par13.a2":"50 m backstroke",
+  "par13.runSec":"Running · Stołeczny Running Club","par13.a3":"Winter Run · 1 km",
+  "par13.sensitive":"Certificates and health data are not part of the passport or the public export.",
+  "par13.barDefault.tpl":"Zofia's passport · {n,plural,one{# achievement}other{# achievements}}","par13.barAlt.tpl":"Link valid until {d} · read-only",
+  "par13.share":"Share verification link","par13.history":"Full history","par13.export":"Export passport to PDF","par13.openApp":"Open in the app",
+  "par13.sub.tpl":"{age} · swimming and running","par13.a2d.tpl":"fitness test · {d}","par13.a3d.tpl":"finished · {d}",
+  "age.years.tpl":"{n,plural,one{# year}other{# years}}"
+ }
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+let lang="pl-PL", tab="all";
+/* dane stabilne dla makiety - daty w ISO, wiek liczony z dob, NIE w kluczach */
+const KID={name:"Zofia",dob:"2016-04-11",achievements:3};
+const FITNESS_TEST_DATE="2025-04-02";
+const WINTER_RUN_DATE="2025-01-12";
+const LINK_VALID_UNTIL="2025-12-31";
+const NOW=new Date("2025-05-15");
+const t=k=>(I18N[lang]&&I18N[lang][k])??(I18N["en-GB"]&&I18N["en-GB"][k])??k;
+function tPlural(key,vars){
+  let s=t(key);
+  for(const [n,v] of Object.entries(vars)){
+    s=s.replace(new RegExp(`\\{${n}\\}`,"g"),v);
+    /* parsowanie {name,plural,...} z balansowaniem klamr */
+    const start=`{${n},plural,`;
+    let i;
+    while((i=s.indexOf(start))>=0){
+      let depth=1,j=i+start.length;
+      while(j<s.length&&depth>0){
+        if(s[j]==="{")depth++;
+        else if(s[j]==="}"){depth--;if(depth===0)break;}
+        j++;
+      }
+      const inner=s.slice(i+start.length,j);
+      const cat=new Intl.PluralRules(lang).select(v);
+      const m={};inner.replace(/(zero|one|two|few|many|other)\{([^{}]*)\}/g,(_,k,vv)=>{m[k]=vv;});
+      const out=(m[cat]??m.other??"").replace(/#/g,v);
+      s=s.slice(0,i)+out+s.slice(j+1);
+    }
+  }
+  return s;
+}
+const fmtDate=d=>new Intl.DateTimeFormat(lang,{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(d));
+function ageYears(dob){
+  const a=new Date(dob);let y=NOW.getFullYear()-a.getFullYear();
+  const m=NOW.getMonth()-a.getMonth();if(m<0||(m===0&&NOW.getDate()<a.getDate()))y--;return y;
+}
+const ageLabel=()=>tPlural("age.years.tpl",{n:ageYears(KID.dob)});
+function applyTab(){
+  document.querySelectorAll("[data-cat]").forEach(s=>{
+    s.style.display=(tab==="all"||tab===s.dataset.cat)?"block":"none";
+  });
+}
+function render(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"));});
+  /* tekst pod nazwą dziecka - wiek przez plural rules */
+  document.getElementById("ppSub").textContent=t("par13.sub.tpl").replace("{age}",ageLabel());
+  /* daty osiągnięć przez Intl.DateTimeFormat */
+  document.getElementById("a2d").textContent=t("par13.a2d.tpl").replace("{d}",fmtDate(FITNESS_TEST_DATE));
+  document.getElementById("a3d").textContent=t("par13.a3d.tpl").replace("{d}",fmtDate(WINTER_RUN_DATE));
+  /* status w pasku - osiągnięcia z plural, data z Intl */
+  document.getElementById("barDefault").textContent=tPlural("par13.barDefault.tpl",{n:KID.achievements});
+  document.getElementById("barAlt").textContent=t("par13.barAlt.tpl").replace("{d}",fmtDate(LINK_VALID_UNTIL));
+  applyTab();
+}
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();}));
+document.querySelectorAll(".kid").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".kid").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+document.querySelectorAll(".tabbtn").forEach(b=>b.addEventListener("click",()=>{tab=b.dataset.tab;document.querySelectorAll(".tabbtn").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));applyTab();}));
+document.querySelectorAll("[data-state-btn]").forEach(b=>b.addEventListener("click",()=>{document.body.dataset.state=b.dataset.stateBtn;document.querySelectorAll("[data-state-btn]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+render();
+</script>
+</body>
+</html>

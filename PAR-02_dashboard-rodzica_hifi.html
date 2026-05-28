@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR-02 · Dashboard rodzica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;
+  --accent:#ef5a3c;
+  --color-success:#1f9d57;
+  --color-warning:#c47d0a;
+  --color-error:#d6402a;
+  --color-info:#2f72d6;
+  --paper:#faf5ee;
+  --surface-1:#ffffff;
+  --surface-2:#fff9f2;
+  --surface-3:#f3ebe0;
+  --hairline:#e7ddcf;
+  --text-strong:#241c17;
+  --text:#4a4039;
+  --text-muted:#8a7d70;
+  --on-accent:#fff7f3;
+  --kid-1:#ef5a3c;
+  --kid-2:#1f9d8f;
+  --kid-3:#7a5cd6;
+  --kid-4:#c47d0a;
+  --font-display:"Fraunces", Georgia, serif;
+  --font-body:"Hanken Grotesk", system-ui;
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:20px;
+  --shadow:0 14px 34px -16px rgba(60,40,30,.28);
+  --tap:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font-body);color:var(--text);
+  background:
+    radial-gradient(120% 80% at 85% -8%, #fff 0%, transparent 52%),
+    radial-gradient(90% 70% at -10% 108%, #fff4ea 0%, transparent 60%),
+    var(--paper);
+  min-height:100%;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+.appbar{
+  position:sticky;top:0;z-index:30;
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s3);
+  padding:var(--s4) var(--s5) var(--s3);
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);
+}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.brand-mark{width:34px;height:34px;flex:none;border-radius:11px;background:linear-gradient(150deg,var(--accent),#ff8a5c);color:var(--on-accent);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:16px}
+.brand-name{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:18px}
+.brand-name small{display:block;font-family:var(--font-body);font-weight:500;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted)}
+.lang{display:inline-flex;gap:var(--s1);flex:none}
+.lang button{font-weight:600;font-size:12px;min-height:32px;padding:0 var(--s3);border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-muted);border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.lang button:focus-visible,.kid:focus-visible,.seg button:focus-visible,.btn:focus-visible,.link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* kid switcher */
+.kidbar{
+  position:sticky;top:60px;z-index:29;
+  display:flex;gap:var(--s3);align-items:center;overflow-x:auto;
+  padding:var(--s3) var(--s5);
+  background:color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter:blur(6px);border-bottom:1px solid var(--hairline);
+  scrollbar-width:none;
+}
+.kidbar::-webkit-scrollbar{display:none}
+.kid{
+  display:inline-flex;align-items:center;gap:var(--s2);flex:none;cursor:pointer;
+  min-height:40px;padding:0 var(--s3) 0 6px;border-radius:999px;
+  background:var(--surface-1);border:1.5px solid var(--hairline);
+  font-family:var(--font-body);font-weight:600;font-size:13.5px;color:var(--text);
+}
+.kid .tok{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none}
+.kid[aria-pressed="true"]{border-color:var(--brand-ink);background:var(--surface-2);box-shadow:0 6px 16px -10px rgba(60,40,30,.5)}
+.kid.all .tok{background:var(--brand-ink)}
+.kid[data-kid="zofia"] .tok{background:var(--kid-2)}
+.kid[data-kid="jan"] .tok{background:var(--kid-1)}
+
+/* module marker */
+.modmark{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s5);font-size:11px;color:var(--text-muted);letter-spacing:.03em}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-3);border:1px solid var(--hairline);border-radius:999px;padding:3px 10px;font-weight:600;font-size:11px;color:var(--text)}
+.chip i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.chip.z i{background:var(--color-info)}
+.chip.c i{background:var(--accent)}
+
+.statebar{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);background:var(--surface-3);border-bottom:1px dashed var(--hairline);font-size:12px;color:var(--text-muted)}
+.statebar .lbl{font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:10.5px}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;cursor:pointer;border-radius:999px;font-weight:600;font-size:12px;color:var(--text-muted);min-height:30px;padding:0 var(--s3);font-family:var(--font-body)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+
+main{flex:1;padding:var(--s4) var(--s5) calc(var(--s10) + 120px)}
+
+.sync{display:flex;align-items:center;gap:var(--s2);font-size:12px;color:var(--text-muted);margin:var(--s3) 0 var(--s4)}
+.sync .dot{width:8px;height:8px;border-radius:50%;background:var(--color-success);flex:none}
+
+.offlineBanner{display:none;gap:var(--s3);align-items:flex-start;background:#fff4e4;border:1px solid #f0d49a;color:#7a5410;border-radius:14px;padding:var(--s3) var(--s4);margin-bottom:var(--s4);font-size:13.5px}
+.offlineBanner .ico{flex:none;width:22px;height:22px;border-radius:6px;background:var(--color-warning);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+body[data-state="alt"] .offlineBanner{display:flex}
+body[data-state="alt"] .sync .dot{background:var(--text-muted)}
+
+h2.sec{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--text-muted);font-weight:700;margin:var(--s5) 0 var(--s3)}
+
+.alert{background:var(--surface-1);border:1px solid var(--hairline);border-left-width:4px;border-radius:16px;padding:var(--s4);margin-bottom:var(--s3);box-shadow:var(--shadow)}
+.alert.pay{border-left-color:var(--color-error)}
+.alert.offer{border-left-color:var(--accent)}
+.alert.doc{border-left-color:var(--color-warning)}
+.alert .top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s3)}
+.alert .who{display:flex;align-items:center;gap:var(--s2);font-size:12px;color:var(--text-muted);margin-top:2px}
+.alert .who .tok{width:18px;height:18px;border-radius:50%;color:#fff;font-weight:700;font-size:10px;display:grid;place-items:center}
+.alert .who .tok.zofia{background:var(--kid-2)} .alert .who .tok.jan{background:var(--kid-1)}
+.alert .title{font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--text-strong);line-height:1.15}
+.alert .amount{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong);white-space:nowrap}
+.alert .countdown{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--accent);font-size:15px;margin-top:var(--s2)}
+.alert .countdown .clk{font-variant-numeric:tabular-nums}
+.alert .act{display:flex;gap:var(--s2);margin-top:var(--s3)}
+.miniBtn{min-height:40px;padding:0 var(--s4);border-radius:11px;border:1.5px solid transparent;font-family:var(--font-body);font-weight:700;font-size:14px;cursor:pointer}
+.miniBtn.solid{background:var(--accent);color:var(--on-accent)}
+.miniBtn.solid:disabled{opacity:.45;cursor:not-allowed}
+.miniBtn.line{background:var(--surface-2);color:var(--text-strong);border-color:var(--hairline);font-weight:600}
+
+.timeline{background:var(--surface-1);border:1px solid var(--hairline);border-radius:16px;padding:var(--s4);box-shadow:var(--shadow)}
+.tl-row{display:flex;gap:var(--s3);padding:var(--s3) 0;border-bottom:1px solid var(--hairline)}
+.tl-row:last-child{border-bottom:0;padding-bottom:0}
+.tl-row:first-child{padding-top:0}
+.tl-time{font-family:var(--font-display);font-weight:600;color:var(--accent);font-size:15px;flex:none;width:54px}
+.tl-body{flex:1}
+.tl-body .ev{font-weight:600;color:var(--text-strong)}
+.tl-body .meta{font-size:12.5px;color:var(--text-muted)}
+.tl-tag{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+.tl-tag.z{background:#e8f0fc;color:var(--color-info)}
+.tl-tag.c{background:#fdeae4;color:var(--accent)}
+.collision{display:flex;gap:var(--s2);align-items:center;margin-top:var(--s3);padding:var(--s3);background:#fdeee9;border:1px solid #f3c9bd;border-radius:12px;color:#8f2c1c;font-size:13px;font-weight:600}
+
+.wallet{display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);border:1px dashed var(--hairline);border-radius:16px;padding:var(--s4);margin-top:var(--s5)}
+.wallet .v{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--color-success)}
+.wallet .k{font-size:12.5px;color:var(--text-muted)}
+.link{background:none;border:0;color:var(--accent);font-weight:600;font-size:14px;cursor:pointer;font-family:var(--font-body)}
+
+.empty{display:none;text-align:center;color:var(--text-muted);font-size:13px;padding:var(--s5);border:1px dashed var(--hairline);border-radius:14px;margin-top:var(--s3)}
+
+/* bottom bar */
+.actionbar{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:30;
+  background:color-mix(in srgb, var(--surface-1) 94%, transparent);
+  backdrop-filter:blur(10px);border-top:1px solid var(--hairline);
+  padding:var(--s3) var(--s5) calc(var(--s4) + env(safe-area-inset-bottom));
+}
+.status{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s2)}
+.status b{color:var(--text-strong);font-variant-numeric:tabular-nums}
+.actionrow{display:flex;gap:var(--s3);align-items:center}
+.actionrow .second{display:flex;gap:var(--s4);flex:1;flex-wrap:wrap}
+.btn{min-height:var(--tap);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:15.5px;border-radius:14px;border:1.5px solid transparent;padding:0 var(--s5)}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 22px -12px rgba(239,90,60,.9);flex:none}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+
+[data-when]{display:none}
+body[data-state="default"] [data-when="default"]{display:revert}
+body[data-state="alt"] [data-when="alt"]{display:revert}
+
+.reveal{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
+.reveal:nth-child(2){animation-delay:.05s}.reveal:nth-child(3){animation-delay:.1s}.reveal:nth-child(4){animation-delay:.15s}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}}
+[dir="rtl"] .alert{border-left-width:1px;border-right-width:4px}
+</style>
+</head>
+<body data-state="default">
+<div class="app">
+
+  <header class="appbar">
+    <div class="brand">
+      <div class="brand-mark">K</div>
+      <div class="brand-name" data-i18n="acct.name">Rodzina Kowalskich<small data-i18n="acct.kicker">konto rodzinne</small></div>
+    </div>
+    <div class="lang" role="group" aria-label="Język">
+      <button data-lang="pl-PL" aria-pressed="true">PL</button>
+      <button data-lang="en-GB" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <div class="kidbar" role="group" aria-label="Wybór dziecka">
+    <button class="kid all" data-kid="all" aria-pressed="true"><span class="tok">∗</span><span data-i18n="kid.all">Cała rodzina</span></button>
+    <button class="kid" data-kid="zofia" aria-pressed="false"><span class="tok">Z</span>Zofia</button>
+    <button class="kid" data-kid="jan" aria-pressed="false"><span class="tok">J</span>Jan</button>
+  </div>
+
+  <div class="modmark">
+    <span data-i18n="mod.covers">Pulpit obejmuje oba moduły:</span>
+    <span class="chip z"><i></i><span data-i18n="mod.classes">zajęcia</span></span>
+    <span class="chip c"><i></i><span data-i18n="mod.comp">zawody</span></span>
+  </div>
+
+  <div class="statebar">
+    <span class="lbl" data-i18n="state.label">Stan makiety</span>
+    <div class="seg" role="group" aria-label="Stan ekranu">
+      <button data-state-btn="default" aria-pressed="true" data-i18n="state.default">domyślny</button>
+      <button data-state-btn="alt" aria-pressed="false" data-i18n="state.alt02">offline</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="sync reveal">
+      <span class="dot" aria-hidden="true"></span>
+      <span data-when="default"><span data-i18n="sync.fresh">Dane świeże · ostatnia synchronizacja</span> <b id="syncTime">18:42</b></span>
+      <span data-when="alt"><span data-i18n="sync.stale">Pokazujemy dane z</span> <b>18:42</b></span>
+    </div>
+
+    <div class="offlineBanner reveal" role="status">
+      <span class="ico" aria-hidden="true">⚠</span>
+      <div>
+        <strong data-i18n="offline.title">Brak połączenia.</strong>
+        <span data-i18n="offline.body"> Zmiany czekają w kolejce i wyślą się po powrocie sieci. Płatności i potwierdzenia ofert wymagają połączenia.</span>
+      </div>
+    </div>
+
+    <h2 class="sec reveal" data-i18n="sec.urgent">Najpilniejsze</h2>
+    <div id="alerts" class="reveal"></div>
+    <div class="empty" id="alertsEmpty" data-i18n="alerts.empty">Brak pilnych spraw dla tego dziecka.</div>
+
+    <h2 class="sec" data-i18n="sec.today">Dziś i jutro</h2>
+    <div class="timeline" id="timeline"></div>
+
+    <div class="wallet">
+      <div>
+        <div class="v" id="walletVal">+40,00 zł</div>
+        <div class="k" data-i18n="wallet.k">Kredyt w portfelu · Klub Pływacki Delfin</div>
+      </div>
+      <button class="link" data-i18n="wallet.open">Otwórz portfel</button>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="status">
+      <span class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--color-error)" aria-hidden="true"></span>
+      <span data-i18n="bar.status">Do rozliczenia:</span> <b id="barAmt">89,00 zł</b>
+    </div>
+    <div class="actionrow">
+      <div class="second">
+        <button class="link" data-i18n="bar.absence">Zgłoś nieobecność</button>
+        <button class="link" data-i18n="bar.schedule">Grafik</button>
+        <button class="link" data-i18n="bar.gallery">Galeria</button>
+      </div>
+      <button class="btn btn-primary" id="mainAction" data-when="default" data-i18n="bar.pay">Zapłać 89 zł</button>
+      <button class="btn btn-primary" id="mainActionAlt" data-when="alt" disabled data-i18n="bar.payOffline">Płatność wymaga sieci</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "acct.name":"Rodzina Kowalskich","acct.kicker":"konto rodzinne",
+  "kid.all":"Cała rodzina",
+  "mod.covers":"Pulpit obejmuje oba moduły:","mod.classes":"zajęcia","mod.comp":"zawody",
+  "state.label":"Stan makiety","state.default":"domyślny","state.alt02":"offline",
+  "sync.fresh":"Dane świeże · ostatnia synchronizacja","sync.stale":"Pokazujemy dane z",
+  "offline.title":"Brak połączenia.","offline.body":" Zmiany czekają w kolejce i wyślą się po powrocie sieci. Płatności i potwierdzenia ofert wymagają połączenia.",
+  "sec.urgent":"Najpilniejsze","sec.today":"Dziś i jutro","alerts.empty":"Brak pilnych spraw dla tego dziecka.",
+  "wallet.k":"Kredyt w portfelu · Klub Pływacki Delfin","wallet.open":"Otwórz portfel",
+  "bar.status":"Do rozliczenia:","bar.absence":"Zgłoś nieobecność","bar.schedule":"Grafik","bar.gallery":"Galeria",
+  "bar.pay":"Zapłać","bar.payOffline":"Płatność wymaga sieci",
+  "a.pay.title":"Zaległa płatność","a.pay.cta":"Zapłać","a.pay.detail.tpl":"pływanie · termin minął {d}",
+  "a.offer.title":"Zwolniło się miejsce","a.offer.detail":"Lista rezerwowa · grupa Żabki","a.offer.cta":"Potwierdź","a.offer.alt":"Zobacz alternatywy","a.offer.left":"do decyzji",
+  "a.doc.title":"Brakujący dokument","a.doc.detail":"Karta pływacka · blokuje zapis","a.doc.cta":"Wgraj dokument",
+  "ev.swim":"Trening pływacki","ev.swim.meta":"Klub Pływacki Delfin · sala A","ev.start":"Start: Bieg Wiosenny","ev.start.meta":"Stołeczny Klub Biegacza · Park Miejski","ev.lesson":"Lekcja 1:1","ev.lesson.meta":"Szkoła Pływania Nurek · tor 3",
+  "collision":"Kolizja: dwa starty w jednym bloku godzinowym."
+ },
+ "en-GB":{
+  "acct.name":"The Kowalski family","acct.kicker":"family account",
+  "kid.all":"Whole family",
+  "mod.covers":"Dashboard covers both modules:","mod.classes":"classes","mod.comp":"competitions",
+  "state.label":"Mockup state","state.default":"default","state.alt02":"offline",
+  "sync.fresh":"Data fresh · last sync","sync.stale":"Showing data from",
+  "offline.title":"No connection.","offline.body":" Changes are queued and will send once you are back online. Payments and offer confirmations need a connection.",
+  "sec.urgent":"Most urgent","sec.today":"Today and tomorrow","alerts.empty":"No urgent matters for this child.",
+  "wallet.k":"Wallet credit · Delfin Swimming Club","wallet.open":"Open wallet",
+  "bar.status":"To settle:","bar.absence":"Report absence","bar.schedule":"Schedule","bar.gallery":"Gallery",
+  "bar.pay":"Pay","bar.payOffline":"Payment needs a connection",
+  "a.pay.title":"Overdue payment","a.pay.cta":"Pay","a.pay.detail.tpl":"swimming · due {d}",
+  "a.offer.title":"A spot opened up","a.offer.detail":"Waiting list · Żabki group","a.offer.cta":"Confirm","a.offer.alt":"See alternatives","a.offer.left":"to decide",
+  "a.doc.title":"Missing document","a.doc.detail":"Swimming card · blocks sign-up","a.doc.cta":"Upload document",
+  "ev.swim":"Swimming training","ev.swim.meta":"Delfin Swimming Club · room A","ev.start":"Start: Spring Run","ev.start.meta":"Stołeczny Running Club · City Park","ev.lesson":"1:1 lesson","ev.lesson.meta":"Nurek Swim School · lane 3",
+  "collision":"Clash: two starts in the same time block."
+ }
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+let lang="pl-PL", kid="all";
+const t=k=>(I18N[lang]&&I18N[lang][k])??(I18N["en-GB"]&&I18N["en-GB"][k])??k;
+const money=v=>new Intl.NumberFormat(lang,{style:"currency",currency:"PLN"}).format(v);
+const moneySigned=v=>new Intl.NumberFormat(lang,{style:"currency",currency:"PLN",signDisplay:"exceptZero"}).format(v);
+
+/* data model */
+const ALERTS=[
+ {id:"pay",owner:"zofia",cls:"pay",amount:89,dueDate:"2025-05-14",prio:1},
+ {id:"offer",owner:"jan",cls:"offer",prio:2,deadline:298 /*sec*/},
+ {id:"doc",owner:"zofia",cls:"doc",prio:3}
+];
+const EVENTS=[
+ {owner:"zofia",time:"09:00",ev:"ev.swim",meta:"ev.swim.meta",tag:"z"},
+ {owner:"jan",time:"17:30",ev:"ev.start",meta:"ev.start.meta",tag:"c"},
+ {owner:"jan",time:"17:30",ev:"ev.lesson",meta:"ev.lesson.meta",tag:"c"}
+];
+const fmtDueDate=d=>new Intl.DateTimeFormat(lang,{day:"2-digit",month:"long"}).format(new Date(d));
+
+function tok(owner){const m={zofia:"Z",jan:"J"};return `<span class="tok ${owner}">${m[owner]}</span>`;}
+function ownerName(owner){return owner==="zofia"?"Zofia":owner==="jan"?"Jan":t("kid.all");}
+
+function renderAlerts(){
+  const box=document.getElementById("alerts");
+  const list=ALERTS.filter(a=>kid==="all"||a.owner===kid).sort((a,b)=>a.prio-b.prio);
+  box.innerHTML="";
+  document.getElementById("alertsEmpty").style.display=list.length?"none":"block";
+  list.forEach(a=>{
+    const el=document.createElement("div");
+    el.className="alert "+a.cls;
+    if(a.id==="pay"){
+      const detail=t("a.pay.detail.tpl").replace("{d}",fmtDueDate(a.dueDate));
+      el.innerHTML=`<div class="top"><div><div class="title">${t("a.pay.title")}</div>
+        <div class="who">${tok(a.owner)} ${ownerName(a.owner)} · <span>${detail}</span></div></div>
+        <div class="amount">${money(a.amount)}</div></div>
+        <div class="act"><button class="miniBtn solid">${t("a.pay.cta")} ${money(a.amount)}</button></div>`;
+    }else if(a.id==="offer"){
+      el.innerHTML=`<div class="top"><div><div class="title">${t("a.offer.title")}</div>
+        <div class="who">${tok(a.owner)} ${ownerName(a.owner)} · <span>${t("a.offer.detail")}</span></div></div></div>
+        <div class="countdown"><span aria-hidden="true">⏱</span><span class="clk" id="clk">04:58</span><span style="font-weight:500;color:var(--text-muted);font-size:13px"> ${t("a.offer.left")}</span></div>
+        <div class="act"><button class="miniBtn solid" data-net="1">${t("a.offer.cta")}</button><button class="miniBtn line">${t("a.offer.alt")}</button></div>`;
+    }else{
+      el.innerHTML=`<div class="top"><div><div class="title">${t("a.doc.title")}</div>
+        <div class="who">${tok(a.owner)} ${ownerName(a.owner)} · <span>${t("a.doc.detail")}</span></div></div></div>
+        <div class="act"><button class="miniBtn solid">${t("a.doc.cta")}</button></div>`;
+    }
+    box.appendChild(el);
+  });
+  // offline: disable net actions
+  const off=document.body.dataset.state==="alt";
+  box.querySelectorAll('[data-net]').forEach(b=>b.disabled=off);
+  startClock();
+}
+
+let clockTimer=null,remain=298;
+function startClock(){
+  clearInterval(clockTimer);
+  const elc=document.getElementById("clk");
+  if(!elc) return;
+  const off=document.body.dataset.state==="alt";
+  const paint=()=>{const m=String(Math.floor(remain/60)).padStart(2,"0");const s=String(remain%60).padStart(2,"0");elc.textContent=`${m}:${s}`;};
+  paint();
+  if(off) return; // frozen offline
+  clockTimer=setInterval(()=>{remain=Math.max(0,remain-1);paint();if(remain===0)clearInterval(clockTimer);},1000);
+}
+
+function renderTimeline(){
+  const tl=document.getElementById("timeline");
+  const list=EVENTS.filter(e=>kid==="all"||e.owner===kid);
+  tl.innerHTML="";
+  if(!list.length){tl.innerHTML=`<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:8px 0">${t("alerts.empty")}</div>`;return;}
+  list.forEach(e=>{
+    const row=document.createElement("div");row.className="tl-row";
+    row.innerHTML=`<div class="tl-time">${e.time}</div>
+      <div class="tl-body"><div class="ev">${t(e.ev)}</div><div class="meta">${ownerName(e.owner)} · ${t(e.meta)}</div></div>
+      <span class="tl-tag ${e.tag}">${t(e.tag==="z"?"mod.classes":"mod.comp")}</span>`;
+    tl.appendChild(row);
+  });
+  // collision only when viewing whole family or Jan (two 17:30 starts belong to Jan)
+  const janStarts=EVENTS.filter(e=>e.owner==="jan"&&e.time==="17:30");
+  if((kid==="all"||kid==="jan")&&janStarts.length>1){
+    const c=document.createElement("div");c.className="collision";
+    c.innerHTML=`<span aria-hidden="true">⚠</span><span>${t("collision")}</span>`;
+    tl.appendChild(c);
+  }
+}
+
+function renderBar(){
+  const payAlert=ALERTS.find(a=>a.id==="pay"&&(kid==="all"||a.owner===kid));
+  const main=document.getElementById("mainAction");
+  if(payAlert){
+    document.getElementById("barAmt").textContent=money(payAlert.amount);
+    main.textContent=`${t("bar.pay")} ${money(payAlert.amount)}`;
+    main.disabled=false;
+  }else{
+    document.getElementById("barAmt").textContent=money(0);
+    main.textContent=t("bar.pay");
+    main.disabled=true;
+  }
+}
+
+function render(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const k=el.getAttribute("data-i18n");const small=el.querySelector("small");
+    if(small){el.childNodes[0].nodeValue=t(k);}else el.textContent=t(k);
+  });
+  document.getElementById("walletVal").textContent=moneySigned(40);
+  renderAlerts();renderTimeline();renderBar();
+}
+
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{
+  lang=b.dataset.lang;document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();
+}));
+document.querySelectorAll(".kid").forEach(b=>b.addEventListener("click",()=>{
+  kid=b.dataset.kid;document.querySelectorAll(".kid").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  renderAlerts();renderTimeline();renderBar();
+}));
+document.querySelectorAll("[data-state-btn]").forEach(b=>b.addEventListener("click",()=>{
+  document.body.dataset.state=b.dataset.stateBtn;
+  document.querySelectorAll("[data-state-btn]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  renderAlerts();renderBar();
+}));
+
+render();
+</script>
+</body>
+</html>

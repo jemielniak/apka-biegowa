@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INS · Tablica ścieżki: dzień instruktora jednej grupy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* tokeny z Bloku startowego INS */
+  --brand-ink:#0d1a1e; --accent:#21d8c4;
+  --color-success:#4ade80; --color-warning:#f6b73c; --color-error:#ff6b5e; --color-info:#5aa8ff;
+  --surface-1:#13242a; --surface-2:#1a313a; --surface-3:#234049; --hairline:#2c4b55;
+  --text-strong:#f0f6f5; --text:#c7d6d8; --text-muted:#83a0a5; --on-accent:#062420; --paper:#eef4f1;
+  --lvl1:#5aa8ff; --lvl2:#4ade80; --lvl3:#21d8c4;
+  --font-display:"Bricolage Grotesque", system-ui, sans-serif;
+  --font-body:"IBM Plex Sans", system-ui, sans-serif;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:16px; --shadow:0 12px 32px -14px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  font-family:var(--font-body);color:var(--text);line-height:1.45;-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(130% 90% at 0% 0%, color-mix(in srgb,var(--accent) 10%,transparent) 0, transparent 46%),
+    radial-gradient(130% 90% at 100% 100%, var(--surface-2) 0, transparent 50%),
+    #06100f;
+  padding:var(--s8) var(--s5) calc(var(--s10) + env(safe-area-inset-bottom));
+}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- nagłówek strony ---------- */
+header.page{max-width:1180px;margin:0 auto var(--s6);display:flex;flex-direction:column;gap:var(--s3)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+  font:600 11px/1 var(--font-display);letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted)}
+.eyebrow::before{content:"";width:20px;height:20px;border-radius:6px;
+  background:radial-gradient(circle at 30% 30%,#2ff0da,var(--accent) 60%,#0fae9e)}
+h1{font:800 32px/1.05 var(--font-display);color:var(--text-strong);letter-spacing:-.01em;max-width:36ch}
+.lede{font:400 15px/1.55 var(--font-body);color:var(--text);max-width:66ch}
+.lede b{color:var(--text-strong);font-weight:600}
+
+/* ---------- legenda ---------- */
+.legend{max-width:1180px;margin:0 auto var(--s6);background:var(--surface-1);border:1px solid var(--hairline);
+  border-radius:var(--radius);padding:var(--s4) var(--s5);display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4);box-shadow:var(--shadow)}
+.legend h2{grid-column:1/-1;font:700 11px/1 var(--font-display);letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--s1)}
+.legend-item{display:flex;align-items:center;gap:10px;font:500 13px/1.35 var(--font-body);color:var(--text)}
+.legend-item b{font-weight:600;color:var(--text-strong)}
+.legend-swatch{flex:0 0 auto;width:48px;height:24px;border-radius:6px;display:grid;place-items:center;position:relative}
+.swatch-primary::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:2px;background:var(--accent);transform:translateY(-50%)}
+.swatch-primary::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;border-left:8px solid var(--accent);border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%)}
+.swatch-sec::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:2px;background:var(--text-muted);transform:translateY(-50%)}
+.swatch-sec::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;border-left:8px solid var(--text-muted);border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%)}
+.swatch-branch::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:0;border-top:2px dashed var(--color-warning);transform:translateY(-1px)}
+.swatch-branch::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;border-left:8px solid var(--color-warning);border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%)}
+.swatch-alt{background:color-mix(in srgb,var(--color-warning) 14%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-warning) 50%,transparent);color:var(--color-warning);
+  font:700 9px/1 var(--font-display);letter-spacing:.03em;text-transform:lowercase}
+
+/* ---------- plansza ---------- */
+.board-wrap{max-width:1180px;margin:0 auto;overflow:auto;background:var(--surface-1);border:1px solid var(--hairline);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:var(--s5)}
+.board{position:relative;width:1140px;height:1180px;margin:0 auto}
+
+/* ---------- SVG strzałki ---------- */
+.arrows{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.arrows .path-primary{fill:none;stroke:var(--accent);stroke-width:2.2;marker-end:url(#ah-primary)}
+.arrows .path-sec{fill:none;stroke:var(--text-muted);stroke-width:1.8;marker-end:url(#ah-sec)}
+.arrows .path-branch{fill:none;stroke:var(--color-warning);stroke-width:1.8;stroke-dasharray:6 4;marker-end:url(#ah-branch)}
+
+/* ---------- etykiety przy strzałkach ---------- */
+.label{position:absolute;transform:translate(-50%,-50%);background:var(--surface-2);border:1px solid var(--hairline);
+  border-radius:999px;padding:4px 10px;font:600 11px/1.1 var(--font-body);color:var(--text-strong);
+  white-space:nowrap;z-index:2;letter-spacing:.01em;box-shadow:0 2px 8px -4px rgba(0,0,0,.6)}
+.label.primary{border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent)}
+.label.branch{border-color:color-mix(in srgb,var(--color-warning) 50%,transparent);background:color-mix(in srgb,var(--color-warning) 13%,var(--surface-1));color:var(--color-warning)}
+
+/* ---------- węzeł ---------- */
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;z-index:1}
+.node .cap{margin-top:8px;text-align:center;font:600 12px/1.25 var(--font-display);color:var(--text-strong);width:130px}
+.node .cap small{display:block;font-family:var(--font-body);font-weight:500;color:var(--text-muted);margin-top:1px;letter-spacing:.01em}
+a.node{text-decoration:none;color:inherit;cursor:pointer;animation:rise .5s both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+a.node .phone{transition:transform .18s cubic-bezier(.2,.7,.3,1),box-shadow .18s,border-color .18s}
+a.node:hover{z-index:5}
+a.node:hover .phone{transform:translateY(-3px);border-color:var(--accent);
+  box-shadow:0 16px 34px -12px rgba(0,0,0,.8),0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent)}
+a.node:hover .cap{color:var(--accent)}
+a.node:focus-visible{outline:none}
+a.node:focus-visible .phone{box-shadow:0 0 0 3px var(--accent),0 14px 30px -12px rgba(0,0,0,.7);border-color:var(--accent)}
+a.node:focus-visible .cap{color:var(--accent)}
+
+/* ---------- ramka telefonu ---------- */
+.phone{width:120px;height:188px;background:var(--surface-1);border:1px solid var(--hairline);border-radius:13px;
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.phone .band{height:3px;background:radial-gradient(circle at 20% 50%,#2ff0da,var(--accent) 70%,#0fae9e)}
+.phone .hdr{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:5px 7px;border-bottom:1px solid var(--hairline);background:var(--surface-2)}
+.phone .id{font:800 10px/1 var(--font-display);color:var(--text-strong);letter-spacing:.03em}
+.phone .tag{font:600 8px/1 var(--font-display);color:var(--text-muted);letter-spacing:.05em}
+.phone .body{flex:1;padding:6px;display:flex;flex-direction:column;gap:4px;background:var(--surface-1);min-height:0}
+.phone .foot{padding:5px 6px;border-top:1px solid var(--hairline);background:var(--surface-2)}
+.phone .cta{display:block;width:100%;background:var(--accent);color:var(--on-accent);text-align:center;
+  padding:5px 0;border-radius:6px;font:800 9px/1 var(--font-display);letter-spacing:.02em}
+.phone .cta.ghost{background:transparent;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+
+/* ---------- badge stanu alternatywnego ---------- */
+.altbadge{position:absolute;right:-8px;top:-8px;background:color-mix(in srgb,var(--color-warning) 16%,var(--surface-1));
+  border:1px solid color-mix(in srgb,var(--color-warning) 55%,transparent);color:var(--color-warning);
+  font:700 8px/1 var(--font-display);letter-spacing:.03em;padding:3px 6px;border-radius:999px;z-index:3;white-space:nowrap;
+  box-shadow:0 3px 8px -3px rgba(0,0,0,.7)}
+
+/* ============ miniatury body ============ */
+/* INS-01 logowanie */
+.i-login{flex:1;display:flex;flex-direction:column;gap:5px;justify-content:center}
+.i-login .fld{height:22px;border-radius:6px;background:var(--surface-2);border:1px solid var(--hairline);display:flex;align-items:center;padding:0 6px;font:500 8px/1 var(--font-body);color:var(--text-muted)}
+.i-login .bio{display:flex;align-items:center;gap:5px;font:500 7.5px/1.2 var(--font-body);color:var(--text-muted)}
+.i-login .bio i{width:16px;height:16px;border-radius:5px;background:var(--surface-3);border:1px solid var(--hairline);flex:none}
+
+/* INS-02 najbliższe */
+.i-next{flex:1;display:flex;flex-direction:column;gap:4px}
+.i-next .card{background:var(--surface-2);border:1px solid color-mix(in srgb,var(--accent) 40%,var(--hairline));border-radius:6px;padding:5px 6px;display:flex;flex-direction:column;gap:2px}
+.i-next .card .t{font:800 11px/1 var(--font-display);color:var(--text-strong)}
+.i-next .card .g{font:600 8.5px/1 var(--font-body);color:var(--text-strong)}
+.i-next .card .m{font:600 7px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;color:var(--color-warning)}
+.i-next .lat{display:flex;justify-content:space-between;padding:2px 4px;border-radius:4px;background:var(--surface-2);font:500 8px/1 var(--font-body);color:var(--text-muted)}
+
+/* INS-03 grafik tygodnia */
+.i-week{flex:1;display:flex;flex-direction:column;gap:2px}
+.i-week .d{display:flex;align-items:center;gap:4px}
+.i-week .d .dn{width:14px;font:700 7px/1 var(--font-display);color:var(--text-muted)}
+.i-week .blk{flex:1;height:13px;border-radius:3px;border-left:3px solid var(--lvl3);background:var(--surface-2)}
+.i-week .blk.l1{border-left-color:var(--lvl1)} .i-week .blk.l2{border-left-color:var(--lvl2)}
+.i-week .blk.x{border-left-color:var(--color-error);background:repeating-linear-gradient(45deg,var(--surface-2) 0 4px,color-mix(in srgb,var(--color-error) 22%,var(--surface-2)) 4px 5px)}
+.i-week .free{flex:1;height:13px;border-radius:3px;border:1px dashed var(--hairline)}
+
+/* INS-04 obecność */
+.i-att{flex:1;display:flex;flex-direction:column;gap:3px}
+.i-att .r{display:flex;align-items:center;gap:4px;padding:2px 4px;border-radius:4px;background:var(--surface-2)}
+.i-att .r .nm{flex:1;font:500 8px/1 var(--font-body);color:var(--text-strong);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.i-att .r .p{width:15px;height:15px;border-radius:4px;border:1px solid var(--hairline);display:grid;place-items:center;font:800 6.5px/1 var(--font-display);color:var(--text-muted);flex:none}
+.i-att .r .p.ob{background:var(--color-success);border-color:var(--color-success);color:#06280f}
+.i-att .r .p.ab{background:var(--color-error);border-color:var(--color-error);color:#3a0d09}
+
+/* INS-05 umiejętności */
+.i-skill{flex:1;display:flex;flex-direction:column;gap:4px}
+.i-skill .s{display:flex;align-items:center;gap:5px}
+.i-skill .st{width:16px;height:16px;border-radius:50%;border:2px solid var(--hairline);display:grid;place-items:center;font:700 8px/1 var(--font-body);color:var(--text-muted);flex:none}
+.i-skill .s.done .st{background:var(--color-success);border-color:var(--color-success);color:#06280f}
+.i-skill .s.prog .st{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.i-skill .s .lb{flex:1;font:500 8px/1.1 var(--font-body);color:var(--text-strong);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.i-skill .s.done .lb{color:var(--color-success)} .i-skill .s.prog .lb{color:var(--accent)}
+
+/* INS-06 profil */
+.i-prof{flex:1;display:flex;flex-direction:column;gap:4px}
+.i-prof .safe{display:flex;gap:4px;padding:5px;border-radius:6px;background:color-mix(in srgb,var(--color-info) 15%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-info) 45%,transparent);border-left:3px solid var(--color-info)}
+.i-prof .safe i{width:14px;height:14px;border-radius:4px;background:color-mix(in srgb,var(--color-info) 30%,transparent);color:#fff;display:grid;place-items:center;font:700 9px/1 var(--font-body);flex:none}
+.i-prof .safe span{font:500 7.5px/1.2 var(--font-body);color:var(--text-strong)}
+.i-prof .stat{display:flex;align-items:center;justify-content:space-between;padding:4px 6px;border-radius:5px;background:var(--surface-2)}
+.i-prof .stat .k{font:500 7.5px/1 var(--font-body);color:var(--text-muted)}
+.i-prof .stat .v{font:800 11px/1 var(--font-display);color:var(--text-strong)}
+
+/* INS-07 dostępność */
+.i-avail{flex:1;display:flex;flex-direction:column;gap:2px}
+.i-avail .g{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,1fr);gap:2px;flex:1}
+.i-avail .cc{border-radius:3px;background:var(--surface-2);border:1px solid var(--hairline)}
+.i-avail .cc.on{background:color-mix(in srgb,var(--accent) 32%,var(--surface-2));border-color:color-mix(in srgb,var(--accent) 50%,transparent)}
+.i-avail .cc.no{background:repeating-linear-gradient(45deg,var(--surface-2) 0 4px,color-mix(in srgb,var(--color-warning) 24%,var(--surface-2)) 4px 5px);border-color:color-mix(in srgb,var(--color-warning) 45%,transparent)}
+
+/* INS-08 ewidencja */
+.i-hours{flex:1;display:flex;flex-direction:column;gap:3px}
+.i-hours .h{display:flex;align-items:center;justify-content:space-between;padding:2px 5px;border-radius:4px;background:var(--surface-2);font:500 8px/1 var(--font-body);color:var(--text)}
+.i-hours .h .hv{font:800 8.5px/1 var(--font-display);color:var(--text-strong)}
+.i-hours .sum{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding:3px 5px;border-radius:4px;background:color-mix(in srgb,var(--accent) 13%,var(--surface-1));border:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
+.i-hours .sum .sk{font:600 7.5px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted)}
+.i-hours .sum .sv{font:800 11px/1 var(--font-display);color:var(--accent)}
+
+/* INS-09 lekcje 1:1 */
+.i-lesson{flex:1;display:flex;flex-direction:column;gap:4px}
+.i-lesson .bk{background:var(--surface-2);border:1px solid var(--hairline);border-radius:6px;padding:5px 6px;display:flex;flex-direction:column;gap:2px}
+.i-lesson .bk .t{font:800 10px/1 var(--font-display);color:var(--text-strong)}
+.i-lesson .bk .c{font:600 8px/1 var(--font-body);color:var(--text-strong)}
+.i-lesson .bk .l{font:500 7.5px/1 var(--font-body);color:var(--text-muted)}
+.i-lesson .slot{padding:4px 6px;border-radius:6px;border:1px dashed color-mix(in srgb,var(--accent) 45%,transparent);font:600 7.5px/1 var(--font-body);color:var(--accent);text-align:center}
+
+/* INS-10 komunikaty */
+.i-msg{flex:1;display:flex;flex-direction:column;gap:4px}
+.i-msg .to{display:flex;align-items:center;gap:4px;font:600 7.5px/1 var(--font-body);color:var(--text-muted)}
+.i-msg .to b{background:color-mix(in srgb,var(--color-info) 16%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-info) 45%,transparent);color:var(--color-info);font:700 7.5px/1 var(--font-display);padding:3px 6px;border-radius:999px}
+.i-msg .box{flex:1;border-radius:6px;background:var(--surface-2);border:1px solid var(--hairline);padding:5px;display:flex;flex-direction:column;gap:3px}
+.i-msg .box .ln{height:5px;border-radius:3px;background:var(--surface-3)}
+.i-msg .box .ln.s{width:60%}
+
+/* ---------- nota ---------- */
+footer.page{max-width:1180px;margin:var(--s6) auto 0;padding:var(--s4) var(--s5);background:var(--surface-1);
+  border:1px solid var(--hairline);border-radius:var(--radius);display:flex;gap:var(--s4);align-items:flex-start;box-shadow:var(--shadow)}
+footer.page .pill-tag{flex:0 0 auto;background:var(--accent);color:var(--on-accent);font:800 10px/1 var(--font-display);
+  letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:7px}
+footer.page p{font:400 13.5px/1.65 var(--font-body);color:var(--text);max-width:78ch}
+footer.page p b{color:var(--text-strong);font-weight:600}
+footer.page p + p{margin-top:var(--s3)}
+
+@media (max-width:1220px){.board-wrap{padding:var(--s3)}}
+@media (prefers-reduced-motion:reduce){a.node{animation:none}a.node:hover .phone{transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<header class="page">
+  <span class="eyebrow">INS · panel instruktora · moduł zajęć</span>
+  <h1>Tablica ścieżki: dzień instruktora jednej grupy</h1>
+  <p class="lede">
+    Trasa instruktora od logowania po obecność, umiejętności i profil dziecka, na przykładzie grupy
+    <b>Delfinki (poziom 3)</b> w Klubie Pływackim Delfin. Każdy kafel to jeden ekran panelu;
+    <b>kliknięcie miniatury otwiera odpowiednią makietę w nowej karcie</b>. Strzałki pokazują, która akcja
+    prowadzi dalej. <b>Aqua</b> to akcje główne, <b>szary</b> to nawigacja drugorzędna, a <b>bursztynowa
+    przerywana</b> to rozgałęzienia od wyjątków. Badge przy miniaturze to udokumentowany stan alternatywny
+    danego ekranu, ten sam, który siedzi w jego przełączniku stanu.
+  </p>
+</header>
+
+<section class="legend" aria-label="Legenda">
+  <h2>Legenda</h2>
+  <div class="legend-item"><span class="legend-swatch swatch-primary"></span><span><b>Akcja główna</b>: dominujące przejście z CTA ekranu.</span></div>
+  <div class="legend-item"><span class="legend-swatch swatch-sec"></span><span><b>Nawigacja drugorzędna</b>: skrót, podgląd, powiązanie.</span></div>
+  <div class="legend-item"><span class="legend-swatch swatch-branch"></span><span><b>Rozgałęzienie</b>: wyjątek lub zwrot asynchroniczny.</span></div>
+  <div class="legend-item"><span class="legend-swatch swatch-alt">alt</span><span><b>Stan alternatywny</b> ekranu (z przełącznika).</span></div>
+</section>
+
+<div class="board-wrap">
+  <div class="board" role="img" aria-label="Tablica ścieżki przejść między ekranami INS-01 do INS-10 dla pracy instruktora z jedną grupą">
+
+    <!-- ============================ SVG: STRZAŁKI ============================ -->
+    <svg class="arrows" viewBox="0 0 1140 1180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <marker id="ah-primary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:#21d8c4"/>
+        </marker>
+        <marker id="ah-sec" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:#83a0a5"/>
+        </marker>
+        <marker id="ah-branch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:#f6b73c"/>
+        </marker>
+      </defs>
+
+      <!-- PRIMARY -->
+      <path class="path-primary" d="M 570 204 L 570 298"/>            <!-- 01->02 -->
+      <path class="path-primary" d="M 525 488 C 380 530, 250 548, 194 583"/> <!-- 02->04 -->
+      <path class="path-primary" d="M 190 488 L 190 583"/>            <!-- 03->04 -->
+      <path class="path-primary" d="M 252 670 L 366 670"/>            <!-- 04->05 -->
+      <path class="path-primary" d="M 650 705 L 494 705"/>            <!-- 06->05 -->
+
+      <!-- SECONDARY -->
+      <path class="path-sec" d="M 508 350 L 254 350"/>                <!-- 02->03 -->
+      <path class="path-sec" d="M 632 350 L 886 350"/>                <!-- 02->09 -->
+      <path class="path-sec" d="M 600 488 C 662 525, 700 552, 710 583"/> <!-- 02->06 -->
+      <path class="path-sec" d="M 548 488 C 480 525, 446 552, 434 583"/> <!-- 02->05 -->
+      <path class="path-sec" d="M 632 412 C 800 458, 906 512, 940 583"/> <!-- 02->07 -->
+      <path class="path-sec" d="M 512 446 C 360 600, 300 732, 308 868"/> <!-- 02->08 -->
+      <path class="path-sec" d="M 250 748 C 430 824, 548 812, 648 762"/> <!-- 04->06 -->
+      <path class="path-sec" d="M 886 650 L 774 650"/>                <!-- 09->06 -->
+      <path class="path-sec" d="M 712 773 C 742 816, 792 842, 828 868"/> <!-- 06->10 -->
+
+      <!-- BRANCH -->
+      <path class="path-branch" d="M 948 488 C 1002 642, 952 782, 848 868"/> <!-- 09->10 -->
+      <path class="path-branch" d="M 902 583 C 800 512, 716 466, 634 442"/>  <!-- 07->02 -->
+    </svg>
+
+    <!-- ============================ ETYKIETY ============================ -->
+    <div class="label primary" style="left:570px;top:251px">zaloguj się</div>
+    <div class="label primary" style="left:352px;top:521px">rozpocznij obecność</div>
+    <div class="label primary" style="left:190px;top:536px">otwórz blok</div>
+    <div class="label primary" style="left:309px;top:652px">zamknij → umiejętności</div>
+    <div class="label primary" style="left:572px;top:724px">aktualizuj umiejętności</div>
+
+    <div class="label" style="left:381px;top:350px">mój grafik</div>
+    <div class="label" style="left:759px;top:350px">lekcje 1:1</div>
+    <div class="label" style="left:702px;top:536px">podgląd uczestnika</div>
+    <div class="label" style="left:466px;top:536px">po zajęciach</div>
+    <div class="label" style="left:820px;top:470px">zgłoś dostępność</div>
+    <div class="label" style="left:352px;top:660px">ewidencja godzin</div>
+    <div class="label" style="left:446px;top:812px">wiersz → profil</div>
+    <div class="label" style="left:830px;top:632px">profil dziecka</div>
+    <div class="label" style="left:800px;top:824px">kontakt z opiekunem</div>
+
+    <div class="label branch" style="left:992px;top:700px">odwołanie → rodzic</div>
+    <div class="label branch" style="left:772px;top:512px">zatwierdzone zastępstwo</div>
+
+    <!-- ============================ WĘZŁY ============================ -->
+
+    <!-- INS-01 logowanie -->
+    <a class="node" style="left:510px;top:16px" href="INS-01_logowanie_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-01: logowanie">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-01</span><span class="tag">PL</span></div>
+        <div class="body">
+          <div class="i-login">
+            <div class="fld">a.mazur@klubdelfin.pl</div>
+            <div class="bio"><i aria-hidden="true"></i><span>Odcisk / Face ID na tym urządzeniu</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Zaloguj linkiem</span></div>
+        <div class="altbadge">alt · bez placówki</div>
+      </div>
+      <div class="cap">INS-01<small>logowanie</small></div>
+    </a>
+
+    <!-- INS-02 dashboard dziś (HUB) -->
+    <a class="node" style="left:510px;top:300px" href="INS-02_dashboard-dzis_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-02: dashboard dnia">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-02</span><span class="tag">wt</span></div>
+        <div class="body">
+          <div class="i-next">
+            <div class="card"><span class="t num">16:00 · Tor 2</span><span class="g">Delfinki · p.3</span><span class="m">obecność nierozpocz.</span></div>
+            <div class="lat"><span class="num">17:00</span><span>Żabki · zast.</span></div>
+            <div class="lat"><span class="num">18:00</span><span>Rekiny · zamkn.</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Rozpocznij obecność</span></div>
+        <div class="altbadge">alt · offline</div>
+      </div>
+      <div class="cap">INS-02<small>dashboard dnia</small></div>
+    </a>
+
+    <!-- INS-03 mój grafik -->
+    <a class="node" style="left:130px;top:300px" href="INS-03_moj-grafik_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-03: mój grafik">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-03</span><span class="tag">tyg</span></div>
+        <div class="body">
+          <div class="i-week">
+            <div class="d"><span class="dn">Pn</span><span class="blk"></span></div>
+            <div class="d"><span class="dn">Wt</span><span class="blk"></span></div>
+            <div class="d"><span class="dn">Wt</span><span class="blk l2"></span></div>
+            <div class="d"><span class="dn">Śr</span><span class="free"></span></div>
+            <div class="d"><span class="dn">Cz</span><span class="blk x"></span></div>
+            <div class="d"><span class="dn">Pt</span><span class="blk"></span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta ghost">Otwórz blok</span></div>
+        <div class="altbadge">alt · pusty tydz.</div>
+      </div>
+      <div class="cap">INS-03<small>mój grafik</small></div>
+    </a>
+
+    <!-- INS-09 lekcje 1:1 -->
+    <a class="node" style="left:890px;top:300px" href="INS-09_lekcje-jeden-na-jeden_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-09: kalendarz lekcji jeden na jeden">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-09</span><span class="tag">1:1</span></div>
+        <div class="body">
+          <div class="i-lesson">
+            <div class="bk"><span class="t num">Sob 10:00</span><span class="c">Kowalska, Zofia</span><span class="l">Tor 1 · technika</span></div>
+            <div class="slot">+ wolne okno 11:00</div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Oznacz obecność</span></div>
+        <div class="altbadge">alt · rezerwacja</div>
+      </div>
+      <div class="cap">INS-09<small>lekcje 1:1</small></div>
+    </a>
+
+    <!-- INS-04 obecność -->
+    <a class="node" style="left:130px;top:585px" href="INS-04_lista-obecnosci_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-04: lista obecności">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-04</span><span class="tag num">7/11</span></div>
+        <div class="body">
+          <div class="i-att">
+            <div class="r"><span class="nm">Kowalska, Z.</span><span class="p ob">OB</span><span class="p">N</span></div>
+            <div class="r"><span class="nm">Nowak, Jan</span><span class="p ob">OB</span><span class="p">N</span></div>
+            <div class="r"><span class="nm">Wiśniewski, A.</span><span class="p">OB</span><span class="p ab">N</span></div>
+            <div class="r"><span class="nm">Lewy, Maja</span><span class="p">OB</span><span class="p">N</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Zamknij i sync</span></div>
+        <div class="altbadge">alt · offline</div>
+      </div>
+      <div class="cap">INS-04<small>obecność</small></div>
+    </a>
+
+    <!-- INS-05 umiejętności -->
+    <a class="node" style="left:370px;top:585px" href="INS-05_umiejetnosci_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-05: aktualizacja umiejętności">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-05</span><span class="tag">p.3</span></div>
+        <div class="body">
+          <div class="i-skill">
+            <div class="s done"><span class="st">✓</span><span class="lb">Wydech do wody</span></div>
+            <div class="s prog"><span class="st">◐</span><span class="lb">Praca nóg</span></div>
+            <div class="s"><span class="st">○</span><span class="lb">Koordynacja</span></div>
+            <div class="s"><span class="st">○</span><span class="lb">Nawrót prosty</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Zaznacz opanowanie</span></div>
+        <div class="altbadge">alt · zbiorczo</div>
+      </div>
+      <div class="cap">INS-05<small>umiejętności</small></div>
+    </a>
+
+    <!-- INS-06 profil uczestnika -->
+    <a class="node" style="left:650px;top:585px" href="INS-06_profil-uczestnika_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-06: profil uczestnika">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-06</span><span class="tag">odczyt</span></div>
+        <div class="body">
+          <div class="i-prof">
+            <div class="safe"><i aria-hidden="true">＋</i><span>Astma wysiłkowa · inhalator w torbie</span></div>
+            <div class="stat"><span class="k">Postęp</span><span class="v num">5/12</span></div>
+            <div class="stat"><span class="k">Frekwencja</span><span class="v num">92%</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Aktualizuj umiejętności</span></div>
+        <div class="altbadge">alt · ograniczony</div>
+      </div>
+      <div class="cap">INS-06<small>profil uczestnika</small></div>
+    </a>
+
+    <!-- INS-07 dostępność -->
+    <a class="node" style="left:890px;top:585px" href="INS-07_zglaszanie-dostepnosci_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-07: zgłaszanie dostępności (Partia 2, planowany)">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-07</span><span class="tag">tyg</span></div>
+        <div class="body">
+          <div class="i-avail">
+            <div class="g">
+              <span class="cc on"></span><span class="cc on"></span><span class="cc"></span><span class="cc on"></span><span class="cc"></span>
+              <span class="cc"></span><span class="cc on"></span><span class="cc no"></span><span class="cc on"></span><span class="cc"></span>
+              <span class="cc on"></span><span class="cc"></span><span class="cc on"></span><span class="cc"></span><span class="cc on"></span>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta ghost">Zgłoś niedostępność</span></div>
+        <div class="altbadge">alt · zastępstwo</div>
+      </div>
+      <div class="cap">INS-07<small>dostępność · P2</small></div>
+    </a>
+
+    <!-- INS-08 ewidencja godzin -->
+    <a class="node" style="left:250px;top:870px" href="INS-08_ewidencja-godzin_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-08: ewidencja godzin (Partia 2, planowany)">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-08</span><span class="tag">maj</span></div>
+        <div class="body">
+          <div class="i-hours">
+            <div class="h"><span>06.05 Delfinki</span><span class="hv num">1,0</span></div>
+            <div class="h"><span>07.05 Żabki</span><span class="hv num">1,0</span></div>
+            <div class="h"><span>08.05 Rekiny</span><span class="hv num">1,5</span></div>
+            <div class="sum"><span class="sk">Suma okresu</span><span class="sv num">24,0 h</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Potwierdź godziny</span></div>
+        <div class="altbadge">alt · plan≠wyk.</div>
+      </div>
+      <div class="cap">INS-08<small>ewidencja · P2</small></div>
+    </a>
+
+    <!-- INS-10 komunikaty -->
+    <a class="node" style="left:770px;top:870px" href="INS-10_komunikaty_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-10: komunikaty do grupy lub rodziców (Partia 2, planowany)">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">INS-10</span><span class="tag">PL</span></div>
+        <div class="body">
+          <div class="i-msg">
+            <div class="to">do: <b>Cała grupa</b></div>
+            <div class="box"><span class="ln"></span><span class="ln"></span><span class="ln s"></span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Wyślij komunikat</span></div>
+        <div class="altbadge">alt · potwierdź</div>
+      </div>
+      <div class="cap">INS-10<small>komunikaty · P2</small></div>
+    </a>
+
+  </div>
+</div>
+
+<footer class="page">
+  <span class="pill-tag">jak czytać</span>
+  <div>
+    <p>
+      Trasa zaczyna się na <b>INS-01</b>. Logowanie linkiem albo skrótem biometrycznym prowadzi na
+      <b>INS-02</b>, czyli pulpit dnia, który jest węzłem całej tablicy. Z niego wychodzi jedna akcja
+      dominująca, <b>Rozpocznij obecność</b>, prosto na <b>INS-04</b>. Zamknięcie obecności otwiera
+      <b>INS-05</b>, aktualizację umiejętności po zajęciach. Ten sam ekran umiejętności jest też główną
+      akcją profilu dziecka <b>INS-06</b>, więc oba prowadzą do jednego miejsca.
+    </p>
+    <p>
+      Szare strzałki to skróty z pulpitu: własny grafik <b>INS-03</b>, podgląd uczestnika <b>INS-06</b>,
+      zgłoszenie dostępności <b>INS-07</b>, lekcje indywidualne <b>INS-09</b> oraz ewidencja godzin
+      <b>INS-08</b>. Profil dziecka jest osiągalny z kilku stron naraz: z wiersza obecności na INS-04,
+      z listy umiejętności na INS-05 i z karty lekcji na INS-09. Grafik domyka pętlę, bo blok zajęć też
+      otwiera obecność.
+    </p>
+    <p>
+      Bursztynowe linie przerywane to <b>rozgałęzienia od wyjątków</b>. Odwołanie lekcji na INS-09 uruchamia
+      powiadomienie rodzica przez komunikaty <b>INS-10</b>. Zatwierdzona niedostępność z INS-07 wraca
+      asynchronicznie na pulpit jako zastępstwo, bo decyzję podejmuje organizator poza panelem instruktora.
+      Warto zauważyć, czego tu nie ma: <b>nie ma gałęzi błędu płatności</b>, którą znasz z panelu organizatora.
+      Instruktor nie widzi finansów, więc taki zwrot nie istnieje w tym module.
+    </p>
+    <p>
+      Badge przy miniaturze to <b>stan alternatywny</b> ekranu, ten sam, który w makiecie siedzi w przełączniku:
+      konto bez placówki, tryb offline, pusty tydzień, ograniczony wgląd, akcja zbiorcza. To pętle na ten sam
+      ekran, nie osobne podstrony. <b>Klikaj miniatury</b>, żeby otworzyć właściwą makietę w nowej karcie. Pliki
+      INS-01 do INS-06 leżą obok tego pliku. <b>INS-07 do INS-10</b> to Partia 2, kolejna w produkcji; ich kafle
+      już prowadzą pod docelowe nazwy, a makiety dołączą w tej samej lokalizacji.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

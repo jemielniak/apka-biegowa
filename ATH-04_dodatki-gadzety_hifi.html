@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<!--
+  ATH-04 - dodatki i gadżety (panel zawodnika, moduł zawodów)
+  Stan domyślny: katalog z realnym stanem magazynu, przypięta suma, sugestia pogodowa jako podpowiedź.
+  Stan alternatywny: ostatnia sztuka znika z koszyka bez obciążenia, z czytelnym wyjaśnieniem.
+  Napisy = klucze tłumaczeń BCP 47 (pl-PL domyślny, en-GB zapasowy). Motywowanie tylko przez zmienne CSS.
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dodatki i gadżety · ATH-04</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#10141b;--accent:#d6f622;
+  --color-success:#3ddc84;--color-warning:#ffb84d;--color-error:#ff6b5e;--color-info:#6aa9ff;
+  --surface-1:#181e28;--surface-2:#1f2733;--surface-3:#283241;--hairline:#313c4c;
+  --text-strong:#f2f5f7;--text:#cdd5df;--text-muted:#8c97a6;--on-accent:#10141b;--paper:#f4f5ef;
+  --font-display:"Saira Condensed",system-ui;--font-body:"Barlow",system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);
+  --radius:14px;--shadow:0 10px 30px -12px rgba(0,0,0,.65);--tap:48px;
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 60% at 80% -10%,rgba(214,246,34,.10),transparent 60%),var(--brand-ink);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+[dir="rtl"] body{direction:rtl}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 64px);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 80%,transparent)}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:188px}
+header.bar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(16,20,27,.96),rgba(16,20,27,.86));backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);box-shadow:0 1px 0 rgba(214,246,34,.18)}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--accent);position:relative;overflow:hidden}
+.mark::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 38%,var(--on-accent) 38% 50%,transparent 50% 60%,var(--on-accent) 60% 72%,transparent 72%)}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:15px;line-height:1.05}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+.lang{margin-inline-start:auto;position:relative}
+.lang select{appearance:none;-webkit-appearance:none;font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.steps{display:flex;align-items:center;gap:6px;padding:var(--s2) var(--s4) var(--s3)}
+.step{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-muted);white-space:nowrap}
+.step .n{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:12px;background:var(--surface-3);color:var(--text-muted)}
+.step.active .n{background:var(--accent);color:var(--on-accent)}.step.active{color:var(--text-strong)}
+.step .ln{flex:1;height:1px;background:var(--hairline);min-width:8px}
+.seg{display:flex;gap:var(--s2);padding:var(--s2) var(--s4) var(--s2)}
+.seg button{flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:.3px;background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);transition:all .18s;padding:0 var(--s2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 18px -8px rgba(214,246,34,.6)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding:var(--s2) var(--s4) 0;animation:rise .4s ease both}
+.sec-h{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-muted);margin:var(--s5) 0 var(--s2)}
+.card{margin-top:var(--s2);border-radius:var(--radius);border:1px solid var(--hairline);background:linear-gradient(160deg,var(--surface-2),var(--surface-1));overflow:hidden}
+.card .ch{display:flex;gap:var(--s3);padding:var(--s4)}
+.thumb{flex:0 0 auto;width:60px;height:60px;border-radius:12px;background:var(--surface-3);display:grid;place-items:center;color:var(--text-muted)}
+.card .ci{flex:1;min-width:0}
+.card h3{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--text-strong);margin:0}
+.card .cd{font-size:12.5px;color:var(--text-muted);margin-top:1px}
+.card .cp{font-family:var(--font-display);font-weight:800;font-size:20px;color:var(--accent);font-variant-numeric:tabular-nums;text-align:end;white-space:nowrap}
+.sizes{display:flex;flex-wrap:wrap;gap:var(--s2);padding:0 var(--s4) var(--s3)}
+.size{min-width:46px;min-height:42px;border-radius:10px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text);font:inherit;font-weight:700;cursor:pointer;position:relative}
+.size[aria-pressed="true"]{border-color:var(--accent);background:rgba(214,246,34,.12);color:var(--text-strong)}
+.size[disabled]{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+.size:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stock{padding:0 var(--s4) var(--s3);font-size:12px;display:flex;align-items:center;gap:6px;color:var(--text-muted)}
+.stock.low{color:var(--color-warning)}
+.stock .sdot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.crow{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4);border-top:1px dashed var(--hairline)}
+.sizelink{margin-inline-end:auto;background:none;border:none;color:var(--color-info);font:inherit;font-size:12.5px;font-weight:600;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.add{min-height:42px;border-radius:10px;border:1px solid var(--accent);background:rgba(214,246,34,.1);color:var(--text-strong);font:inherit;font-weight:700;font-size:13.5px;padding:0 16px;cursor:pointer}
+.add.in{background:var(--surface-3);border-color:var(--hairline);color:var(--text)}
+.add:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.fieldmsg{display:none;padding:0 var(--s4) var(--s3);font-size:12.5px;color:var(--color-error);align-items:flex-start;gap:6px}
+.fieldmsg.show{display:flex}.fieldmsg svg{flex:0 0 auto;margin-top:2px}
+.fieldmsg.info{color:var(--color-info)}
+.tipcard{margin-top:var(--s2);border-radius:var(--radius);border:1px solid rgba(106,169,255,.35);background:rgba(106,169,255,.07);overflow:hidden}
+.tipcard .tt{padding:var(--s2) var(--s4);font-size:10.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--color-info);background:rgba(106,169,255,.1)}
+.tipcard .tb{display:flex;gap:var(--s3);padding:var(--s3) var(--s4);align-items:center}
+.tipcard .tb .ci{flex:1}.tipcard h3{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--text-strong);margin:0}
+.tipcard .cd{font-size:12.5px;color:var(--text-muted)}
+.tipcard .cp{font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.sztab{display:none;margin:0 var(--s4) var(--s3);border-radius:12px;border:1px solid var(--hairline);overflow:hidden}
+.sztab.show{display:block}
+.sztab table{width:100%;border-collapse:collapse;font-size:12.5px}
+.sztab th,.sztab td{padding:7px 10px;text-align:center;border-bottom:1px solid var(--hairline);font-variant-numeric:tabular-nums}
+.sztab th{background:var(--surface-3);color:var(--text-muted);font-weight:700;text-transform:uppercase;font-size:10.5px;letter-spacing:.4px}
+.sztab td:first-child{text-align:start;color:var(--text-muted)}
+/* portfel toggle */
+.wallet{margin-top:var(--s2);display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1)}
+.wallet .wt{flex:1;font-size:13.5px;color:var(--text)}.wallet .wt small{display:block;color:var(--text-muted);font-size:12px;font-variant-numeric:tabular-nums}
+.switch{flex:0 0 auto;width:50px;height:30px;border-radius:999px;background:var(--surface-3);border:1px solid var(--hairline);position:relative;cursor:pointer;padding:0}
+.switch::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:24px;height:24px;border-radius:50%;background:var(--text-muted);transition:all .18s}
+.switch[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+.switch[aria-checked="true"]::after{inset-inline-start:22px;background:var(--on-accent)}
+.switch:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* alt: zniknięcie sztuki */
+.vanish{margin-top:var(--s4)}
+.vanish .notice{display:flex;gap:var(--s3);padding:var(--s4);border-radius:var(--radius);border:1px solid rgba(255,184,77,.45);background:rgba(255,184,77,.09)}
+.vanish .notice svg{flex:0 0 auto;color:var(--color-warning);margin-top:1px}
+.vanish .notice .nt b{color:var(--text-strong)}.vanish .notice .nt{font-size:13.5px;color:var(--text)}
+.linecard{margin-top:var(--s2);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1);overflow:hidden}
+.line{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--hairline)}
+.line:last-child{border-bottom:none}
+.line.removed{opacity:.55}.line.removed .lname{text-decoration:line-through}
+.line .lname{flex:1;font-size:14px;color:var(--text)}.line .lname small{display:block;color:var(--text-muted);font-size:12px}
+.line .lp{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.line.removed .lp{color:var(--color-warning)}
+/* przypięty pasek sumy + akcje */
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:linear-gradient(180deg,rgba(16,20,27,.4),var(--brand-ink) 35%);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+.inner{max-width:480px;margin:0 auto}
+.sumrow{display:flex;align-items:baseline;gap:var(--s3);margin-bottom:var(--s2)}
+.sumrow .sl{font-size:12.5px;color:var(--text-muted)}
+.sumrow .sv{margin-inline-start:auto;font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.sumbreak{font-size:11.5px;color:var(--text-muted);margin-bottom:var(--s3);font-variant-numeric:tabular-nums}
+.status-line{display:none;align-items:flex-start;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600;text-align:center}
+.status-line svg{flex:0 0 auto;margin-top:2px}.status-line.show{display:flex}.status-line.warn{color:var(--color-warning)}
+.sec-actions{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-bottom:var(--s3)}
+.sec-actions button{background:none;border:none;color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hairline)}
+.sec-actions button:hover{color:var(--text)}.sec-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.cta{width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.4px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s}
+.cta:active{transform:translateY(1px) scale(.995)}.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}
+.hidden{display:none !important}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo"><div class="mark" aria-hidden="true"></div>
+        <div class="org"><b data-i18n="title">Dodatki i gadżety</b><span id="orgName">Stołeczny Klub Biegacza</span></div></div>
+      <div class="lang"><label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language"><option value="pl-PL">PL</option><option value="en-GB">EN</option></select></div>
+    </div>
+    <div class="steps" aria-label="Postęp zapisu">
+      <span class="step"><span class="n">1</span><span data-i18n="step1">Dane</span></span><span class="ln"></span>
+      <span class="step active"><span class="n">2</span><span data-i18n="step2">Dodatki</span></span><span class="ln"></span>
+      <span class="step"><span class="n">3</span><span data-i18n="step3">Płatność</span></span>
+    </div>
+  </header>
+
+  <div class="seg" role="group" aria-label="Stan ekranu">
+    <button id="segCat" aria-pressed="true" data-i18n="segCat">Katalog</button>
+    <button id="segVanish" aria-pressed="false" data-i18n="segVanish">Ostatnia sztuka znika</button>
+  </div>
+
+  <!-- STAN DOMYŚLNY -->
+  <main id="viewCat">
+    <div class="sec-h" data-i18n="catalogHead">Do dokupienia</div>
+
+    <!-- koszulka z rozmiarami -->
+    <div class="card" data-prod="shirt">
+      <div class="ch"><div class="thumb" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M8 3l-5 3 2 4 2-1v9h10v-9l2 1 2-4-5-3a4 4 0 0 1-8 0Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <div class="ci"><h3 data-i18n="shirtName">Koszulka techniczna</h3><div class="cd" data-i18n="shirtDesc">oddychająca, krój sportowy</div></div>
+        <div class="cp" id="shirtPrice"></div></div>
+      <div class="sizes" id="shirtSizes" role="group" aria-label="Rozmiar koszulki">
+        <button class="size" data-sz="S" aria-pressed="false">S</button>
+        <button class="size" data-sz="M" aria-pressed="false">M</button>
+        <button class="size" data-sz="L" aria-pressed="false">L</button>
+        <button class="size" data-sz="XL" aria-pressed="false" disabled>XL</button>
+      </div>
+      <div class="stock low" id="shirtStock"></div>
+      <div class="fieldmsg" id="shirtMsg" role="alert"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="shirtMsgText"></span></div>
+      <div class="sztab" id="shirtTab"><table><thead><tr><th data-i18n="szSize">rozmiar</th><th>S</th><th>M</th><th>L</th><th>XL</th></tr></thead>
+        <tbody><tr><td data-i18n="szChest">klatka (cm)</td><td>92</td><td>100</td><td>108</td><td>116</td></tr>
+        <tr><td data-i18n="szLen">długość (cm)</td><td>68</td><td>71</td><td>74</td><td>77</td></tr></tbody></table></div>
+      <div class="crow"><button class="sizelink" id="shirtTabBtn" data-i18n="sizeTable">tabela rozmiarów</button>
+        <button class="add" id="shirtAdd" data-i18n="addBtn">Dodaj</button></div>
+    </div>
+
+    <!-- medal bez rozmiaru -->
+    <div class="card" data-prod="medal">
+      <div class="ch"><div class="thumb" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="15" r="6" stroke="currentColor" stroke-width="1.6"/><path d="M9 3l3 6 3-6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <div class="ci"><h3 data-i18n="medalName">Medal pamiątkowy</h3><div class="cd" data-i18n="medalDesc">grawer z datą i dystansem</div></div>
+        <div class="cp" id="medalPrice"></div></div>
+      <div class="crow"><button class="add" id="medalAdd" data-i18n="addBtn" style="margin-inline-start:auto">Dodaj</button></div>
+    </div>
+
+    <!-- depozyt -->
+    <div class="card" data-prod="deposit">
+      <div class="ch"><div class="thumb" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 8h16v11H4zM4 8l2-4h12l2 4M9 13h6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <div class="ci"><h3 data-i18n="depName">Depozyt</h3><div class="cd" data-i18n="depDesc">przechowanie rzeczy w trakcie biegu</div></div>
+        <div class="cp" id="depPrice"></div></div>
+      <div class="crow"><button class="add" id="depAdd" data-i18n="addBtn" style="margin-inline-start:auto">Dodaj</button></div>
+    </div>
+
+    <div class="sec-h" data-i18n="tipHead">Dopasowane do pogody</div>
+    <div class="tipcard">
+      <div class="tt" data-i18n="tipFlag">podpowiedź, nie domyślny wybór</div>
+      <div class="tb"><div class="ci"><h3 data-i18n="buffName">Komin / buff</h3><div class="cd" data-i18n="buffDesc">prognoza na start: 6°C, wiatr - przyda się na szyję</div></div>
+        <div class="cp" id="buffPrice"></div></div>
+      <div class="crow"><button class="add" id="buffAdd" data-i18n="addBtn" style="margin-inline-start:auto">Dodaj</button></div>
+    </div>
+
+    <div class="wallet">
+      <div class="wt"><span data-i18n="walletLabel">Pokryj część z portfela</span><small id="walletBal"></small></div>
+      <button class="switch" id="walletSw" role="switch" aria-checked="false" aria-label="Pokryj część z portfela"></button>
+    </div>
+  </main>
+
+  <!-- STAN ALTERNATYWNY: zniknięcie ostatniej sztuki -->
+  <main id="viewVanish" class="hidden">
+    <div class="vanish">
+      <div class="notice">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 9v4M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <div class="nt"><b data-i18n="vanishTitle">Koszulka w rozmiarze S zniknęła z dostępności.</b> <span data-i18n="vanishBody">Ostatnią sztukę dodał ktoś inny, zanim sfinalizowałeś zapis. Usunęliśmy ją z koszyka i nie obciążymy Cię za nią.</span></div>
+      </div>
+      <div class="sec-h" data-i18n="cartHead">Twój koszyk po korekcie</div>
+      <div class="linecard">
+        <div class="line removed"><div class="lname" data-i18n="shirtName">Koszulka techniczna<small data-i18n="vanishLine">rozmiar S - niedostępna, zdjęta</small></div><div class="lp">0,00 zł</div></div>
+        <div class="line"><div class="lname" data-i18n="medalName">Medal pamiątkowy</div><div class="lp" id="vMedal"></div></div>
+      </div>
+      <div class="fieldmsg info show" style="padding-inline:0;margin-top:var(--s3)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span data-i18n="vanishHint">Chcesz koszulkę w innym rozmiarze? Wróć do katalogu - M i L są dostępne.</span></div>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="inner">
+      <div class="status-line" id="statusLine"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="statusText"></span></div>
+      <div class="sumrow"><span class="sl" data-i18n="sumLabel">Suma zgłoszenia</span><span class="sv" id="sumVal"></span></div>
+      <div class="sumbreak" id="sumBreak"></div>
+      <div class="sec-actions" id="secCat">
+        <button id="secSkip" data-i18n="secSkip">Pomiń dodatki</button>
+      </div>
+      <div class="sec-actions hidden" id="secVanish">
+        <button id="secBack" data-i18n="secBack">Wróć do katalogu</button>
+      </div>
+      <button class="cta" id="mainCta"><span class="spinner" aria-hidden="true"></span><span id="ctaLabel"></span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const I18N={
+ "pl-PL":{title:"Dodatki i gadżety",langLabel:"Język",step1:"Dane",step2:"Dodatki",step3:"Płatność",
+  segCat:"Katalog",segVanish:"Ostatnia sztuka znika",catalogHead:"Do dokupienia",
+  shirtName:"Koszulka techniczna",shirtDesc:"oddychająca, krój sportowy",
+  medalName:"Medal pamiątkowy",medalDesc:"grawer z datą i dystansem",
+  depName:"Depozyt",depDesc:"przechowanie rzeczy w trakcie biegu",
+  tipHead:"Dopasowane do pogody",tipFlag:"podpowiedź, nie domyślny wybór",buffName:"Komin / buff",buffDesc:"prognoza na start: 6°C, wiatr - przyda się na szyję",
+  sizeTable:"tabela rozmiarów",szSize:"rozmiar",szChest:"klatka (cm)",szLen:"długość (cm)",
+  addBtn:"Dodaj",inCartBtn:"W koszyku - usuń",
+  walletLabel:"Pokryj część z portfela",walletBalTpl:"saldo: {bal}",
+  stockLowTpl:"zostały {n} szt. w rozmiarze {sz}",stockOkTpl:"dostępne",
+  sumLabel:"Suma zgłoszenia",breakTpl:"wpisowe {entry} + dodatki {add}{wallet}",walletPartTpl:" - portfel {w}",
+  errPickSize:"Wybierz rozmiar przed dodaniem koszulki.",
+  errVariant:"Rozmiar XL jest niedostępny. Najbliższy dostępny to L - dodać L?",
+  walletShortTpl:"Portfel pokryje {cov}. Pozostałe {rest} dopłacisz przy płatności.",
+  ctaNext:"Przejdź do zgód i regulaminów",processingTxt:"Zapisuję…",
+  secSkip:"Pomiń dodatki",secBack:"Wróć do katalogu",
+  goNext:"Dodatki zapisane. Przechodzę do zgód i regulaminów (ATH-05).",
+  addedTpl:"Dodano: {name}.",removedTpl:"Usunięto: {name}.",walletOn:"Część kwoty pokryje portfel.",walletOff:"Płacisz całość bez portfela.",
+  cartHead:"Twój koszyk po korekcie",vanishTitle:"Koszulka w rozmiarze S zniknęła z dostępności.",vanishBody:"Ostatnią sztukę dodał ktoś inny, zanim sfinalizowałeś zapis. Usunęliśmy ją z koszyka i nie obciążymy Cię za nią.",
+  vanishLine:"rozmiar S - niedostępna, zdjęta",vanishHint:"Chcesz koszulkę w innym rozmiarze? Wróć do katalogu - M i L są dostępne."},
+ "en-GB":{title:"Add-ons and merchandise",langLabel:"Language",step1:"Details",step2:"Add-ons",step3:"Payment",
+  segCat:"Catalogue",segVanish:"Last piece sells out",catalogHead:"Add to your order",
+  shirtName:"Technical tee",shirtDesc:"breathable, athletic cut",
+  medalName:"Commemorative medal",medalDesc:"engraved with date and distance",
+  depName:"Bag drop",depDesc:"store your things during the race",
+  tipHead:"Matched to the weather",tipFlag:"a suggestion, not a default",buffName:"Neck buff",buffDesc:"start forecast: 6°C, wind - handy for your neck",
+  sizeTable:"size table",szSize:"size",szChest:"chest (cm)",szLen:"length (cm)",
+  addBtn:"Add",inCartBtn:"In basket - remove",
+  walletLabel:"Cover part from the wallet",walletBalTpl:"balance: {bal}",
+  stockLowTpl:"{n} left in size {sz}",stockOkTpl:"available",
+  sumLabel:"Order total",breakTpl:"entry {entry} + add-ons {add}{wallet}",walletPartTpl:" - wallet {w}",
+  errPickSize:"Choose a size before adding the tee.",
+  errVariant:"Size XL is unavailable. The nearest available is L - add L?",
+  walletShortTpl:"The wallet covers {cov}. You'll pay the remaining {rest} at checkout.",
+  ctaNext:"Go to consents and terms",processingTxt:"Saving…",
+  secSkip:"Skip add-ons",secBack:"Back to catalogue",
+  goNext:"Add-ons saved. Going to consents and terms (ATH-05).",
+  addedTpl:"Added: {name}.",removedTpl:"Removed: {name}.",walletOn:"Part of the amount will be covered by the wallet.",walletOff:"Paying in full without the wallet.",
+  cartHead:"Your basket after the fix",vanishTitle:"The tee in size S has sold out.",vanishBody:"Someone added the last piece before you finalised. We removed it from your basket and won't charge you for it.",
+  vanishLine:"size S - unavailable, removed",vanishHint:"Want the tee in another size? Go back to the catalogue - M and L are available."}
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+const PRICES={shirt:79,medal:29,deposit:10,buff:19};
+const DATA={locale:"pl-PL",entry:120,wallet:120,sStock:1};
+const UI={view:"cat",shirtSize:null,cart:{shirt:false,medal:false,deposit:false,buff:false},useWallet:false};
+const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function t(k){const L=I18N[DATA.locale]||{},F=I18N["en-GB"];return (k in L)?L[k]:(F[k]??k);}
+function tpl(k,m){let s=t(k);for(const x in m)s=s.replace(new RegExp("{"+x+"}","g"),m[x]);return s;}
+function applyStatic(){$$("[data-i18n]").forEach(e=>e.textContent=t(e.getAttribute("data-i18n")));}
+const fmtMoney=(v)=>new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN"}).format(v);
+function addonsTotal(){let s=0;for(const k in UI.cart)if(UI.cart[k])s+=PRICES[k];return s;}
+function renderPrices(){$("#shirtPrice").textContent=fmtMoney(PRICES.shirt);$("#medalPrice").textContent=fmtMoney(PRICES.medal);$("#depPrice").textContent=fmtMoney(PRICES.deposit);$("#buffPrice").textContent=fmtMoney(PRICES.buff);$("#vMedal").textContent=fmtMoney(PRICES.medal);$("#walletBal").textContent=tpl("walletBalTpl",{bal:fmtMoney(DATA.wallet)});$("#shirtStock").innerHTML='<span class="sdot" aria-hidden="true"></span>'+tpl("stockLowTpl",{n:DATA.sStock,sz:"S"});}
+function renderSum(){
+  const add=addonsTotal();const gross=DATA.entry+add;
+  let walletPart="";let net=gross;
+  if(UI.useWallet){const cov=Math.min(DATA.wallet,gross);net=gross-cov;walletPart=tpl("walletPartTpl",{w:fmtMoney(cov)});}
+  $("#sumVal").textContent=fmtMoney(net);
+  $("#sumBreak").textContent=tpl("breakTpl",{entry:fmtMoney(DATA.entry),add:fmtMoney(add),wallet:walletPart});
+}
+function renderAddBtns(){
+  $("#shirtAdd").textContent=UI.cart.shirt?t("inCartBtn"):t("addBtn");$("#shirtAdd").classList.toggle("in",UI.cart.shirt);
+  $("#medalAdd").textContent=UI.cart.medal?t("inCartBtn"):t("addBtn");$("#medalAdd").classList.toggle("in",UI.cart.medal);
+  $("#depAdd").textContent=UI.cart.deposit?t("inCartBtn"):t("addBtn");$("#depAdd").classList.toggle("in",UI.cart.deposit);
+  $("#buffAdd").textContent=UI.cart.buff?t("inCartBtn"):t("addBtn");$("#buffAdd").classList.toggle("in",UI.cart.buff);
+}
+let st=null;
+function showStatus(x,warn){const s=$("#statusLine");$("#statusText").textContent=x;s.classList.add("show");s.classList.toggle("warn",!!warn);}
+function hideStatus(){$("#statusLine").classList.remove("show");}
+function fieldMsg(id,txt,info){const m=$("#"+id);$("#"+id+"Text").textContent=txt;m.classList.add("show");m.classList.toggle("info",!!info);}
+function clearFieldMsg(id){$("#"+id).classList.remove("show");}
+function runProcessing(done){const c=$("#mainCta"),l=$("#ctaLabel");c.disabled=true;c.classList.add("processing");l.textContent=t("processingTxt");$(".spinner").style.display="inline-block";clearTimeout(st);st=setTimeout(()=>{c.classList.remove("processing");c.disabled=false;$("#ctaLabel").textContent=t("ctaNext");done();},850);}
+function setView(v){UI.view=v;$("#segCat").setAttribute("aria-pressed",v==="cat");$("#segVanish").setAttribute("aria-pressed",v==="vanish");
+  $("#viewCat").classList.toggle("hidden",v!=="cat");$("#viewVanish").classList.toggle("hidden",v!=="vanish");
+  $("#secCat").classList.toggle("hidden",v!=="cat");$("#secVanish").classList.toggle("hidden",v!=="vanish");hideStatus();
+  if(v==="vanish"){$("#sumVal").textContent=fmtMoney(DATA.entry+PRICES.medal);$("#sumBreak").textContent=tpl("breakTpl",{entry:fmtMoney(DATA.entry),add:fmtMoney(PRICES.medal),wallet:""});}
+  else renderSum();}
+function setLocale(loc){DATA.locale=loc;document.documentElement.lang=loc;document.documentElement.dir=RTL.has(loc.split("-")[0])?"rtl":"ltr";applyStatic();renderPrices();renderAddBtns();$("#ctaLabel").textContent=t("ctaNext");if(UI.view==="vanish")setView("vanish");else renderSum();}
+document.addEventListener("DOMContentLoaded",()=>{
+  setLocale("pl-PL");$("#langSel").value="pl-PL";
+  $("#langSel").addEventListener("change",e=>setLocale(e.target.value));
+  $("#segCat").addEventListener("click",()=>setView("cat"));
+  $("#segVanish").addEventListener("click",()=>setView("vanish"));
+  $$("#shirtSizes .size").forEach(b=>b.addEventListener("click",()=>{
+    if(b.disabled){fieldMsg("shirtMsg",t("errVariant"));return;}
+    clearFieldMsg("shirtMsg");$$("#shirtSizes .size").forEach(x=>x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true");UI.shirtSize=b.dataset.sz;}));
+  $("#shirtAdd").addEventListener("click",()=>{
+    if(UI.cart.shirt){UI.cart.shirt=false;renderAddBtns();renderSum();showStatus(tpl("removedTpl",{name:t("shirtName")}));return;}
+    if(!UI.shirtSize){fieldMsg("shirtMsg",t("errPickSize"));return;}
+    clearFieldMsg("shirtMsg");UI.cart.shirt=true;renderAddBtns();renderSum();showStatus(tpl("addedTpl",{name:t("shirtName")+" ("+UI.shirtSize+")"}));});
+  const toggle=(key,nameKey)=>{UI.cart[key]=!UI.cart[key];renderAddBtns();renderSum();showStatus(tpl(UI.cart[key]?"addedTpl":"removedTpl",{name:t(nameKey)}));};
+  $("#medalAdd").addEventListener("click",()=>toggle("medal","medalName"));
+  $("#depAdd").addEventListener("click",()=>toggle("deposit","depName"));
+  $("#buffAdd").addEventListener("click",()=>toggle("buff","buffName"));
+  $("#shirtTabBtn").addEventListener("click",()=>$("#shirtTab").classList.toggle("show"));
+  $("#walletSw").addEventListener("click",e=>{const on=e.currentTarget.getAttribute("aria-checked")==="true";e.currentTarget.setAttribute("aria-checked",String(!on));UI.useWallet=!on;renderSum();
+    const gross=DATA.entry+addonsTotal();if(!on&&DATA.wallet<gross){showStatus(tpl("walletShortTpl",{cov:fmtMoney(DATA.wallet),rest:fmtMoney(gross-DATA.wallet)}),true);}else{showStatus(t(!on?"walletOn":"walletOff"));}});
+  $("#mainCta").addEventListener("click",()=>{if(UI.view==="vanish"){setView("cat");showStatus(t("goNext"));return;}runProcessing(()=>showStatus(t("goNext")));});
+  $("#secSkip").addEventListener("click",()=>runProcessing(()=>showStatus(t("goNext"))));
+  $("#secBack").addEventListener("click",()=>setView("cat"));
+});
+</script>
+</body>
+</html>

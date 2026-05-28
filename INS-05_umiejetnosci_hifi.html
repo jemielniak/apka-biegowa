@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INS-05 · Umiejętności</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#0d1a1e; --accent:#21d8c4;
+  --color-success:#4ade80; --color-warning:#f6b73c; --color-error:#ff6b5e; --color-info:#5aa8ff;
+  --surface-1:#13242a; --surface-2:#1a313a; --surface-3:#234049; --hairline:#2c4b55;
+  --text-strong:#f0f6f5; --text:#c7d6d8; --text-muted:#83a0a5; --on-accent:#062420; --paper:#eef4f1;
+  --font-display:"Bricolage Grotesque", system-ui; --font-body:"IBM Plex Sans", system-ui;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:16px; --shadow:0 12px 32px -14px rgba(0,0,0,.7); --tap:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06100f;color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%}
+.num{font-variant-numeric:tabular-nums}
+.shell{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--brand-ink)}
+header.app{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border-bottom:1px solid var(--hairline)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);min-height:var(--tap)}
+.childpick{display:flex;align-items:center;gap:var(--s3);flex:1;min-width:0;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:4px 4px 4px 6px;cursor:pointer;color:inherit;font:inherit;height:44px}
+.childpick:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.av{width:34px;height:34px;border-radius:50%;background:var(--surface-3);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;color:var(--accent);flex:none}
+.childpick b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.childpick .ch{margin-left:auto;color:var(--text-muted);padding-right:8px}
+.lang{display:flex;align-items:center;gap:var(--s1);background:var(--surface-3);border:1px solid var(--hairline);color:var(--text-strong);border-radius:999px;padding:0 var(--s3);height:40px;font:600 14px/1 var(--font-body);cursor:pointer;flex:none}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);font-size:12.5px;color:var(--text-muted);border-top:1px solid var(--hairline);background:var(--surface-1)}
+.lvl{font-family:var(--font-display);font-weight:700;color:var(--text-strong)}
+.spacer{flex:1}.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.on{background:var(--color-success);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-success) 25%,transparent)}
+body.is-offline .dot.on{background:var(--color-warning);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-warning) 25%,transparent)}
+.netnote .off{display:none;color:var(--color-warning);font-weight:600}body.is-offline .netnote .on{display:none}body.is-offline .netnote .off{display:inline}
+.offline-banner{display:none;align-items:flex-start;gap:var(--s3);margin:var(--s4) var(--s4) 0;padding:var(--s3) var(--s4);border:1px solid color-mix(in srgb,var(--color-warning) 50%,var(--hairline));border-left:4px solid var(--color-warning);border-radius:var(--radius);background:color-mix(in srgb,var(--color-warning) 12%,var(--surface-1));color:var(--text-strong);font-size:13.5px;line-height:1.4}
+body.is-offline .offline-banner{display:flex}.offline-banner b{font-weight:600}
+.seg{display:flex;gap:var(--s1);margin:var(--s4) var(--s4) 0;padding:var(--s1);background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px}
+.seg button{flex:1;border:0;background:transparent;color:var(--text-muted);font:600 13px/1 var(--font-body);height:40px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected=true]{background:var(--surface-3);color:var(--text-strong)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{flex:1;padding:var(--s4) var(--s4) calc(var(--s10)*2)}
+.branch{display:flex;align-items:center;gap:var(--s2);margin:var(--s4) 0 var(--s3);font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:17px;background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);padding:var(--s3) var(--s4);cursor:pointer;width:100%}
+.branch:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.branch .ch{margin-left:auto;color:var(--text-muted)}
+.skill{display:flex;align-items:center;gap:var(--s3);min-height:var(--tap);padding:var(--s3);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);margin-bottom:var(--s2);animation:rise .4s both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.skill .state{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:18px;border:2px solid var(--hairline);color:var(--text-muted)}
+.skill[data-st=done] .state{background:var(--color-success);border-color:var(--color-success);color:#06280f}
+.skill[data-st=progress] .state{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.skill .body{flex:1;min-width:0}
+.skill .sk{font-weight:600;color:var(--text-strong);font-size:15.5px}
+.skill .lab{font-size:12px;color:var(--text-muted);margin-top:2px}
+.skill[data-st=done] .lab{color:var(--color-success)} .skill[data-st=progress] .lab{color:var(--accent)}
+.set{flex:none;display:flex;gap:6px}
+.set button{height:40px;padding:0 12px;border-radius:11px;border:1.5px solid var(--hairline);background:var(--surface-2);color:var(--text);font:600 13px/1 var(--font-body);cursor:pointer}
+.set button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.set button[aria-pressed=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.thumb{display:flex;align-items:center;gap:var(--s3);margin:0 0 var(--s2) 56px;padding:var(--s2) var(--s3);background:var(--surface-2);border:1px solid var(--hairline);border-radius:12px;font-size:12.5px;color:var(--text-muted)}
+.thumb .play{width:44px;height:32px;border-radius:8px;background:#06100f;display:grid;place-items:center;color:var(--accent);flex:none;border:1px solid var(--hairline)}
+.validate{display:none;gap:var(--s3);margin-top:var(--s4);padding:var(--s3) var(--s4);border-radius:12px;font-size:13.5px;line-height:1.4;background:color-mix(in srgb,var(--color-warning) 13%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-warning) 50%,transparent);color:#ffe9c2}
+.validate.show{display:flex}.validate b{color:#fff;font-weight:600}
+.bulk{display:none;align-items:center;gap:var(--s3);margin-top:var(--s4);padding:var(--s3) var(--s4);border-radius:var(--radius);background:color-mix(in srgb,var(--accent) 12%,var(--surface-1));border:1px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+body.is-bulk .bulk{display:flex}
+.bulk .ic{width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:800;flex:none}
+.bulk .txt{flex:1;font-size:13px;color:var(--text-strong)}
+.bulk .txt small{display:block;color:var(--text-muted);font-size:11.5px}
+.bulk .cnt{font-family:var(--font-display);font-weight:800;color:var(--accent)}
+.secondary{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s5)}
+.secondary button{flex:1 1 calc(50% - var(--s2));min-height:48px;border-radius:13px;border:1.5px solid var(--hairline);background:var(--surface-1);color:var(--text);font:600 13.5px/1.1 var(--font-body);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:var(--s2)}
+.secondary button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.secondary .ic{color:var(--accent)}
+.secondary .danger{color:var(--color-error);border-color:color-mix(in srgb,var(--color-error) 40%,var(--hairline))}.secondary .danger .ic{color:var(--color-error)}
+.hide{display:none!important}
+footer.app{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:20;background:linear-gradient(0deg,var(--surface-2),var(--surface-1));border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom))}
+.saveline{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s3)}
+.saveline .off{display:none;color:var(--color-warning);font-weight:600}body.is-offline .saveline .on{display:none}body.is-offline .saveline .off{display:inline}
+.cta{width:100%;min-height:var(--tap);border:0;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
+.cta:focus-visible{outline:3px solid var(--text-strong);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.skill{animation:none}}
+</style>
+</head>
+<body class="pl-PL">
+<div class="shell">
+  <header class="app">
+    <div class="bar">
+      <button class="childpick" aria-label="Zmień dziecko">
+        <span class="av">ZK</span><b>Kowalska, Zofia</b><span class="ch" aria-hidden="true">▾</span>
+      </button>
+      <button class="lang" id="langBtn" aria-label="Zmień język"><span id="langLabel">PL</span> ▾</button>
+    </div>
+    <div class="sys">
+      <span class="lvl" data-i="level">Poziom 3</span>
+      <span class="spacer"></span>
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="netnote"><span class="on" data-i="syncFilm">Sync ok · film w tle</span><span class="off" data-i="offShort">Offline</span></span>
+    </div>
+  </header>
+
+  <div class="offline-banner" role="status">
+    <span aria-hidden="true">⚠</span>
+    <span><b data-i="offTitle">Tryb offline.</b> <span data-i="offBody">Statusy zapisują się lokalnie i pójdą po sieci. Nagrania czekają na lżejsze łącze.</span></span>
+  </div>
+
+  <div class="seg" role="tablist" aria-label="Podgląd stanu ekranu">
+    <button role="tab" aria-selected="true" data-state="single" data-i="stSingle">Jedno dziecko</button>
+    <button role="tab" aria-selected="false" data-state="bulk" data-i="stBulk">Zbiorczo dla podgrupy</button>
+  </div>
+
+  <main>
+    <button class="branch" aria-expanded="true"><span data-i="branch">Gałąź: Pływanie na piersiach</span><span class="ch" aria-hidden="true">▾</span></button>
+
+    <div class="skill" data-st="done">
+      <span class="state" aria-hidden="true">✓</span>
+      <div class="body"><div class="sk" data-i="s1">Wydech do wody</div><div class="lab" id="doneLab">zaliczone · 06.05.2026</div></div>
+    </div>
+
+    <div class="skill" data-st="progress">
+      <span class="state" aria-hidden="true">◐</span>
+      <div class="body"><div class="sk" data-i="s2">Praca nóg</div><div class="lab" data-i="l2">w toku</div></div>
+      <div class="set" role="group" aria-label="Status">
+        <button data-set="progress" aria-pressed="true" data-i="setProg">w toku</button>
+        <button data-set="done" aria-pressed="false" data-i="setDone">zaliczone</button>
+      </div>
+    </div>
+
+    <div class="skill" data-st="none" id="skill3">
+      <span class="state" aria-hidden="true">○</span>
+      <div class="body"><div class="sk" data-i="s3">Koordynacja ramion i nóg</div><div class="lab" data-i="l3">do ustawienia</div></div>
+      <div class="set" role="group" aria-label="Status">
+        <button data-set="progress" aria-pressed="false" data-i="setProg">w toku</button>
+        <button data-set="done" aria-pressed="false" data-i="setDone">zaliczone</button>
+      </div>
+    </div>
+    <div class="thumb"><span class="play" aria-hidden="true">▶</span><span><span data-i="attached">Dołączony film</span> · <span class="num">0:08</span></span></div>
+
+    <div class="validate" id="validate" role="alert">
+      <span aria-hidden="true">?</span>
+      <span><b data-i="vB">Zaliczenie bez etapu „w toku".</b> <span data-i="vAsk">Pominąć etap pośredni dla tej umiejętności?</span></span>
+    </div>
+
+    <div class="bulk" role="note">
+      <span class="ic" aria-hidden="true">👥</span>
+      <span class="txt"><span data-i="bulkTxt">Ten sam postęp trafi do zaznaczonych dzieci z grupy.</span><small data-i="bulkSub">Możesz odznaczyć pojedyncze dzieci przed zapisem.</small></span>
+      <span class="cnt num">6</span>
+    </div>
+
+    <div class="secondary">
+      <button><span class="ic" aria-hidden="true">＋</span><span data-i="aFilm">Dołącz film</span></button>
+      <button><span class="ic" aria-hidden="true">↩</span><span data-i="aUndo">Cofnij status</span></button>
+      <button><span class="ic" aria-hidden="true">✎</span><span data-i="aNote">Notatka</span></button>
+      <button class="danger"><span class="ic" aria-hidden="true">🗑</span><span data-i="aDelFilm">Usuń film</span></button>
+    </div>
+  </main>
+
+  <footer class="app">
+    <div class="saveline">
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="on" data-i="autosave">Statusy zapisywane na bieżąco</span>
+      <span class="off" data-i="localSafe">Statusy lokalnie · film po sieci</span>
+    </div>
+    <button class="cta" id="cta" data-i="ctaSingle">Zaznacz opanowanie</button>
+  </footer>
+</div>
+
+<script>
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL", lastChange:new Date(2026,4,6)};
+const I18N={
+ "pl-PL":{level:"Poziom 3", syncFilm:"Sync ok · film w tle", offShort:"Offline",
+  offTitle:"Tryb offline.", offBody:"Statusy zapisują się lokalnie i pójdą po sieci. Nagrania czekają na lżejsze łącze.",
+  stSingle:"Jedno dziecko", stBulk:"Zbiorczo dla podgrupy",
+  branch:"Gałąź: Pływanie na piersiach",
+  s1:"Wydech do wody", l1:"zaliczone · 06.05.2026",
+  s2:"Praca nóg", l2:"w toku", setProg:"w toku", setDone:"zaliczone",
+  s3:"Koordynacja ramion i nóg", l3:"do ustawienia", attached:"Dołączony film",
+  vB:"Zaliczenie bez etapu „w toku\u201D.", vAsk:"Pominąć etap pośredni dla tej umiejętności?",
+  bulkTxt:"Ten sam postęp trafi do zaznaczonych dzieci z grupy.", bulkSub:"Możesz odznaczyć pojedyncze dzieci przed zapisem.",
+  aFilm:"Dołącz film", aUndo:"Cofnij status", aNote:"Notatka", aDelFilm:"Usuń film",
+  autosave:"Statusy zapisywane na bieżąco", localSafe:"Statusy lokalnie · film po sieci",
+  ctaSingle:"Zaznacz opanowanie", ctaBulk:"Zastosuj do 6 dzieci",
+  labDone:"zaliczone", labProg:"w toku", labNone:"do ustawienia"
+ },
+ "en-GB":{level:"Level 3", syncFilm:"Synced · video in background", offShort:"Offline",
+  offTitle:"Offline mode.", offBody:"Statuses save locally and sync when online. Videos wait for a lighter connection.",
+  stSingle:"One child", stBulk:"Whole subgroup",
+  branch:"Branch: Breaststroke",
+  s1:"Exhaling underwater", l1:"passed · 06.05.2026",
+  s2:"Leg kick", l2:"in progress", setProg:"in progress", setDone:"passed",
+  s3:"Arm-leg coordination", l3:"to set", attached:"Attached video",
+  vB:"Passing without the \u201Cin progress\u201D step.", vAsk:"Skip the intermediate step for this skill?",
+  bulkTxt:"The same progress goes to the selected children in the group.", bulkSub:"You can deselect individual children before saving.",
+  aFilm:"Attach video", aUndo:"Undo status", aNote:"Note", aDelFilm:"Delete video",
+  autosave:"Statuses saved as you go", localSafe:"Statuses local · video later",
+  ctaSingle:"Mark as mastered", ctaBulk:"Apply to 6 children",
+  labDone:"passed", labProg:"in progress", labNone:"to set"
+ }
+};
+const FALLBACK="en-GB";
+function t(k){const l=I18N[DATA.locale]||{};return (k in l)?l[k]:(I18N[FALLBACK][k]??k);}
+function applyLang(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i);});
+  const d=new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit",year:"numeric"}).format(DATA.lastChange);
+  document.getElementById("doneLab").textContent=t("labDone")+" · "+d;
+  document.getElementById("langLabel").textContent=DATA.locale.split("-")[0].toUpperCase();
+  document.documentElement.lang=DATA.locale;document.documentElement.dir=RTL.has(DATA.locale.split("-")[0])?"rtl":"ltr";
+  relabel();
+}
+document.getElementById("langBtn").addEventListener("click",()=>{DATA.locale=DATA.locale==="pl-PL"?"en-GB":"pl-PL";applyLang();});
+
+function relabel(){
+  document.querySelectorAll(".skill").forEach(sk=>{
+    if(sk.dataset.st==="done")return; // keep dated done label
+    const lab=sk.querySelector(".lab");
+    if(!lab)return;
+    if(sk.dataset.st==="progress")lab.textContent=t("labProg");
+    else if(sk.dataset.st==="none")lab.textContent=t("labNone");
+  });
+}
+// status setters on skill 2 and 3
+document.querySelectorAll(".skill .set").forEach(set=>{
+  const sk=set.closest(".skill");
+  set.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{
+    const v=btn.dataset.set, was=btn.getAttribute("aria-pressed")==="true";
+    set.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed","false"));
+    if(was){sk.dataset.st="none";}
+    else{btn.setAttribute("aria-pressed","true");sk.dataset.st=v;}
+    sk.querySelector(".state").textContent = sk.dataset.st==="done"?"✓":(sk.dataset.st==="progress"?"◐":"○");
+    // validation: jump straight to done from none
+    const jumped = (v==="done" && !was && sk.dataset.st==="done" && sk.id==="skill3");
+    document.getElementById("validate").classList.toggle("show", jumped);
+    relabel();
+  }));
+});
+
+const tabs=document.querySelectorAll('[role=tab]');
+const cta=document.getElementById("cta");
+tabs.forEach(tb=>tb.addEventListener("click",()=>{
+  tabs.forEach(x=>x.setAttribute("aria-selected",x===tb));
+  const bulk=tb.dataset.state==="bulk";
+  document.body.classList.toggle("is-bulk",bulk);
+  cta.textContent = bulk? t("ctaBulk"): t("ctaSingle");
+  cta.dataset.i = bulk? "ctaBulk":"ctaSingle";
+}));
+
+applyLang();
+</script>
+</body>
+</html>

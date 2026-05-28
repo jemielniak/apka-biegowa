@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOL-06 · Lista startowa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600..800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#11161c;
+  --accent:#0b69d4;
+
+  --color-success:#0a7d35;
+  --color-warning:#b45309;
+  --color-error:#c4181f;
+  --color-info:#0b69d4;
+
+  --paper:#f1f4f8;
+  --surface-1:#ffffff;
+  --surface-2:#e9eef4;
+  --surface-3:#dbe3ec;
+  --hairline:#c5cfdb;
+  --text-strong:#11161c;
+  --text:#33404e;
+  --text-muted:#5d6b7c;
+  --on-accent:#ffffff;
+  --hivis:#f3b50a;
+  --hivis-rgb:243,181,10;
+  --tint-success-bg:#ecfdf3;
+  --tint-success-border:#a6e0bd;
+  --tint-success-text:#075c28;
+  --tint-warning-bg:#fff7ed;
+  --tint-warning-border:#f2c79a;
+  --tint-warning-text:#7c3d05;
+  --tint-error-bg:#fdeaea;
+  --tint-error-border:#f0b4b4;
+  --tint-error-text:#8a1318;
+  --tint-info-bg:#eaf2fc;
+  --tint-info-border:#b8d3f3;
+  --tint-info-text:#0a4a96;
+
+
+  --verdict-ok:#0a7d35;
+  --verdict-no:#c4181f;
+  --status-paid:#0a7d35;
+  --status-unpaid:#b45309;
+  --status-check:#5d6b7c;
+
+  --font-display:"Archivo", system-ui, sans-serif;
+  --font-body:"IBM Plex Sans", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:14px;
+  --shadow:0 10px 26px -14px rgba(17,22,28,.34);
+  --tap:56px;
+  --tap-primary:64px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font-body);background:var(--brand-ink);color:var(--text);line-height:1.45;min-height:100vh}
+
+.demo-bar{position:sticky;top:0;z-index:50;background:var(--brand-ink);color:#cdd7e3;display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);border-bottom:1px solid #2a333f;font-size:12px}
+.demo-bar b{color:#fff;font-family:var(--font-display);font-weight:700;letter-spacing:.02em}
+.seg{margin-left:auto;display:flex;background:#1c242e;border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:#9fb0c2;font-family:var(--font-body);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;min-height:32px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.seg button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+.frame{max-width:480px;margin:0 auto;background:var(--paper);min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+header.app{position:sticky;top:43px;z-index:30;background:var(--surface-1);border-bottom:1px solid var(--hairline)}
+.head-row{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4)}
+.head-title{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong);flex:1}
+.count{font-family:var(--font-display);font-weight:800;font-size:15px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.count small{font-weight:600;font-size:11px;color:var(--text-muted);display:block;text-transform:uppercase;letter-spacing:.05em}
+.sync{display:flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--hairline);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--text-muted);min-height:36px}
+.sync .dot{width:8px;height:8px;border-radius:50%;background:var(--color-success)}
+body.is-alt .sync .dot{background:var(--color-warning)}
+.lang{display:flex;align-items:center;gap:4px;min-height:var(--tap);background:transparent;border:1px solid var(--hairline);border-radius:10px;padding:0 10px;font-family:var(--font-body);font-weight:600;font-size:14px;color:var(--text-strong);cursor:pointer}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* wyszukiwarka + filtry */
+.tools{padding:var(--s3) var(--s4);display:flex;flex-direction:column;gap:var(--s3);background:var(--surface-1);border-bottom:1px solid var(--hairline);position:sticky;top:115px;z-index:25}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--hairline);border-radius:12px;padding:0 14px;min-height:var(--tap)}
+.search input{flex:1;border:0;background:transparent;font-family:var(--font-body);font-size:16px;color:var(--text-strong);min-height:var(--tap)}
+.search input:focus{outline:none}
+.search:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.search .ico{color:var(--text-muted);font-size:18px}
+.filters{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.filter{flex-shrink:0;min-height:44px;border:1px solid var(--hairline);background:var(--surface-1);border-radius:999px;padding:0 16px;font-family:var(--font-body);font-weight:600;font-size:14px;color:var(--text-strong);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.filter[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.filter:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.filter .swatch{width:9px;height:9px;border-radius:50%}
+.filter .swatch.paid{background:var(--status-paid)}
+.filter .swatch.check{background:var(--status-check)}
+
+main{flex:1;padding:var(--s4);padding-bottom:96px;display:flex;flex-direction:column;gap:var(--s3)}
+
+.banner{display:flex;gap:10px;align-items:flex-start;border-radius:var(--radius);padding:var(--s3) var(--s4);font-size:13px;font-weight:500;border:1px solid}
+.banner.warn{background:var(--tint-warning-bg);border-color:var(--tint-warning-border);color:var(--tint-warning-text)}
+.banner .ico{font-size:18px;line-height:1.2;flex-shrink:0}
+.banner.alt-only{display:none}
+body.is-alt .banner.alt-only{display:flex}
+
+/* wiersz uczestnika */
+.row{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);padding:var(--s4);width:100%;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:10px;font-family:var(--font-body);color:var(--text)}
+.row:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row:active{transform:translateY(1px)}
+.row.locked{cursor:default}
+.row-head{display:flex;align-items:baseline;gap:var(--s3)}
+.bib{font-family:var(--font-display);font-weight:800;font-size:26px;color:var(--text-strong);font-variant-numeric:tabular-nums;line-height:1}
+.bib::before{content:"#";font-size:16px;color:var(--text-muted);font-weight:700}
+.pname{font-weight:600;font-size:17px;color:var(--text-strong);flex:1}
+.go{color:var(--text-muted);font-size:20px}
+
+/* znaczniki statusu */
+.statuses{display:flex;gap:var(--s2);flex-wrap:wrap}
+.stat{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:6px 10px;font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:.03em;border:1px solid}
+.stat .lbl{font-family:var(--font-body);font-weight:600;font-size:11px;letter-spacing:0;color:var(--text-muted);text-transform:uppercase}
+.stat .ico{font-size:13px}
+.stat.ok{background:var(--tint-success-bg);border-color:var(--tint-success-border);color:var(--color-success)}
+.stat.no{background:var(--tint-error-bg);border-color:var(--tint-error-border);color:var(--color-error)}
+.stat.wait{background:var(--tint-warning-bg);border-color:var(--tint-warning-border);color:var(--color-warning)}
+.stat.none{background:var(--surface-2);border-color:var(--hairline);color:var(--text-muted)}
+
+/* skierowanie do koordynatora */
+.refer{display:flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);font-weight:500}
+.refer .arrow{color:var(--accent);font-weight:700}
+.refer.danger{background:var(--tint-error-bg);color:var(--tint-error-text)}
+.refer .link{margin-left:auto;color:var(--accent);font-weight:700;text-decoration:none;white-space:nowrap}
+
+/* dolny pasek statusu */
+.statusbar{position:fixed;left:0;right:0;bottom:0;z-index:30;max-width:480px;margin:0 auto;background:var(--surface-1);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4);display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted)}
+.statusbar .dot{width:9px;height:9px;border-radius:50%;background:var(--color-success)}
+body.is-alt .statusbar .dot{background:var(--color-warning)}
+.statusbar b{color:var(--text-strong);font-weight:600;font-variant-numeric:tabular-nums}
+.statusbar .default-only{display:flex;align-items:center;gap:8px}
+.statusbar .alt-only{display:none}
+body.is-alt .statusbar .default-only{display:none}
+body.is-alt .statusbar .alt-only{display:flex;align-items:center;gap:8px}
+
+@media (prefers-reduced-motion:no-preference){
+  .row,.banner{animation:rise .4s both}
+  main>*:nth-child(1){animation-delay:.04s}
+  main>*:nth-child(2){animation-delay:.08s}
+  main>*:nth-child(3){animation-delay:.12s}
+  main>*:nth-child(4){animation-delay:.16s}
+  main>*:nth-child(5){animation-delay:.20s}
+}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">
+  <b>VOL-06</b><span data-i18n="demo.name">lista startowa z weryfikacją opłaty</span>
+  <div class="seg" role="group" aria-label="Podgląd stanu ekranu">
+    <button id="b-default" aria-pressed="true" data-i18n="demo.default">Stan domyślny (online)</button>
+    <button id="b-alt" aria-pressed="false" data-i18n="demo.alt">Praca offline</button>
+  </div>
+</div>
+
+<div class="frame">
+  <header class="app">
+    <div class="head-row">
+      <div class="head-title" data-i18n="head.title">Lista startowa</div>
+      <div class="count"><span class="t-count">84/120</span><small data-i18n="head.ready">Gotowi</small></div>
+      <div class="sync" title="Synchronizacja"><span class="dot" aria-hidden="true"></span><span data-i18n="sync.now">sync</span></div>
+      <button class="lang" id="langBtn" data-i18n-aria="aria.lang" aria-label="Zmień język"><span id="langLabel">PL</span><span aria-hidden="true">▾</span></button>
+    </div>
+  </header>
+
+  <div class="tools">
+    <label class="search">
+      <span class="ico" aria-hidden="true">⌕</span>
+      <input type="search" inputmode="text" placeholder="Numer lub nazwisko" data-i18n-ph="search.ph" data-i18n-aria="aria.search" aria-label="Szukaj uczestnika">
+    </label>
+    <div class="filters" role="group" data-i18n-aria="aria.filters" aria-label="Filtr statusu">
+      <button class="filter" aria-pressed="true" data-i18n="filter.all">Wszyscy</button>
+      <button class="filter" aria-pressed="false"><span class="swatch paid" aria-hidden="true"></span><span data-i18n="filter.paid">Opłaceni</span></button>
+      <button class="filter" aria-pressed="false"><span class="swatch check" aria-hidden="true"></span><span data-i18n="filter.check">Do wyjaśnienia</span></button>
+    </div>
+  </div>
+
+  <main>
+    <div class="banner warn alt-only" role="status">
+      <span class="ico" aria-hidden="true">⚠</span>
+      <span data-i18n="banner.offline">Pracujesz na liście z 08:52. Status opłaty mógł się zmienić po stronie organizatora — w razie wątpliwości potwierdź u koordynatora.</span>
+    </div>
+
+    <!-- #142 wszystko OK -->
+    <button class="row" data-i18n-aria="row.ok" aria-label="Jan Kowalski, numer 142, gotowy do startu">
+      <div class="row-head">
+        <span class="bib">142</span>
+        <span class="pname">Jan Kowalski</span>
+        <span class="go" aria-hidden="true">›</span>
+      </div>
+      <div class="statuses">
+        <span class="stat ok"><span class="lbl" data-i18n="lbl.pay">Opłata</span><span class="ico" aria-hidden="true">✓</span><span data-i18n="st.ok">OK</span></span>
+        <span class="stat ok"><span class="lbl" data-i18n="lbl.check">Odprawa</span><span class="ico" aria-hidden="true">✓</span><span data-i18n="st.ok">OK</span></span>
+        <span class="stat ok"><span class="lbl" data-i18n="lbl.pack">Pakiet</span><span class="ico" aria-hidden="true">✓</span><span data-i18n="st.ok">OK</span></span>
+      </div>
+    </button>
+
+    <!-- #143 nieopłacony -->
+    <div class="row locked" role="group" data-i18n-aria="row.unpaid" aria-label="Jan Nowak, numer 143, nieopłacony, skieruj do koordynatora">
+      <div class="row-head">
+        <span class="bib">143</span>
+        <span class="pname">Jan Nowak</span>
+      </div>
+      <div class="statuses">
+        <span class="stat no"><span class="lbl" data-i18n="lbl.pay">Opłata</span><span class="ico" aria-hidden="true">✕</span><span data-i18n="st.no">NIE</span></span>
+        <span class="stat none"><span class="lbl" data-i18n="lbl.check">Odprawa</span>—</span>
+        <span class="stat none"><span class="lbl" data-i18n="lbl.pack">Pakiet</span>—</span>
+      </div>
+      <div class="refer danger">
+        <span class="arrow" aria-hidden="true">→</span>
+        <span data-i18n="refer.unpaid">Wstrzymaj wydanie. Sprawę płatności prowadzi koordynator.</span>
+        <a href="#" class="link" data-i18n="refer.link">Skieruj</a>
+      </div>
+    </div>
+
+    <!-- #144 do wyjaśnienia -->
+    <div class="row locked" role="group" data-i18n-aria="row.check" aria-label="Ewa Lis, numer 144, status do wyjaśnienia">
+      <div class="row-head">
+        <span class="bib">144</span>
+        <span class="pname">Ewa Lis</span>
+      </div>
+      <div class="statuses">
+        <span class="stat wait"><span class="lbl" data-i18n="lbl.pay">Opłata</span><span class="ico" aria-hidden="true">?</span><span data-i18n="st.check">DO WYJAŚNIENIA</span></span>
+        <span class="stat none"><span class="lbl" data-i18n="lbl.check">Odprawa</span>—</span>
+        <span class="stat none"><span class="lbl" data-i18n="lbl.pack">Pakiet</span>—</span>
+      </div>
+      <div class="refer">
+        <span class="arrow" aria-hidden="true">→</span>
+        <span data-i18n="refer.check">Sprawę prowadzi koordynator. Bez kwoty na tym ekranie.</span>
+        <a href="#" class="link" data-i18n="refer.link">Skieruj</a>
+      </div>
+    </div>
+
+    <!-- #145 OK z numerem ale bez odprawy -->
+    <button class="row" data-i18n-aria="row.waiting" aria-label="Piotr Wiśniewski, numer 145, opłacony, bez odprawy">
+      <div class="row-head">
+        <span class="bib">145</span>
+        <span class="pname">Piotr Wiśniewski</span>
+        <span class="go" aria-hidden="true">›</span>
+      </div>
+      <div class="statuses">
+        <span class="stat ok"><span class="lbl" data-i18n="lbl.pay">Opłata</span><span class="ico" aria-hidden="true">✓</span><span data-i18n="st.ok">OK</span></span>
+        <span class="stat none"><span class="lbl" data-i18n="lbl.check">Odprawa</span><span data-i18n="st.waiting">CZEKA</span></span>
+        <span class="stat none"><span class="lbl" data-i18n="lbl.pack">Pakiet</span>—</span>
+      </div>
+    </button>
+  </main>
+
+  <div class="statusbar" role="status">
+    <span class="default-only"><span class="dot" aria-hidden="true"></span><span data-i18n="status.online">Online · synchronizacja: <b>09:41</b> · statusy aktualne</span></span>
+    <span class="alt-only"><span class="dot" aria-hidden="true"></span><span data-i18n="status.offline">Offline · lista z <b>08:52</b> · status mógł się zmienić</span></span>
+  </div>
+</div>
+
+<script>
+const RTL = new Set(["ar","he","fa","ur"]);
+const I18N = {
+  "pl-PL":{
+    "demo.name":"lista startowa z weryfikacją opłaty","demo.default":"Stan domyślny (online)","demo.alt":"Praca offline",
+    "head.title":"Lista startowa","head.ready":"Gotowi","sync.now":"sync",
+    "aria.lang":"Zmień język","aria.search":"Szukaj uczestnika","aria.filters":"Filtr statusu",
+    "row.ok":"Jan Kowalski, numer 142, gotowy do startu",
+    "row.unpaid":"Jan Nowak, numer 143, nieopłacony, skieruj do koordynatora",
+    "row.check":"Ewa Lis, numer 144, status do wyjaśnienia",
+    "row.waiting":"Piotr Wiśniewski, numer 145, opłacony, bez odprawy",
+    "search.ph":"Numer lub nazwisko","filter.all":"Wszyscy","filter.paid":"Opłaceni","filter.check":"Do wyjaśnienia",
+    "banner.offline":"Pracujesz na liście z 08:52. Status opłaty mógł się zmienić po stronie organizatora — w razie wątpliwości potwierdź u koordynatora.",
+    "lbl.pay":"Opłata","lbl.check":"Odprawa","lbl.pack":"Pakiet","st.ok":"OK","st.no":"NIE","st.check":"DO WYJAŚNIENIA","st.waiting":"CZEKA",
+    "refer.unpaid":"Wstrzymaj wydanie. Sprawę płatności prowadzi koordynator.","refer.check":"Sprawę prowadzi koordynator. Bez kwoty na tym ekranie.","refer.link":"Skieruj",
+    "status.online":"Online · synchronizacja: <b>09:41</b> · statusy aktualne","status.offline":"Offline · lista z <b>08:52</b> · status mógł się zmienić"
+  },
+  "en-GB":{
+    "demo.name":"start list with payment check","demo.default":"Default (online)","demo.alt":"Working offline",
+    "head.title":"Start list","head.ready":"Ready","sync.now":"sync",
+    "aria.lang":"Change language","aria.search":"Search participant","aria.filters":"Status filter",
+    "row.ok":"Jan Kowalski, bib 142, ready to start",
+    "row.unpaid":"Jan Nowak, bib 143, unpaid, refer to coordinator",
+    "row.check":"Ewa Lis, bib 144, status to clarify",
+    "row.waiting":"Piotr Wiśniewski, bib 145, paid, awaiting check-in",
+    "search.ph":"Bib or surname","filter.all":"Everyone","filter.paid":"Paid","filter.check":"To clarify",
+    "banner.offline":"You are on the 08:52 list. Payment status may have changed on the organiser side — confirm with the coordinator if in doubt.",
+    "lbl.pay":"Payment","lbl.check":"Check-in","lbl.pack":"Pack","st.ok":"OK","st.no":"NO","st.check":"TO CLARIFY","st.waiting":"PENDING",
+    "refer.unpaid":"Hold the handout. Payment is handled by the coordinator.","refer.check":"Handled by the coordinator. No amount shown here.","refer.link":"Refer",
+    "status.online":"Online · sync: <b>09:41</b> · statuses current","status.offline":"Offline · list from <b>08:52</b> · status may have changed"
+  }
+};
+
+let lang="pl-PL";
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.getElementById("langLabel").textContent=lang.split("-")[0].toUpperCase();
+  const dict=I18N[lang]||I18N["en-GB"];
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.innerHTML=dict[el.getAttribute("data-i18n")]??(I18N["en-GB"][el.getAttribute("data-i18n")]||el.innerHTML)});
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{el.placeholder=dict[el.getAttribute("data-i18n-ph")]||el.placeholder});
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>{const k=el.getAttribute("data-i18n-aria");el.setAttribute("aria-label",dict[k]??(I18N["en-GB"][k]||el.getAttribute("aria-label")));});
+  // licznik wg regionu
+  const n=new Intl.NumberFormat(lang);
+  document.querySelectorAll(".t-count").forEach(e=>e.textContent=n.format(84)+"/"+n.format(120));
+}
+document.getElementById("langBtn").addEventListener("click",()=>{lang=lang==="pl-PL"?"en-GB":"pl-PL";applyLang()});
+
+// filtry (pojedynczy wybór, demonstracyjnie)
+document.querySelectorAll(".filter").forEach(f=>f.addEventListener("click",()=>{
+  document.querySelectorAll(".filter").forEach(x=>x.setAttribute("aria-pressed","false"));
+  f.setAttribute("aria-pressed","true");
+}));
+
+function setState(alt){
+  document.body.classList.toggle("is-alt",alt);
+  document.getElementById("b-default").setAttribute("aria-pressed",String(!alt));
+  document.getElementById("b-alt").setAttribute("aria-pressed",String(alt));
+}
+document.getElementById("b-default").addEventListener("click",()=>setState(false));
+document.getElementById("b-alt").addEventListener("click",()=>setState(true));
+
+setState(false);
+applyLang();
+</script>
+</body>
+</html>

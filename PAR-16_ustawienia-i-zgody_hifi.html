@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR-16 · Ustawienia i zgody</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;--accent:#ef5a3c;
+  --color-success:#1f9d57;--color-warning:#c47d0a;--color-error:#d6402a;--color-info:#2f72d6;
+  --paper:#faf5ee;--surface-1:#ffffff;--surface-2:#fff9f2;--surface-3:#f3ebe0;--hairline:#e7ddcf;
+  --text-strong:#241c17;--text:#4a4039;--text-muted:#8a7d70;--on-accent:#fff7f3;
+  --kid-1:#ef5a3c;--kid-2:#1f9d8f;--kid-3:#7a5cd6;--kid-4:#c47d0a;
+  --font-display:"Fraunces", Georgia, serif;--font-body:"Hanken Grotesk", system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:20px;--shadow:0 14px 34px -16px rgba(60,40,30,.28);--tap:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);color:var(--text);
+  background:radial-gradient(120% 80% at 85% -8%,#fff 0%,transparent 52%),radial-gradient(90% 70% at -10% 108%,#fff4ea 0%,transparent 60%),var(--paper);
+  min-height:100%;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+.appbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s4) var(--s5);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline)}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.iconbtn{width:36px;height:36px;flex:none;border-radius:11px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);display:grid;place-items:center;font-size:17px;cursor:pointer}
+.title-h{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:18px}
+.lang{display:inline-flex;gap:var(--s1);flex:none}
+.lang button{font-weight:600;font-size:12px;min-height:32px;padding:0 var(--s3);border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-muted);border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.lang button:focus-visible,.seg button:focus-visible,.btn:focus-visible,.link:focus-visible,.sw:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.statebar{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);background:var(--surface-3);border-bottom:1px dashed var(--hairline);font-size:12px;color:var(--text-muted)}
+.statebar .lbl{font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:10.5px}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;cursor:pointer;border-radius:999px;font-weight:600;font-size:12px;color:var(--text-muted);min-height:30px;padding:0 var(--s3);font-family:var(--font-body)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+
+main{flex:1;padding:var(--s5) var(--s5) calc(var(--s10) + 110px)}
+
+.card{background:var(--surface-1);border:1px solid var(--hairline);border-radius:18px;padding:var(--s5);box-shadow:var(--shadow);margin-bottom:var(--s4)}
+.card h2{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--text-muted);font-weight:700;margin-bottom:var(--s4)}
+
+.row{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) 0;border-bottom:1px solid var(--hairline)}
+.row:last-child{border-bottom:0;padding-bottom:0}
+.row .lab{font-weight:600;color:var(--text-strong);font-size:14.5px}
+.row .desc{font-size:12px;color:var(--text-muted);margin-top:1px;max-width:30ch}
+.req{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--text-muted);background:var(--surface-3);border-radius:999px;padding:2px 7px;margin-left:var(--s2)}
+.new{font-size:10px;font-weight:700;color:var(--accent);margin-left:var(--s2)}
+
+/* toggle switch */
+.sw{position:relative;width:50px;height:30px;border-radius:999px;border:0;background:var(--surface-3);cursor:pointer;flex:none;transition:background .15s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.sw[aria-checked="true"]{background:var(--accent)}
+.sw[aria-checked="true"]::after{left:23px}
+.sw[disabled]{opacity:.5;cursor:not-allowed}
+[dir="rtl"] .sw::after{left:auto;right:3px}
+[dir="rtl"] .sw[aria-checked="true"]::after{right:23px;left:auto}
+
+select{min-height:42px;font-family:var(--font-body);font-size:14.5px;color:var(--text-strong);background:var(--surface-2);border:1.5px solid var(--hairline);border-radius:12px;padding:0 var(--s3)}
+.docmeta{font-size:11.5px;color:var(--text-muted);margin-top:var(--s1)}
+.docmeta a{color:var(--accent)}
+
+.danger-zone{border-color:#f0cabd}
+.danger-zone h2{color:var(--color-error)}
+.danger-row{display:flex;align-items:center;justify-content:space-between;gap:var(--s3)}
+.danger-row .lab{font-weight:600;color:var(--text-strong);font-size:14px}
+.danger-row .desc{font-size:12px;color:var(--text-muted)}
+.dbtn{min-height:42px;padding:0 var(--s4);border-radius:11px;border:1.5px solid #f0cabd;background:none;color:var(--color-error);font-weight:600;font-family:var(--font-body);cursor:pointer;flex:none}
+
+/* ALT unsaved guard */
+.guard{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;background:rgba(36,28,23,.4);max-width:480px;left:50%;transform:translateX(-50%)}
+body[data-state="alt"] .guard{display:flex}
+.guard .sheet{background:var(--surface-1);width:100%;border-radius:20px 20px 0 0;padding:var(--s6) var(--s5) calc(var(--s6)+env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.2)}
+.guard .gt{font-family:var(--font-display);font-weight:600;font-size:20px;color:var(--text-strong)}
+.guard p{font-size:14px;color:var(--text);margin-top:var(--s2)}
+.guard .acts{display:flex;flex-direction:column;gap:var(--s3);margin-top:var(--s5)}
+.unsaved{display:none;align-items:center;gap:var(--s2);background:#fbf0d8;border:1px solid #f0d49a;color:#7a5410;border-radius:12px;padding:var(--s3) var(--s4);font-size:13px;font-weight:600;margin-bottom:var(--s4)}
+body[data-state="alt"] .unsaved{display:flex}
+
+.actionbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:30;background:color-mix(in srgb,var(--surface-1) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--hairline);padding:var(--s3) var(--s5) calc(var(--s4)+env(safe-area-inset-bottom))}
+.status{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s2)}
+.status .dot{width:8px;height:8px;border-radius:50%;background:var(--color-success)}
+.second{display:flex;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s3)}
+.link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body)}
+.btn{width:100%;min-height:var(--tap);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:16px;border-radius:14px;border:1.5px solid transparent}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 22px -12px rgba(239,90,60,.9)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn-ghost{background:var(--surface-1);color:var(--text-strong);border-color:var(--hairline)}
+
+[data-when]{display:none}
+body[data-state="default"] [data-when="default"]{display:revert}
+body[data-state="alt"] [data-when="alt"]{display:revert}
+.reveal{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}}
+[dir="rtl"] .row,[dir="rtl"] .danger-row,[dir="rtl"] .status,[dir="rtl"] .unsaved{flex-direction:row-reverse}
+</style>
+</head>
+<body data-state="default">
+<div class="app">
+  <header class="appbar">
+    <div class="brand"><button class="iconbtn" aria-label="Wstecz">‹</button><span class="title-h" data-i18n="par16.h1">Ustawienia i zgody</span></div>
+    <div class="lang" role="group" aria-label="Język"><button data-lang="pl-PL" aria-pressed="true">PL</button><button data-lang="en-GB" aria-pressed="false">EN</button></div>
+  </header>
+
+  <div class="statebar">
+    <span class="lbl" data-i18n="state.label">Stan makiety</span>
+    <div class="seg" role="group" aria-label="Stan ekranu">
+      <button data-state-btn="default" aria-pressed="true" data-i18n="state.default">ustawienia</button>
+      <button data-state-btn="alt" aria-pressed="false" data-i18n="state.alt16">niezapisane zmiany</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="unsaved" role="status"><span aria-hidden="true">⚠</span><span data-i18n="par16.unsavedBar">Masz niezapisane zmiany na tym ekranie.</span></div>
+
+    <section class="card reveal">
+      <h2 data-i18n="par16.secNotif">Powiadomienia</h2>
+      <div class="row">
+        <div><div class="lab" data-i18n="par16.nPush">Push</div><div class="desc" data-i18n="par16.nPushD">oferty z list rezerwowych, potwierdzenia</div></div>
+        <button class="sw" role="switch" aria-checked="true" aria-labelledby="" data-sw></button>
+      </div>
+      <div class="row">
+        <div><div class="lab" data-i18n="par16.nEmail">E-mail</div><div class="desc" data-i18n="par16.nEmailD">faktury, podsumowania tygodnia</div></div>
+        <button class="sw" role="switch" aria-checked="true" data-sw></button>
+      </div>
+      <div class="row">
+        <div><div class="lab" data-i18n="par16.nSms">SMS</div><div class="desc" data-i18n="par16.nSmsD">tylko pilne, np. odwołane zajęcia</div></div>
+        <button class="sw" role="switch" aria-checked="false" data-sw></button>
+      </div>
+    </section>
+
+    <section class="card reveal">
+      <h2 data-i18n="par16.secConsents">Zgody (RODO)</h2>
+      <div class="row">
+        <div><div class="lab" data-i18n="par16.cTerms">Regulamin i przetwarzanie danych <span class="req" data-i18n="par16.required">niezbędne</span></div><div class="docmeta" id="cTermsMeta"></div></div>
+        <button class="sw" role="switch" aria-checked="true" disabled aria-disabled="true"></button>
+      </div>
+      <div class="row">
+        <div><div class="lab" data-i18n="par16.cMarketing">Komunikacja marketingowa <span class="new" data-i18n="par16.optional">dobrowolne</span></div><div class="docmeta" data-i18n="par16.cMarketingD">nowości organizatorów, promocje</div></div>
+        <button class="sw" role="switch" aria-checked="false" data-sw data-dirty></button>
+      </div>
+      <div class="row">
+        <div><div class="lab" data-i18n="par16.cImage">Wizerunek w galeriach <span class="new" data-i18n="par16.optional">dobrowolne</span></div><div class="docmeta" data-i18n="par16.cImageD">zdjęcia z zawodów, RunPixie</div></div>
+        <button class="sw" role="switch" aria-checked="true" data-sw data-dirty></button>
+      </div>
+    </section>
+
+    <section class="card reveal">
+      <h2 data-i18n="par16.secLang">Język i region</h2>
+      <div class="row">
+        <div><div class="lab" data-i18n="par16.appLang">Język aplikacji</div></div>
+        <select id="appLang"><option value="pl-PL">Polski (pl-PL)</option><option value="en-GB">English (en-GB)</option></select>
+      </div>
+    </section>
+
+    <section class="card danger-zone reveal">
+      <h2 data-i18n="par16.secData">Twoje dane</h2>
+      <div class="danger-row" style="padding-bottom:var(--s3);border-bottom:1px solid var(--hairline)">
+        <div><div class="lab" data-i18n="par16.export">Eksport danych</div><div class="desc" data-i18n="par16.exportD">kopia danych konta i dzieci</div></div>
+        <button class="dbtn" style="color:var(--text-strong);border-color:var(--hairline)" data-i18n="par16.request">Poproś</button>
+      </div>
+      <div class="danger-row" style="padding-top:var(--s3)">
+        <div><div class="lab" data-i18n="par16.delete">Usunięcie konta</div><div class="desc" data-i18n="par16.deleteD">po rozliczeniu zobowiązań</div></div>
+        <button class="dbtn" data-i18n="par16.start">Rozpocznij</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="actionbar">
+    <div class="status"><span class="dot" id="barDot" aria-hidden="true"></span><span data-when="default" data-i18n="par16.saved">Wszystko zapisane</span><span data-when="alt" id="dirtyCount"></span></div>
+    <div class="second">
+      <button class="link" data-i18n="par16.history">Historia zgód</button>
+      <button class="link" data-i18n="par16.privacy">Polityka prywatności</button>
+    </div>
+    <button class="btn btn-primary" id="saveBtn" data-when="default" disabled data-i18n="par16.allSaved">Brak zmian do zapisania</button>
+    <button class="btn btn-primary" data-when="alt" data-i18n="par16.save">Zapisz zmiany</button>
+  </div>
+
+  <!-- ALT guard sheet -->
+  <div class="guard" role="dialog" aria-modal="true" aria-labelledby="guardT">
+    <div class="sheet">
+      <div class="gt" id="guardT" data-i18n="par16.guard.title">Zapisać zmiany przed wyjściem?</div>
+      <p data-i18n="par16.guard.body">Zmieniłeś zgody marketingowe i wizerunek. Jeśli wyjdziesz teraz, zmiany przepadną.</p>
+      <div class="acts">
+        <button class="btn btn-primary" data-i18n="par16.guard.save">Zapisz i wyjdź</button>
+        <button class="btn btn-ghost" data-i18n="par16.guard.discard">Wyjdź bez zapisywania</button>
+        <button class="link" style="margin-top:var(--s1)" data-i18n="par16.guard.stay">Zostań na ekranie</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "state.label":"Stan makiety","state.default":"ustawienia","state.alt16":"niezapisane zmiany",
+  "par16.h1":"Ustawienia i zgody",
+  "par16.unsavedBar":"Masz niezapisane zmiany na tym ekranie.",
+  "par16.secNotif":"Powiadomienia","par16.nPush":"Push","par16.nPushD":"oferty z list rezerwowych, potwierdzenia","par16.nEmail":"E-mail","par16.nEmailD":"faktury, podsumowania tygodnia","par16.nSms":"SMS","par16.nSmsD":"tylko pilne, np. odwołane zajęcia",
+  "par16.secConsents":"Zgody (RODO)","par16.required":"niezbędne","par16.optional":"dobrowolne","par16.view":"podgląd",
+  "par16.cTerms":"Regulamin i przetwarzanie danych","par16.cMarketing":"Komunikacja marketingowa","par16.cMarketingD":"nowości organizatorów, promocje","par16.cImage":"Wizerunek w galeriach","par16.cImageD":"zdjęcia z zawodów, RunPixie",
+  "par16.secLang":"Język i region","par16.appLang":"Język aplikacji",
+  "par16.secData":"Twoje dane","par16.export":"Eksport danych","par16.exportD":"kopia danych konta i dzieci","par16.request":"Poproś","par16.delete":"Usunięcie konta","par16.deleteD":"po rozliczeniu zobowiązań","par16.start":"Rozpocznij",
+  "par16.saved":"Wszystko zapisane","par16.history":"Historia zgód","par16.privacy":"Polityka prywatności",
+  "par16.allSaved":"Brak zmian do zapisania","par16.save":"Zapisz zmiany",
+  "par16.guard.title":"Zapisać zmiany przed wyjściem?","par16.guard.body":"Zmieniłeś zgody marketingowe i wizerunek. Jeśli wyjdziesz teraz, zmiany przepadną.","par16.guard.save":"Zapisz i wyjdź","par16.guard.discard":"Wyjdź bez zapisywania","par16.guard.stay":"Zostań na ekranie",
+  "cTermsMeta.tpl":"wersja {v} · zaakceptowano {d} · ",
+  "par16.dirty.tpl":"{n,plural,one{# niezapisana zmiana}few{# niezapisane zmiany}many{# niezapisanych zmian}other{# niezapisanych zmian}}"
+ },
+ "en-GB":{
+  "state.label":"Mockup state","state.default":"settings","state.alt16":"unsaved changes",
+  "par16.h1":"Settings and consents",
+  "par16.unsavedBar":"You have unsaved changes on this screen.",
+  "par16.secNotif":"Notifications","par16.nPush":"Push","par16.nPushD":"waiting-list offers, confirmations","par16.nEmail":"Email","par16.nEmailD":"invoices, weekly summaries","par16.nSms":"SMS","par16.nSmsD":"urgent only, e.g. cancelled class",
+  "par16.secConsents":"Consents (GDPR)","par16.required":"required","par16.optional":"optional","par16.view":"view",
+  "par16.cTerms":"Terms and data processing","par16.cMarketing":"Marketing communication","par16.cMarketingD":"organiser news, promotions","par16.cImage":"Image in galleries","par16.cImageD":"competition photos, RunPixie",
+  "par16.secLang":"Language and region","par16.appLang":"App language",
+  "par16.secData":"Your data","par16.export":"Data export","par16.exportD":"a copy of account and children data","par16.request":"Request","par16.delete":"Delete account","par16.deleteD":"after settling obligations","par16.start":"Start",
+  "par16.saved":"Everything saved","par16.history":"Consent history","par16.privacy":"Privacy policy",
+  "par16.allSaved":"No changes to save","par16.save":"Save changes",
+  "par16.guard.title":"Save changes before leaving?","par16.guard.body":"You changed marketing and image consents. If you leave now, the changes are lost.","par16.guard.save":"Save and exit","par16.guard.discard":"Exit without saving","par16.guard.stay":"Stay on the screen",
+  "cTermsMeta.tpl":"version {v} · accepted {d} · ",
+  "par16.dirty.tpl":"{n,plural,one{# unsaved change}other{# unsaved changes}}"
+ }
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+let lang="pl-PL";
+const t=k=>(I18N[lang]&&I18N[lang][k])??(I18N["en-GB"]&&I18N["en-GB"][k])??k;
+const fmtDate=d=>new Intl.DateTimeFormat(lang,{day:"2-digit",month:"long",year:"numeric"}).format(new Date(d));
+/* lekki podstawiacz {n,plural,...} bez zewnętrznych bibliotek */
+function tPlural(key,vars){
+  let s=t(key);
+  for(const [name,val] of Object.entries(vars)){
+    s=s.replace(new RegExp(`\\{${name}\\}`,"g"),val);
+    /* parsowanie {name,plural,...} z balansowaniem klamr */
+    const start=`{${name},plural,`;
+    let i;
+    while((i=s.indexOf(start))>=0){
+      let depth=1,j=i+start.length;
+      while(j<s.length&&depth>0){
+        if(s[j]==="{")depth++;
+        else if(s[j]==="}"){depth--;if(depth===0)break;}
+        j++;
+      }
+      const inner=s.slice(i+start.length,j);
+      const cat=new Intl.PluralRules(lang).select(val);
+      const map={};inner.replace(/(zero|one|two|few|many|other)\{([^{}]*)\}/g,(_,k,v)=>{map[k]=v;});
+      const out=(map[cat]??map.other??"").replace(/#/g,val);
+      s=s.slice(0,i)+out+s.slice(j+1);
+    }
+  }
+  return s;
+}
+/* stan danych (poza I18N), żeby wartości szły przez Intl, nie przez klucze */
+const DATA={termsVersion:4,termsAcceptedAt:"2025-01-12",dirtyCount:2};
+function render(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"));});
+  /* meta regulaminu z prawdziwą datą przez Intl */
+  const meta=document.getElementById("cTermsMeta");
+  const head=t("cTermsMeta.tpl").replace("{v}",DATA.termsVersion).replace("{d}",fmtDate(DATA.termsAcceptedAt));
+  meta.innerHTML=head+`<a href="#" data-i18n="par16.view">${t("par16.view")}</a>`;
+  /* licznik zmian przez Intl.PluralRules */
+  const dc=document.getElementById("dirtyCount");
+  if(dc)dc.textContent=tPlural("par16.dirty.tpl",{n:DATA.dirtyCount});
+  document.getElementById("barDot").style.background=document.body.dataset.state==="alt"?"var(--color-warning)":"var(--color-success)";
+}
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();}));
+// generic switch toggles
+document.querySelectorAll("[data-sw]").forEach(s=>s.addEventListener("click",()=>{
+  if(s.disabled)return;
+  s.setAttribute("aria-checked",String(s.getAttribute("aria-checked")!=="true"));
+}));
+document.getElementById("appLang").addEventListener("change",e=>{
+  lang=e.target.value;document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.lang===lang)));render();
+});
+document.querySelectorAll("[data-state-btn]").forEach(b=>b.addEventListener("click",()=>{document.body.dataset.state=b.dataset.stateBtn;document.querySelectorAll("[data-state-btn]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();}));
+render();
+</script>
+</body>
+</html>

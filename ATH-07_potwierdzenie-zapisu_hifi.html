@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<!--
+  ATH-07 - potwierdzenie zapisu (panel zawodnika, moduł zawodów)
+  Stan domyślny: baner sukcesu z numerem startowym, kod QR odbioru, karta startu, następne kroki.
+  Stan alternatywny: wpłata zaksięgowana, numer w trakcie nadawania (stan przejściowy, nie porażka).
+  Napisy = klucze tłumaczeń BCP 47 (pl-PL domyślny, en-GB zapasowy). Motywowanie tylko przez zmienne CSS.
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Potwierdzenie zapisu · ATH-07</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#10141b;--accent:#d6f622;
+  --color-success:#3ddc84;--color-warning:#ffb84d;--color-error:#ff6b5e;--color-info:#6aa9ff;
+  --surface-1:#181e28;--surface-2:#1f2733;--surface-3:#283241;--hairline:#313c4c;
+  --text-strong:#f2f5f7;--text:#cdd5df;--text-muted:#8c97a6;--on-accent:#10141b;--paper:#f4f5ef;
+  --font-display:"Saira Condensed",system-ui;--font-body:"Barlow",system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);
+  --radius:14px;--shadow:0 10px 30px -12px rgba(0,0,0,.65);--tap:48px;
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 60% at 80% -10%,rgba(214,246,34,.10),transparent 60%),var(--brand-ink);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+[dir="rtl"] body{direction:rtl}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 64px);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 80%,transparent)}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:172px}
+header.bar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(16,20,27,.96),rgba(16,20,27,.86));backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);box-shadow:0 1px 0 rgba(214,246,34,.18)}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--accent);position:relative;overflow:hidden}
+.mark::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 38%,var(--on-accent) 38% 50%,transparent 50% 60%,var(--on-accent) 60% 72%,transparent 72%)}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:15px;line-height:1.05}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+.lang{margin-inline-start:auto;position:relative}
+.lang select{appearance:none;-webkit-appearance:none;font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s2) var(--s4) var(--s3);font-size:12.5px;color:var(--text-muted)}
+.dot{display:inline-flex;align-items:center;gap:6px}.dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--color-success);box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+.dot.off::before{background:var(--color-warning);box-shadow:0 0 0 3px rgba(255,184,77,.18)}
+.statepill{margin-inline-start:auto;font-family:var(--font-display);font-weight:800;font-size:11px;letter-spacing:.5px;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:var(--color-success);color:var(--on-accent)}
+.statepill.pending{background:var(--color-info)}
+.seg{display:flex;gap:var(--s2);padding:var(--s4) var(--s4) var(--s2)}
+.seg button{flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:.3px;background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);transition:all .18s;padding:0 var(--s2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 18px -8px rgba(214,246,34,.6)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding:var(--s2) var(--s4) 0;animation:rise .4s ease both}
+/* baner sukcesu z numerem */
+.hero{margin-top:var(--s2);border-radius:18px;border:1px solid rgba(214,246,34,.35);background:radial-gradient(120% 90% at 50% -20%,rgba(214,246,34,.18),transparent 60%),linear-gradient(160deg,var(--surface-2),var(--surface-1));padding:var(--s5) var(--s4) var(--s4);text-align:center;box-shadow:var(--shadow)}
+.hero .ok{width:54px;height:54px;border-radius:50%;margin:0 auto var(--s3);display:grid;place-items:center;background:var(--color-success);color:var(--on-accent)}
+.hero h1{font-family:var(--font-display);font-weight:800;font-size:24px;color:var(--text-strong);margin:0}
+.hero .ev{font-size:13px;color:var(--text-muted);margin-top:2px}
+.bibwrap{margin-top:var(--s4);padding:var(--s4);border-radius:14px;background:var(--brand-ink);border:1px dashed rgba(214,246,34,.4)}
+.bibwrap .bl{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)}
+.bibwrap .bib{font-family:var(--font-display);font-weight:800;font-size:64px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:2px;margin-top:2px}
+/* stan przejściowy numeru */
+.bibpending{margin-top:var(--s4);padding:var(--s4);border-radius:14px;background:var(--brand-ink);border:1px dashed rgba(106,169,255,.45)}
+.bibpending .bl{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)}
+.bibpending .pend{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:6px}
+.bibpending .pend .sp{width:20px;height:20px;border:3px solid var(--hairline);border-top-color:var(--color-info);border-radius:50%;animation:spin .8s linear infinite}
+.bibpending .pend b{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong)}
+/* QR */
+.qrcard{margin-top:var(--s4);display:flex;gap:var(--s4);align-items:center;padding:var(--s4);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1)}
+.qr{flex:0 0 auto;width:108px;height:108px;background:var(--paper);border-radius:10px;padding:8px}
+.qr svg{display:block;width:100%;height:100%}
+.qrcard .qt b{display:block;font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--text-strong)}
+.qrcard .qt p{margin:4px 0 0;font-size:12.5px;color:var(--text-muted)}
+.qrcard .qt .code{margin-top:6px;font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--accent);letter-spacing:1px}
+.qrcard.blurred .qr{filter:blur(4px);opacity:.5}
+/* karta startu */
+.startcard{margin-top:var(--s4);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1);overflow:hidden}
+.startcard .row{display:flex;gap:var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--hairline);font-size:13.5px}
+.startcard .row:last-child{border-bottom:none}
+.startcard .row .k{color:var(--text-muted);min-width:96px}
+.startcard .row .v{color:var(--text-strong);font-weight:600;font-variant-numeric:tabular-nums}
+.sec-h{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-muted);margin:var(--s5) 0 var(--s2)}
+.steps-list{border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1);overflow:hidden}
+.nstep{display:flex;gap:var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--hairline)}
+.nstep:last-child{border-bottom:none}
+.nstep .ni{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--surface-3);color:var(--accent);display:grid;place-items:center}
+.nstep .nc b{display:block;color:var(--text-strong);font-size:14px}
+.nstep .nc small{color:var(--text-muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+.gear{margin-top:var(--s2);padding:var(--s3) var(--s4);border-radius:var(--radius);border:1px dashed var(--hairline);font-size:13px;color:var(--text)}
+.gear b{color:var(--text-strong)}
+.gadgets{margin-top:var(--s2);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1);overflow:hidden}
+.gadgets .g{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--hairline);font-size:13.5px}
+.gadgets .g:last-child{border-bottom:none}
+.gadgets .g .gn{flex:1;color:var(--text)}.gadgets .g .gp{color:var(--text-muted);font-variant-numeric:tabular-nums}
+.pendnote{margin-top:var(--s4);display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s4);border-radius:var(--radius);background:rgba(106,169,255,.08);border:1px solid rgba(106,169,255,.35)}
+.pendnote svg{flex:0 0 auto;color:var(--color-info);margin-top:1px}
+.pendnote p{margin:0;font-size:13px;color:var(--text)}.pendnote p b{color:var(--text-strong)}
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:linear-gradient(180deg,rgba(16,20,27,.4),var(--brand-ink) 40%);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+.inner{max-width:480px;margin:0 auto}
+.status-line{display:none;align-items:flex-start;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600;text-align:center}
+.status-line svg{flex:0 0 auto;margin-top:2px}.status-line.show{display:flex}.status-line.info{color:var(--color-info)}
+.sec-actions{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-bottom:var(--s3)}
+.sec-actions button{background:none;border:none;color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hairline)}
+.sec-actions button:hover{color:var(--text)}.sec-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.cta{width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.4px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s}
+.cta:active{transform:translateY(1px) scale(.995)}.cta.ghost{background:var(--surface-2);color:var(--text-strong);box-shadow:none;border:1px solid var(--hairline)}
+.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}.cta.ghost .spinner{border-color:var(--hairline);border-top-color:var(--text-strong)}
+.hidden{display:none !important}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo"><div class="mark" aria-hidden="true"></div>
+        <div class="org"><b data-i18n="title">Potwierdzenie</b><span id="orgName">Stołeczny Klub Biegacza</span></div></div>
+      <div class="lang"><label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language"><option value="pl-PL">PL</option><option value="en-GB">EN</option></select></div>
+    </div>
+    <div class="sys">
+      <span class="dot" id="netDot"><span data-i18n="online">online</span></span>
+      <span class="statepill" id="statePill" data-i18n="pillPaid">opłacone</span>
+    </div>
+  </header>
+
+  <div class="seg" role="group" aria-label="Stan ekranu">
+    <button id="segDone" aria-pressed="true" data-i18n="segDone">Numer nadany</button>
+    <button id="segPending" aria-pressed="false" data-i18n="segPending">Numer w nadawaniu</button>
+  </div>
+
+  <main>
+    <div class="hero">
+      <div class="ok" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4 10-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h1 data-i18n="heroTitle">Jesteś zapisany</h1>
+      <div class="ev" id="heroEv"></div>
+
+      <div class="bibwrap" id="bibDone">
+        <div class="bl" data-i18n="bibLabel">Twój numer startowy</div>
+        <div class="bib">1287</div>
+      </div>
+      <div class="bibpending hidden" id="bibPending">
+        <div class="bl" data-i18n="bibLabel">Twój numer startowy</div>
+        <div class="pend"><span class="sp" aria-hidden="true"></span><b data-i18n="bibAssigning">w nadawaniu…</b></div>
+      </div>
+    </div>
+
+    <div class="qrcard" id="qrCard">
+      <div class="qr" id="qrBox" aria-hidden="true"></div>
+      <div class="qt"><b data-i18n="qrTitle">Kod odbioru pakietu</b><p data-i18n="qrDesc">Pokaż przy odbiorze. Działa też offline z zapisanej karty startu.</p><div class="code" id="qrCode">SKB-1287-4Q</div></div>
+    </div>
+
+    <div class="sec-h" data-i18n="cardHead">Karta startu</div>
+    <div class="startcard">
+      <div class="row"><span class="k" data-i18n="rEvent">Wydarzenie</span><span class="v" data-i18n="vEvent">Bieg Stołeczny</span></div>
+      <div class="row"><span class="k" data-i18n="rDate">Data</span><span class="v" id="vDate"></span></div>
+      <div class="row"><span class="k" data-i18n="rDist">Dystans</span><span class="v" data-i18n="vDist">10 km · kat. M40</span></div>
+      <div class="row"><span class="k" data-i18n="rStart">Start</span><span class="v" id="vStart"></span></div>
+    </div>
+
+    <div class="sec-h" data-i18n="nextHead">Następne kroki</div>
+    <div class="steps-list">
+      <div class="nstep"><div class="ni" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 8h16v11H4zM4 8l2-4h12l2 4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div class="nc"><b data-i18n="ns1t">Odbiór pakietu</b><small id="ns1s"></small></div></div>
+      <div class="nstep"><div class="ni" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><div class="nc"><b data-i18n="ns2t">Strefa startu</b><small id="ns2s"></small></div></div>
+    </div>
+    <div class="gear"><b data-i18n="gearLabel">Zabierz:</b> <span data-i18n="gearList">numer (wydamy w pakiecie), agrafki, dokument, kurtkę na 6°C.</span></div>
+
+    <div class="sec-h" data-i18n="gadgetHead">Zamówione gadżety</div>
+    <div class="gadgets">
+      <div class="g"><span class="gn" data-i18n="gShirt">Koszulka techniczna (M)</span><span class="gp" id="gShirtP"></span></div>
+      <div class="g"><span class="gn" data-i18n="gMedal">Medal pamiątkowy</span><span class="gp" id="gMedalP"></span></div>
+    </div>
+
+    <div class="pendnote hidden" id="pendNote">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <p data-i18n="pendBody"><b>Wpłata jest zaksięgowana.</b> Numer nadajemy przy ręcznej weryfikacji płatności. Damy znać powiadomieniem, gdy będzie gotowy - zwykle w kilka minut. Kod odbioru pojawi się razem z numerem.</p>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="inner">
+      <div class="status-line" id="statusLine"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="statusText"></span></div>
+      <div class="sec-actions" id="secMain">
+        <button id="secReceipt" data-i18n="secReceipt">Potwierdzenie płatności</button>
+        <button id="secSelf" data-i18n="secSelf">Samoobsługa zgłoszenia</button>
+        <button id="secMore" data-i18n="secMore">Dokup gadżety</button>
+      </div>
+      <button class="cta" id="mainCta"><span class="spinner" aria-hidden="true"></span><span id="ctaLabel"></span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const I18N={
+ "pl-PL":{title:"Potwierdzenie",langLabel:"Język",online:"online",pillPaid:"opłacone",pillPending:"opłacone · numer w toku",
+  segDone:"Numer nadany",segPending:"Numer w nadawaniu",
+  heroTitle:"Jesteś zapisany",heroEvTpl:"Bieg Stołeczny · {date}",bibLabel:"Twój numer startowy",bibAssigning:"w nadawaniu…",
+  qrTitle:"Kod odbioru pakietu",qrDesc:"Pokaż przy odbiorze. Działa też offline z zapisanej karty startu.",
+  cardHead:"Karta startu",rEvent:"Wydarzenie",vEvent:"Bieg Stołeczny",rDate:"Data",rDist:"Dystans",vDist:"10 km · kat. M40",rStart:"Start",
+  nextHead:"Następne kroki",ns1t:"Odbiór pakietu",ns1sTpl:"{date}, {from}–{to}, hala A",ns2t:"Strefa startu",ns2sTpl:"{date}, godz. {time}, sektor B",
+  gearLabel:"Zabierz:",gearList:"numer (wydamy w pakiecie), agrafki, dokument, kurtkę na 6°C.",
+  gadgetHead:"Zamówione gadżety",gShirt:"Koszulka techniczna (M)",gMedal:"Medal pamiątkowy",
+  pendBody:"<b>Wpłata jest zaksięgowana.</b> Numer nadajemy przy ręcznej weryfikacji płatności. Damy znać powiadomieniem, gdy będzie gotowy - zwykle w kilka minut. Kod odbioru pojawi się razem z numerem.",
+  ctaSave:"Zapisz start do telefonu (offline)",ctaNotify:"Powiadom mnie, gdy numer będzie gotowy",processingSave:"Przygotowuję kartę…",processingNotify:"Włączam powiadomienie…",
+  secReceipt:"Potwierdzenie płatności",secSelf:"Samoobsługa zgłoszenia",secMore:"Dokup gadżety",
+  saved:"Dodano start do kalendarza i pobrano kartę z numerem oraz kodem QR. Otworzysz ją offline.",
+  notifySet:"Włączyliśmy powiadomienie. Damy znać, gdy numer zostanie nadany.",
+  goReceipt:"Otwieram potwierdzenie płatności (powiązane z ATH-10).",goSelf:"Otwieram samoobsługę zgłoszenia (ATH-08).",goMore:"Otwieram dosprzedaż gadżetów (ATH-09)."},
+ "en-GB":{title:"Confirmation",langLabel:"Language",online:"online",pillPaid:"paid",pillPending:"paid · number pending",
+  segDone:"Number assigned",segPending:"Number pending",
+  heroTitle:"You're registered",heroEvTpl:"City Run · {date}",bibLabel:"Your race number",bibAssigning:"assigning…",
+  qrTitle:"Pack collection code",qrDesc:"Show it at collection. Works offline from the saved race card too.",
+  cardHead:"Race card",rEvent:"Event",vEvent:"City Run",rDate:"Date",rDist:"Distance",vDist:"10 km · M40",rStart:"Start",
+  nextHead:"Next steps",ns1t:"Pack collection",ns1sTpl:"{date}, {from}–{to}, hall A",ns2t:"Start zone",ns2sTpl:"{date}, {time}, block B",
+  gearLabel:"Bring:",gearList:"number (issued in the pack), safety pins, ID, a jacket for 6°C.",
+  gadgetHead:"Ordered merchandise",gShirt:"Technical tee (M)",gMedal:"Commemorative medal",
+  pendBody:"<b>Your payment is settled.</b> The number is assigned during manual payment verification. We'll notify you when it's ready - usually within minutes. The collection code appears together with the number.",
+  ctaSave:"Save the race to your phone (offline)",ctaNotify:"Notify me when the number is ready",processingSave:"Preparing the card…",processingNotify:"Turning on the alert…",
+  secReceipt:"Payment confirmation",secSelf:"Self-service",secMore:"Buy more merchandise",
+  saved:"Added the race to your calendar and downloaded the card with the number and QR code. You can open it offline.",
+  notifySet:"Alert turned on. We'll let you know when the number is assigned.",
+  goReceipt:"Opening the payment confirmation (linked to ATH-10).",goSelf:"Opening self-service (ATH-08).",goMore:"Opening merchandise upsell (ATH-09)."}
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL",online:true,start:new Date("2026-05-18T10:00:00"),pickup:new Date("2026-05-17T16:00:00"),shirt:79,medal:29};
+const UI={view:"done"};
+const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function t(k){const L=I18N[DATA.locale]||{},F=I18N["en-GB"];return (k in L)?L[k]:(F[k]??k);}
+function tpl(k,m){let s=t(k);for(const x in m)s=s.replace(new RegExp("{"+x+"}","g"),m[x]);return s;}
+function applyStatic(){$$("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-i18n"),v=t(k);if(v.includes("<"))e.innerHTML=v;else e.textContent=v;});}
+const fmtDate=(d)=>new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"long",year:"numeric"}).format(d);
+const fmtDateShort=(d)=>new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit"}).format(d);
+const fmtTime=(d)=>new Intl.DateTimeFormat(DATA.locale,{hour:"2-digit",minute:"2-digit"}).format(d);
+const fmtMoney=(v)=>new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN"}).format(v);
+function buildQR(seed){
+  // deterministyczny wzór QR (placeholder graficzny, nie realny kod)
+  const n=21,sz=100/n;let r=seed;const rnd=()=>{r=(r*1103515245+12345)&0x7fffffff;return r/0x7fffffff;};
+  let rects="";
+  const finder=(x,y)=>{rects+=`<rect x="${x*sz}" y="${y*sz}" width="${7*sz}" height="${7*sz}" fill="#10141b"/><rect x="${(x+1)*sz}" y="${(y+1)*sz}" width="${5*sz}" height="${5*sz}" fill="#f4f5ef"/><rect x="${(x+2)*sz}" y="${(y+2)*sz}" width="${3*sz}" height="${3*sz}" fill="#10141b"/>`;};
+  for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+    const inFinder=(x<8&&y<8)||(x>n-9&&y<8)||(x<8&&y>n-9);
+    if(inFinder)continue;
+    if(rnd()>0.5)rects+=`<rect x="${x*sz}" y="${y*sz}" width="${sz}" height="${sz}" fill="#10141b"/>`;
+  }
+  finder(0,0);finder(n-7,0);finder(0,n-7);
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#f4f5ef"/>${rects}</svg>`;
+}
+function renderContent(){
+  $("#heroEv").textContent=tpl("heroEvTpl",{date:fmtDate(DATA.start)});
+  $("#vDate").textContent=fmtDate(DATA.start);
+  $("#vStart").textContent=fmtTime(DATA.start);
+  const pEnd=new Date(DATA.pickup.getTime()+4*3600000);
+  $("#ns1s").textContent=tpl("ns1sTpl",{date:fmtDateShort(DATA.pickup),from:fmtTime(DATA.pickup),to:fmtTime(pEnd)});
+  $("#ns2s").textContent=tpl("ns2sTpl",{date:fmtDateShort(DATA.start),time:fmtTime(DATA.start)});
+  $("#gShirtP").textContent=fmtMoney(DATA.shirt);$("#gMedalP").textContent=fmtMoney(DATA.medal);
+  $("#qrBox").innerHTML=buildQR(1287);
+}
+function renderCta(){const l=$("#ctaLabel"),c=$("#mainCta");c.classList.toggle("ghost",UI.view==="pending");l.textContent=UI.view==="done"?t("ctaSave"):t("ctaNotify");}
+let st=null;
+function showStatus(x,info){const s=$("#statusLine");$("#statusText").textContent=x;s.classList.add("show");s.classList.toggle("info",!!info);}
+function hideStatus(){$("#statusLine").classList.remove("show");}
+function runProcessing(key,done){const c=$("#mainCta"),l=$("#ctaLabel");c.disabled=true;c.classList.add("processing");l.textContent=t(key);clearTimeout(st);st=setTimeout(()=>{c.classList.remove("processing");c.disabled=false;renderCta();done();},900);}
+function setView(v){UI.view=v;$("#segDone").setAttribute("aria-pressed",v==="done");$("#segPending").setAttribute("aria-pressed",v==="pending");
+  $("#bibDone").classList.toggle("hidden",v!=="done");$("#bibPending").classList.toggle("hidden",v!=="pending");
+  $("#qrCard").classList.toggle("blurred",v==="pending");$("#qrCode").style.visibility=v==="pending"?"hidden":"";
+  $("#pendNote").classList.toggle("hidden",v!=="pending");
+  const pill=$("#statePill");pill.classList.toggle("pending",v==="pending");pill.textContent=v==="pending"?t("pillPending"):t("pillPaid");
+  hideStatus();renderCta();}
+function setLocale(loc){DATA.locale=loc;document.documentElement.lang=loc;document.documentElement.dir=RTL.has(loc.split("-")[0])?"rtl":"ltr";applyStatic();renderContent();$("#statePill").textContent=UI.view==="pending"?t("pillPending"):t("pillPaid");renderCta();}
+document.addEventListener("DOMContentLoaded",()=>{
+  setLocale("pl-PL");$("#langSel").value="pl-PL";
+  $("#langSel").addEventListener("change",e=>setLocale(e.target.value));
+  $("#segDone").addEventListener("click",()=>setView("done"));
+  $("#segPending").addEventListener("click",()=>setView("pending"));
+  $("#mainCta").addEventListener("click",()=>{if(UI.view==="done")runProcessing("processingSave",()=>showStatus(t("saved")));else runProcessing("processingNotify",()=>showStatus(t("notifySet"),true));});
+  $("#secReceipt").addEventListener("click",()=>showStatus(t("goReceipt")));
+  $("#secSelf").addEventListener("click",()=>showStatus(t("goSelf")));
+  $("#secMore").addEventListener("click",()=>showStatus(t("goMore")));
+});
+</script>
+</body>
+</html>

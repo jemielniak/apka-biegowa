@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCL-05 · Lista rezerwowa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500..700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#1a1f2e;--accent:#4f46e5;
+  --color-success:#15803d;--color-warning:#b45309;--color-error:#dc2626;--color-info:#2563eb;
+  --paper:#f6f8fc;--surface-1:#ffffff;--surface-2:#eef1f8;--surface-3:#e3e7f1;--hairline:#d5dae6;
+  --text-strong:#1a1f2e;--text:#3b4252;--text-muted:#6b7385;--on-accent:#ffffff;
+  --font-display:"Space Grotesk", system-ui, sans-serif;--font-body:"Source Sans 3", system-ui;
+  --u:4px;--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:12px;--shadow:0 8px 24px -16px rgba(26,31,46,.30);--tap:44px;--rail-w:228px;
+}
+*{box-sizing:border-box;}html,body{margin:0;padding:0;}
+body{font-family:var(--font-body);background:var(--paper);color:var(--text);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;}
+.tnum{font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-family:var(--font-display);color:var(--text-strong);margin:0;font-weight:600;letter-spacing:-.01em;}
+button{font-family:var(--font-body);cursor:pointer;}
+
+.topbar{position:sticky;top:0;z-index:40;background:var(--surface-1);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--s4);padding:var(--s3) var(--s5);min-height:60px;}
+.logo{display:flex;align-items:center;gap:var(--s3);font-family:var(--font-display);font-weight:700;color:var(--text-strong);white-space:nowrap;}
+.logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(150deg,var(--accent),#3730a3);display:grid;place-items:center;color:#fff;font-weight:700;}
+.logo small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--text-muted);}
+.topbar .spacer{flex:1;}
+.ctx{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;}
+.field{display:flex;flex-direction:column;gap:2px;}
+.field label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600;}
+select{font-family:var(--font-body);font-size:14px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:7px 28px 7px 10px;min-height:36px;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7385' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 9px center;}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.acct{width:36px;height:36px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface-3);display:grid;place-items:center;font-weight:600;color:var(--text-strong);font-size:13px;}
+
+.shell{display:flex;min-height:calc(100vh - 60px);}
+.rail{width:var(--rail-w);flex:0 0 var(--rail-w);background:var(--surface-1);border-right:1px solid var(--hairline);padding:var(--s4) var(--s3);position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;}
+.rail .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700;padding:var(--s3) var(--s3) var(--s2);}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:9px;color:var(--text);text-decoration:none;font-weight:500;font-size:14.5px;margin-bottom:2px;min-height:40px;position:relative;}
+.nav-item:hover{background:var(--surface-2);}
+.nav-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600;}
+.nav-item .badge{margin-left:auto;background:var(--color-error);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center;}
+
+.main{flex:1;min-width:0;}
+.wrap{max-width:1280px;margin:0 auto;padding:var(--s6) var(--s6) var(--s10);}
+.demobar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--hairline);border-radius:10px;padding:var(--s2) var(--s3);margin-bottom:var(--s5);}
+.demobar .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:700;}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:8px;padding:2px;}
+.seg button{border:0;background:transparent;color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;min-height:32px;}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);}
+
+.pagehead{margin-bottom:var(--s4);}
+.pagehead h1{font-size:24px;}
+.pagehead .sub{color:var(--text-muted);font-size:13.5px;margin-top:2px;}
+
+/* control bar: mode + window + next */
+.controlbar{display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap;background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);padding:var(--s4);margin-bottom:var(--s4);}
+.mode{display:flex;align-items:center;gap:var(--s3);}
+.mode .radios{display:inline-flex;gap:var(--s2);}
+.rad{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--hairline);border-radius:9px;padding:9px 14px;font-weight:600;font-size:14px;min-height:var(--tap);color:var(--text);background:var(--surface-1);}
+.rad[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,transparent);color:var(--accent);}
+.rad .d{width:10px;height:10px;border-radius:50%;border:2px solid currentColor;}
+.rad[aria-pressed="true"] .d{background:currentColor;}
+.win{display:flex;flex-direction:column;gap:4px;}
+.win label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;}
+.win .suffix{display:flex;align-items:center;gap:8px;}
+.win input{width:80px;font-family:var(--font-body);font-size:14.5px;color:var(--text-strong);background:var(--surface-1);border:1px solid var(--hairline);border-radius:9px;padding:9px 12px;min-height:var(--tap);text-align:center;font-variant-numeric:tabular-nums;}
+.win input[aria-invalid="true"]{border-color:var(--color-error);}
+.win .u{font-size:13px;color:var(--text-muted);}
+.next{margin-left:auto;text-align:right;}
+.next .nl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;}
+.next .nn{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong);}
+
+.vmsg{display:none;align-items:flex-start;gap:8px;font-size:13px;border-radius:9px;padding:10px 12px;margin-bottom:var(--s4);}
+.vmsg.show{display:flex;}
+.vmsg.err{background:color-mix(in srgb,var(--color-error) 9%,transparent);color:var(--color-error);border:1px solid color-mix(in srgb,var(--color-error) 35%,transparent);}
+
+/* queue table */
+.panel{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.p-head{display:flex;align-items:center;justify-content:space-between;padding:var(--s4);border-bottom:1px solid var(--hairline);}
+.p-head h2{font-size:15px;}
+table{width:100%;border-collapse:collapse;}
+thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;padding:11px var(--s4);border-bottom:1px solid var(--hairline);background:var(--surface-2);}
+tbody td{padding:13px var(--s4);border-bottom:1px solid var(--surface-2);font-size:14px;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:0;}
+tbody tr.offered{background:color-mix(in srgb,var(--accent) 6%,transparent);}
+.pos{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--text-strong);font-variant-numeric:tabular-nums;}
+.child{font-weight:600;color:var(--text-strong);}
+.contact{color:var(--text-muted);font-size:13px;}
+.ostatus{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;}
+.ostatus .d{width:8px;height:8px;border-radius:50%;}
+.os-sent{color:var(--color-info);} .os-sent .d{background:var(--color-info);}
+.os-wait{color:var(--text-muted);} .os-wait .d{background:var(--text-muted);}
+.os-decline{color:var(--color-error);} .os-decline .d{background:var(--color-error);}
+.os-expired{color:var(--color-warning);} .os-expired .d{background:var(--color-warning);}
+.os-accepted{color:var(--color-success);} .os-accepted .d{background:var(--color-success);}
+.timer{display:inline-flex;align-items:center;gap:6px;margin-left:8px;font-variant-numeric:tabular-nums;font-weight:700;background:var(--surface-2);border-radius:7px;padding:2px 8px;font-size:12.5px;color:var(--text-strong);}
+.timer.low{color:var(--color-error);background:color-mix(in srgb,var(--color-error) 10%,transparent);}
+
+/* history */
+.history{margin-top:var(--s4);}
+.history summary{cursor:pointer;font-weight:700;color:var(--text-strong);padding:var(--s3) var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);list-style:none;display:flex;align-items:center;gap:8px;}
+.history summary::-webkit-details-marker{display:none;}
+.history[open] summary{border-bottom-left-radius:0;border-bottom-right-radius:0;}
+.hbody{border:1px solid var(--hairline);border-top:0;border-radius:0 0 var(--radius) var(--radius);background:var(--surface-1);padding:var(--s2) 0;}
+.hitem{display:grid;grid-template-columns:90px 1fr;gap:var(--s3);padding:10px var(--s4);border-bottom:1px solid var(--surface-2);font-size:13.5px;}
+.hitem:last-child{border-bottom:0;}
+.hitem .ht{color:var(--text-muted);font-variant-numeric:tabular-nums;}
+
+.actionbar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s4);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;font-weight:600;font-size:14px;min-height:var(--tap);padding:0 16px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);}
+.btn:hover{background:var(--surface-2);}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 16px -8px var(--accent);font-size:14.5px;padding:0 20px;}
+.btn-primary:hover{background:#4338ca;}
+.btn-sm{min-height:40px;font-size:13.5px;}
+.btn-danger{color:var(--color-error);border-color:color-mix(in srgb,var(--color-error) 45%,transparent);background:transparent;}
+.btn-danger:hover{background:color-mix(in srgb,var(--color-error) 8%,transparent);}
+.actionbar .grow{flex:1;}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(26,31,46,.45);display:none;align-items:center;justify-content:center;z-index:70;padding:var(--s4);}
+.scrim.show{display:flex;}
+.modal{background:var(--surface-1);border-radius:var(--radius);box-shadow:0 24px 60px -20px rgba(0,0,0,.5);max-width:440px;width:100%;padding:var(--s6);}
+.modal h3{font-size:18px;margin-bottom:var(--s2);}
+.modal p{color:var(--text-muted);margin:0 0 var(--s4);}
+.modal textarea{width:100%;min-height:84px;font-family:var(--font-body);font-size:14.5px;border:1px solid var(--hairline);border-radius:10px;padding:10px 12px;resize:vertical;}
+.modal textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.modal textarea[aria-invalid="true"]{border-color:var(--color-error);}
+.modal .err-line{display:none;color:var(--color-error);font-size:12.5px;margin-top:6px;}
+.modal .err-line.show{display:block;}
+.m-actions{display:flex;gap:var(--s3);justify-content:flex-end;margin-top:var(--s4);}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--brand-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);transition:opacity .25s,transform .25s;z-index:80;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{background:var(--color-success);}.toast.warn{background:var(--color-warning);}
+
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+@media (max-width:1080px){:root{--rail-w:64px;}.nav-item span.t{display:none;}.nav-item{justify-content:center;}.rail .grp{display:none;}.nav-item .badge{position:absolute;margin:0;transform:translate(14px,-12px);}}
+@media (max-width:640px){.rail{display:none;}.ctx .field.hide-sm{display:none;}.contact{display:none;}thead th.col-c,tbody td.col-c{display:none;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo"><span class="mark">D</span><span data-i18n="brand.name">Klub Pływacki Delfin<small data-i18n="brand.role">Panel organizatora</small></span></div>
+  <div class="spacer"></div>
+  <div class="ctx">
+    <div class="field"><label for="mode" data-i18n="ctx.mode">Tryb</label><select id="modeSel"><option data-i18n="mode.classes">Zajęcia</option><option data-i18n="mode.events">Zawody</option></select></div>
+    <div class="field hide-sm"><label for="facility" data-i18n="ctx.facility">Placówka</label><select id="facility"><option>Klub Pływacki Delfin</option><option>Szkoła Pływania Nurek</option></select></div>
+    <div class="field"><label for="lang" data-i18n="ctx.lang">Język</label><select id="lang"><option value="pl-PL">Polski</option><option value="en-GB">English</option></select></div>
+    <div class="acct">JN</div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Nawigacja panelu">
+    <div class="grp" data-i18n="nav.section">Zajęcia</div>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="t" data-i18n="nav.dashboard">Pulpit</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="18" cy="9" r="2"/></svg><span class="t" data-i18n="nav.groups">Grupy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span class="t" data-i18n="nav.schedule">Grafik</span></a>
+    <a class="nav-item active" href="#" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 2h6v4H9z"/></svg><span class="t" data-i18n="nav.waitlist">Rezerwowa</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="t" data-i18n="nav.participants">Uczestnicy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span class="t" data-i18n="nav.payments">Płatności</span><span class="badge tnum">4</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span class="t" data-i18n="nav.settings">Ustawienia</span></a>
+  </nav>
+
+  <main class="main">
+    <div class="wrap">
+      <div class="demobar" role="group" aria-label="Podgląd stanu makiety">
+        <span class="lbl" data-i18n="demo.label">Podgląd stanu</span>
+        <div class="seg">
+          <button id="st-filled" aria-pressed="true" data-i18n="demo.filled">Wypełniony</button>
+          <button id="st-timer" aria-pressed="false" data-i18n="demo.timer">Oferta z timerem</button>
+        </div>
+        <span class="lbl" id="liveNote" style="margin-left:auto;color:var(--color-warning)"></span>
+      </div>
+
+      <div class="pagehead">
+        <h1 data-i18n="page.title">Lista rezerwowa: Rekiny P3</h1>
+        <div class="sub" data-i18n="page.sub">Grupa pełna (10/10). Zwolnione miejsce trafia do pierwszej oczekującej rodziny.</div>
+      </div>
+
+      <div class="controlbar">
+        <div class="mode">
+          <span class="win"><label data-i18n="mode.label">Tryb dopisania</label>
+          <span class="radios" role="group" aria-label="Tryb dopisania">
+            <button class="rad" id="r-auto" aria-pressed="true"><span class="d"></span><span data-i18n="mode.auto">Automatyczny</span></button>
+            <button class="rad" id="r-manual" aria-pressed="false"><span class="d"></span><span data-i18n="mode.manual">Ręczny</span></button>
+          </span></span>
+        </div>
+        <div class="win">
+          <label for="f-window" data-i18n="win.label">Okno na potwierdzenie</label>
+          <div class="suffix"><input type="number" id="f-window" value="24" min="1"><span class="u" data-i18n="u.hours">godz.</span></div>
+        </div>
+        <div class="next">
+          <div class="nl" data-i18n="next.label">Następny w kolejce</div>
+          <div class="nn" id="nextName">rodzina Nowak</div>
+        </div>
+      </div>
+
+      <div class="vmsg err" id="v-window"><span>⚠</span><span data-i18n="v.window">Okno na potwierdzenie nie może być zerowe — bez niego oferta nigdy nie wygaśnie.</span></div>
+
+      <div class="panel">
+        <div class="p-head"><h2 data-i18n="queue.title">Kolejka oczekujących</h2><span class="ghint" id="qHint"></span></div>
+        <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th style="width:48px">#</th>
+            <th data-i18n="col.child">Dziecko</th>
+            <th data-i18n="col.reported">Zgłoszenie</th>
+            <th class="col-c" data-i18n="col.contact">Kontakt</th>
+            <th data-i18n="col.offer">Status oferty</th>
+          </tr></thead>
+          <tbody id="queueBody"></tbody>
+        </table>
+        </div>
+      </div>
+
+      <details class="history">
+        <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-7 3.5M3 4v4h4M12 7v5l3 2"/></svg> <span data-i18n="history.title">Historia ofert i odmów</span></summary>
+        <div class="hbody" id="historyBody"></div>
+      </details>
+
+      <div class="actionbar">
+        <button class="btn btn-primary" id="primary" data-i18n="action.offer">Zaoferuj zwolnione miejsce następnej osobie</button>
+        <span class="grow"></span>
+        <button class="btn btn-sm" id="b-move" data-i18n="action.move">Przesuń ręcznie (z powodem)</button>
+        <button class="btn btn-sm" id="b-pause" data-i18n="action.pause">Wstrzymaj automat</button>
+        <button class="btn btn-sm" id="b-extend" data-i18n="action.extend">Przedłuż okno</button>
+        <button class="btn btn-danger btn-sm" id="b-del" data-i18n="action.remove">Usuń zgłoszenie</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- manual move reason modal -->
+<div class="scrim" id="reasonScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rm-t">
+    <h3 id="rm-t" data-i18n="reason.title">Podaj powód ręcznego przesunięcia</h3>
+    <p data-i18n="reason.body">Kolejka musi być audytowalna. Powód zapisze się w historii i będzie widoczny przy sporze z rodzicem.</p>
+    <textarea id="reasonText" data-i18n-ph="reason.ph" placeholder="np. zgłoszenie poza systemem potwierdzone telefonicznie"></textarea>
+    <div class="err-line" id="reasonErr" data-i18n="reason.err">Powód jest wymagany — bez niego nie zapiszemy przesunięcia.</div>
+    <div class="m-actions">
+      <button class="btn btn-sm" id="rm-close" data-i18n="action.back">Wróć</button>
+      <button class="btn btn-primary btn-sm" id="rm-confirm" data-i18n="reason.confirm">Zapisz przesunięcie</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "brand.name":"Klub Pływacki Delfin","brand.role":"Panel organizatora",
+  "ctx.mode":"Tryb","ctx.facility":"Placówka","ctx.lang":"Język","mode.classes":"Zajęcia","mode.events":"Zawody",
+  "nav.section":"Zajęcia","nav.dashboard":"Pulpit","nav.groups":"Grupy","nav.schedule":"Grafik","nav.waitlist":"Rezerwowa","nav.participants":"Uczestnicy","nav.payments":"Płatności","nav.settings":"Ustawienia",
+  "demo.label":"Podgląd stanu","demo.filled":"Wypełniony","demo.timer":"Oferta z timerem",
+  "page.title":"Lista rezerwowa: Rekiny P3","page.sub":"Grupa pełna (10/10). Zwolnione miejsce trafia do pierwszej oczekującej rodziny.",
+  "mode.label":"Tryb dopisania","mode.auto":"Automatyczny","mode.manual":"Ręczny",
+  "win.label":"Okno na potwierdzenie","u.hours":"godz.","next.label":"Następny w kolejce",
+  "v.window":"Okno na potwierdzenie nie może być zerowe — bez niego oferta nigdy nie wygaśnie.",
+  "queue.title":"Kolejka oczekujących","col.child":"Dziecko","col.reported":"Zgłoszenie","col.contact":"Kontakt","col.offer":"Status oferty",
+  "history.title":"Historia ofert i odmów",
+  "action.offer":"Zaoferuj zwolnione miejsce następnej osobie","action.auto":"Włącz automat","action.move":"Przesuń ręcznie (z powodem)","action.pause":"Wstrzymaj automat","action.extend":"Przedłuż okno","action.remove":"Usuń zgłoszenie","action.back":"Wróć",
+  "reason.title":"Podaj powód ręcznego przesunięcia","reason.body":"Kolejka musi być audytowalna. Powód zapisze się w historii i będzie widoczny przy sporze z rodzicem.","reason.ph":"np. zgłoszenie poza systemem potwierdzone telefonicznie","reason.err":"Powód jest wymagany — bez niego nie zapiszemy przesunięcia.","reason.confirm":"Zapisz przesunięcie",
+  "os.sent":"oferta wysłana","os.wait":"oczekuje","os.decline":"odmowa","os.expired":"oferta wygasła","os.accepted":"dopisano",
+  "contact.tel":"tel/mail",
+  "toast.offer":"Wysłano ofertę do: ","toast.autoon":"Automat włączony — oferty wysyłają się same","toast.autooff":"Automat wstrzymany","toast.extend":"Przedłużono okno na potwierdzenie","toast.moved":"Przesunięto w kolejce — powód zapisany","toast.removed":"Usunięto zgłoszenie — rodzic dostanie powiadomienie","toast.expired":"Oferta wygasła — miejsce wróciło do puli","toast.escalated":"Eskalacja: oferta przeszła do następnej osoby","toast.accepted":"Rodzina potwierdziła — dopisano do grupy",
+  "live.note":"Trwa odliczanie okna na potwierdzenie…",
+  "h.sent":"Wysłano ofertę: ","h.decline":"Odmowa: ","h.expired":"Wygasła oferta: ","h.escal":"Eskalacja do: ",
+  "remaining":"pozostało"
+ },
+ "en-GB":{
+  "brand.name":"Delfin Swim Club","brand.role":"Organiser panel",
+  "ctx.mode":"Mode","ctx.facility":"Facility","ctx.lang":"Language","mode.classes":"Classes","mode.events":"Events",
+  "nav.section":"Classes","nav.dashboard":"Dashboard","nav.groups":"Groups","nav.schedule":"Schedule","nav.waitlist":"Waiting list","nav.participants":"Participants","nav.payments":"Payments","nav.settings":"Settings",
+  "demo.label":"State preview","demo.filled":"Populated","demo.timer":"Offer with timer",
+  "page.title":"Waiting list: Rekiny P3","page.sub":"Group full (10/10). A freed place goes to the first waiting family.",
+  "mode.label":"Add-in mode","mode.auto":"Automatic","mode.manual":"Manual",
+  "win.label":"Confirmation window","u.hours":"h","next.label":"Next in queue",
+  "v.window":"The confirmation window cannot be zero — without it an offer would never expire.",
+  "queue.title":"Waiting queue","col.child":"Child","col.reported":"Reported","col.contact":"Contact","col.offer":"Offer status",
+  "history.title":"History of offers and declines",
+  "action.offer":"Offer the freed place to the next person","action.auto":"Turn on the automation","action.move":"Move manually (with a reason)","action.pause":"Pause automation","action.extend":"Extend window","action.remove":"Remove entry","action.back":"Back",
+  "reason.title":"Give a reason for the manual move","reason.body":"The queue must be auditable. The reason is saved to history and shown if a parent disputes it.","reason.ph":"e.g. out-of-system request confirmed by phone","reason.err":"A reason is required — without it the move will not be saved.","reason.confirm":"Save move",
+  "os.sent":"offer sent","os.wait":"waiting","os.decline":"declined","os.expired":"offer expired","os.accepted":"added",
+  "contact.tel":"tel/mail",
+  "toast.offer":"Offer sent to: ","toast.autoon":"Automation on — offers send themselves","toast.autooff":"Automation paused","toast.extend":"Confirmation window extended","toast.moved":"Moved in the queue — reason saved","toast.removed":"Entry removed — the parent will be notified","toast.expired":"Offer expired — place returned to the pool","toast.escalated":"Escalation: offer passed to the next person","toast.accepted":"Family confirmed — added to the group",
+  "live.note":"Confirmation window counting down…",
+  "h.sent":"Offer sent: ","h.decline":"Declined: ","h.expired":"Offer expired: ","h.escal":"Escalated to: ",
+  "remaining":"remaining"
+ }
+};
+const FALLBACK="en-GB",FACILITY_REGION="pl-PL";let lang="pl-PL";
+const RTL=new Set(["ar","he","fa","ur"]);
+function t(k){const d=I18N[lang]||{};if(k in d)return d[k];const f=I18N[FALLBACK]||{};return (k in f)?f[k]:k;}
+
+let QUEUE=[
+ {id:1,child:"Anna N.",family:"Nowak",reported:[2,5],status:"sent",timer:null},
+ {id:2,child:"Piotr K.",family:"Kowalski",reported:[4,5],status:"wait"},
+ {id:3,child:"Maja W.",family:"Wójcik",reported:[5,5],status:"decline",declined:[3,5]}
+];
+let HISTORY=[
+ {time:[3,5],key:"h.sent",who:"Anna N."},
+ {time:[3,5],key:"h.decline",who:"Maja W."}
+];
+let auto=true, countdown=null, timerSec=0;
+
+function fmtDate(a){return new Intl.DateTimeFormat(FACILITY_REGION,{day:"2-digit",month:"2-digit"}).format(new Date(2025,a[1]-1,a[0]));}
+function mmss(s){const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0");}
+
+function statusCell(q){
+  if(q.status==="sent"){
+    const timer=(q.timer!=null)?`<span class="timer${q.timer<=10?' low':''}">⏳ ${mmss(q.timer)} ${t("remaining")}</span>`:`<span class="timer">⏳ 22:14 ${t("u.hours")}</span>`;
+    return `<span class="ostatus os-sent"><span class="d"></span>${t("os.sent")}</span>${timer}`;
+  }
+  if(q.status==="wait")return `<span class="ostatus os-wait"><span class="d"></span>${t("os.wait")}</span>`;
+  if(q.status==="decline")return `<span class="ostatus os-decline"><span class="d"></span>${t("os.decline")} ${q.declined?fmtDate(q.declined):''}</span>`;
+  if(q.status==="expired")return `<span class="ostatus os-expired"><span class="d"></span>${t("os.expired")}</span>`;
+  if(q.status==="accepted")return `<span class="ostatus os-accepted"><span class="d"></span>${t("os.accepted")}</span>`;
+  return "";
+}
+function renderQueue(){
+  const body=document.getElementById("queueBody");
+  body.innerHTML=QUEUE.map((q,i)=>`<tr class="${q.status==='sent'?'offered':''}">
+    <td><span class="pos">${i+1}</span></td>
+    <td><span class="child">${q.child}</span></td>
+    <td class="tnum">${fmtDate(q.reported)}</td>
+    <td class="col-c"><span class="contact">${t("contact.tel")}</span></td>
+    <td>${statusCell(q)}</td></tr>`).join("");
+  document.getElementById("qHint").textContent=QUEUE.length+"";
+  const next=QUEUE.find(q=>q.status==="wait");
+  document.getElementById("nextName").textContent=next?(lang==="pl-PL"?"rodzina ":"the ")+next.family+(lang==="en-GB"?" family":""):"—";
+  // primary label depends on auto mode
+  document.getElementById("primary").textContent = auto ? t("action.offer") : t("action.offer");
+}
+function renderHistory(){
+  document.getElementById("historyBody").innerHTML=HISTORY.map(h=>
+    `<div class="hitem"><span class="ht">${fmtDate(h.time)}</span><span>${t(h.key)}<b>${h.who}</b>${h.reason?` — „${h.reason}\u201D`:''}</span></div>`).join("");
+}
+
+function validate(){
+  const win=+document.getElementById("f-window").value;
+  const bad=win<=0;
+  document.getElementById("v-window").classList.toggle("show",bad);
+  document.getElementById("f-window").setAttribute("aria-invalid",bad);
+  document.getElementById("primary").disabled=bad;
+  return !bad;
+}
+
+function applyLang(){
+  document.documentElement.lang=lang.split("-")[0];
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(n=>{
+    const k=n.getAttribute("data-i18n");
+    if(k==="brand.name"){n.firstChild.textContent=t(k);return;}
+    n.textContent=t(k);
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach(n=>n.setAttribute("placeholder",t(n.getAttribute("data-i18n-ph"))));
+  renderQueue();renderHistory();
+}
+function toast(msg,kind){const el=document.getElementById("toast");el.textContent=msg;el.className="toast show"+(kind?" "+kind:"");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2600);}
+
+// mode radios
+document.getElementById("r-auto").addEventListener("click",()=>setAuto(true));
+document.getElementById("r-manual").addEventListener("click",()=>setAuto(false));
+function setAuto(v){auto=v;document.getElementById("r-auto").setAttribute("aria-pressed",v);document.getElementById("r-manual").setAttribute("aria-pressed",!v);renderQueue();}
+
+document.getElementById("lang").addEventListener("change",e=>{lang=e.target.value;applyLang();});
+document.getElementById("f-window").addEventListener("input",validate);
+
+document.getElementById("primary").addEventListener("click",()=>{
+  if(!validate())return;
+  const next=QUEUE.find(q=>q.status==="wait");
+  if(next){next.status="sent";HISTORY.unshift({time:[12,5],key:"h.sent",who:next.child});renderQueue();renderHistory();toast(t("toast.offer")+next.child,"ok");}
+});
+document.getElementById("b-pause").addEventListener("click",()=>{setAuto(!auto);toast(t(auto?"toast.autoon":"toast.autooff"),auto?"ok":"warn");});
+document.getElementById("b-extend").addEventListener("click",()=>{document.getElementById("f-window").value=(+document.getElementById("f-window").value)+12;validate();if(timerSec)timerSec+=20;toast(t("toast.extend"),"ok");});
+document.getElementById("b-del").addEventListener("click",()=>{toast(t("toast.removed"),"warn");});
+
+// manual move requires reason
+document.getElementById("b-move").addEventListener("click",()=>{document.getElementById("reasonText").value="";document.getElementById("reasonErr").classList.remove("show");document.getElementById("reasonScrim").classList.add("show");document.getElementById("reasonText").focus();});
+document.getElementById("rm-close").addEventListener("click",()=>document.getElementById("reasonScrim").classList.remove("show"));
+document.getElementById("rm-confirm").addEventListener("click",()=>{
+  const txt=document.getElementById("reasonText").value.trim();
+  if(!txt){document.getElementById("reasonErr").classList.add("show");document.getElementById("reasonText").setAttribute("aria-invalid","true");return;}
+  HISTORY.unshift({time:[12,5],key:"h.escal",who:"Piotr K.",reason:txt});
+  document.getElementById("reasonScrim").classList.remove("show");renderHistory();toast(t("toast.moved"),"ok");
+});
+document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s)s.classList.remove("show");}));
+
+// state toggle: filled vs live timer + escalation
+document.getElementById("st-filled").addEventListener("click",()=>setView("filled"));
+document.getElementById("st-timer").addEventListener("click",()=>setView("timer"));
+function setView(v){
+  document.getElementById("st-filled").setAttribute("aria-pressed",v==="filled");
+  document.getElementById("st-timer").setAttribute("aria-pressed",v==="timer");
+  if(countdown){clearInterval(countdown);countdown=null;}
+  document.getElementById("liveNote").textContent="";
+  // reset queue
+  QUEUE=[
+   {id:1,child:"Anna N.",family:"Nowak",reported:[2,5],status:"sent"},
+   {id:2,child:"Piotr K.",family:"Kowalski",reported:[4,5],status:"wait"},
+   {id:3,child:"Maja W.",family:"Wójcik",reported:[5,5],status:"decline",declined:[3,5]}
+  ];
+  if(v==="timer"){
+    QUEUE[0].timer=18;timerSec=18;
+    document.getElementById("liveNote").textContent=t("live.note");
+    renderQueue();
+    countdown=setInterval(()=>{
+      timerSec--;QUEUE[0].timer=timerSec;
+      if(timerSec<=0){
+        clearInterval(countdown);countdown=null;
+        // escalate: current offer expires, place returns to pool, next gets offered
+        QUEUE[0].status="expired";QUEUE[0].timer=null;
+        const next=QUEUE.find(q=>q.status==="wait");
+        HISTORY.unshift({time:[12,5],key:"h.expired",who:"Anna N."});
+        toast(t("toast.expired"),"warn");
+        if(next){next.status="sent";next.timer=18;timerSec=18;HISTORY.unshift({time:[12,5],key:"h.escal",who:next.child});
+          setTimeout(()=>toast(t("toast.escalated"),"warn"),800);
+          // start a second countdown for the escalated offer
+          renderQueue();renderHistory();
+          countdown=setInterval(()=>{
+            timerSec--;next.timer=timerSec;
+            if(timerSec<=0){clearInterval(countdown);countdown=null;document.getElementById("liveNote").textContent="";}
+            renderQueue();
+          },1000);
+        }else{document.getElementById("liveNote").textContent="";}
+        renderQueue();renderHistory();
+      }else{renderQueue();}
+    },1000);
+  }else{
+    renderQueue();renderHistory();
+  }
+}
+
+// init
+applyLang();
+validate();
+</script>
+</body>
+</html>

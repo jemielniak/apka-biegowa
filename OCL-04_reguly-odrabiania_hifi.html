@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCL-04 · Reguły odrabiania</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500..700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#1a1f2e;--accent:#4f46e5;
+  --color-success:#15803d;--color-warning:#b45309;--color-error:#dc2626;--color-info:#2563eb;
+  --paper:#f6f8fc;--surface-1:#ffffff;--surface-2:#eef1f8;--surface-3:#e3e7f1;--hairline:#d5dae6;
+  --text-strong:#1a1f2e;--text:#3b4252;--text-muted:#6b7385;--on-accent:#ffffff;
+  --font-display:"Space Grotesk", system-ui, sans-serif;--font-body:"Source Sans 3", system-ui;
+  --u:4px;--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:12px;--shadow:0 8px 24px -16px rgba(26,31,46,.30);--tap:44px;--rail-w:228px;
+}
+*{box-sizing:border-box;}html,body{margin:0;padding:0;}
+body{font-family:var(--font-body);background:var(--paper);color:var(--text);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;}
+.tnum{font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-family:var(--font-display);color:var(--text-strong);margin:0;font-weight:600;letter-spacing:-.01em;}
+button{font-family:var(--font-body);cursor:pointer;}
+
+.topbar{position:sticky;top:0;z-index:40;background:var(--surface-1);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--s4);padding:var(--s3) var(--s5);min-height:60px;}
+.logo{display:flex;align-items:center;gap:var(--s3);font-family:var(--font-display);font-weight:700;color:var(--text-strong);white-space:nowrap;}
+.logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(150deg,var(--accent),#3730a3);display:grid;place-items:center;color:#fff;font-weight:700;}
+.logo small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--text-muted);}
+.topbar .spacer{flex:1;}
+.ctx{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;}
+.field{display:flex;flex-direction:column;gap:2px;}
+.field label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600;}
+select{font-family:var(--font-body);font-size:14px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:7px 28px 7px 10px;min-height:36px;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7385' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 9px center;}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.acct{width:36px;height:36px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface-3);display:grid;place-items:center;font-weight:600;color:var(--text-strong);font-size:13px;}
+
+.shell{display:flex;min-height:calc(100vh - 60px);}
+.rail{width:var(--rail-w);flex:0 0 var(--rail-w);background:var(--surface-1);border-right:1px solid var(--hairline);padding:var(--s4) var(--s3);position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;}
+.rail .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700;padding:var(--s3) var(--s3) var(--s2);}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:9px;color:var(--text);text-decoration:none;font-weight:500;font-size:14.5px;margin-bottom:2px;min-height:40px;position:relative;}
+.nav-item:hover{background:var(--surface-2);}
+.nav-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600;}
+.nav-item .badge{margin-left:auto;background:var(--color-error);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center;}
+
+.main{flex:1;min-width:0;}
+.wrap{max-width:1280px;margin:0 auto;padding:var(--s6) var(--s6) var(--s10);}
+.demobar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--hairline);border-radius:10px;padding:var(--s2) var(--s3);margin-bottom:var(--s5);}
+.demobar .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:700;}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:8px;padding:2px;}
+.seg button{border:0;background:transparent;color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;min-height:32px;}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);}
+
+.pagehead{margin-bottom:var(--s5);}
+.pagehead h1{font-size:24px;}
+.pagehead .sub{color:var(--text-muted);font-size:13.5px;margin-top:2px;}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);align-items:start;}
+.panel{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.p-head{display:flex;align-items:center;justify-content:space-between;padding:var(--s4);border-bottom:1px solid var(--hairline);}
+.p-head h2{font-size:15px;}
+.p-body{padding:var(--s4);}
+
+/* rules list */
+.rule{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3);border:1px solid var(--hairline);border-radius:10px;margin-bottom:var(--s3);cursor:pointer;}
+.rule:hover{background:var(--surface-2);}
+.rule.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent);}
+.rule .rmain{flex:1;min-width:0;}
+.rule .rn{font-weight:700;color:var(--text-strong);}
+.rule .rd{font-size:12.5px;color:var(--text-muted);margin-top:2px;}
+.rule .chips{margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;}
+.chip{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--surface-3);color:var(--text-strong);font-family:var(--font-display);}
+.rule.inactive{opacity:.62;}
+.toggle input{width:42px;height:25px;appearance:none;background:var(--surface-3);border-radius:999px;position:relative;cursor:pointer;flex:0 0 auto;transition:background .15s;}
+.toggle input:checked{background:var(--color-success);}
+.toggle input::after{content:"";position:absolute;width:19px;height:19px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.toggle input:checked::after{left:20px;}
+.toggle input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+/* conflict banner */
+.conflict{display:none;align-items:flex-start;gap:10px;background:color-mix(in srgb,var(--color-warning) 11%,transparent);border:1px solid color-mix(in srgb,var(--color-warning) 38%,transparent);color:var(--color-warning);border-radius:10px;padding:12px 14px;margin-bottom:var(--s4);font-size:13px;line-height:1.45;}
+.conflict.show{display:flex;}
+.conflict b{font-weight:700;}
+.conflict .win{display:inline-block;margin-top:4px;font-weight:700;}
+
+/* form */
+.f{display:flex;flex-direction:column;gap:6px;margin-bottom:var(--s4);}
+.f label{font-size:12.5px;font-weight:600;color:var(--text-strong);}
+.f .help{font-size:12px;color:var(--text-muted);}
+.f input[type=text],.f input[type=number]{width:100%;font-family:var(--font-body);font-size:14.5px;color:var(--text-strong);background:var(--surface-1);border:1px solid var(--hairline);border-radius:9px;padding:10px 12px;min-height:var(--tap);}
+.f input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.f input[aria-invalid="true"]{border-color:var(--color-error);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);}
+.levels{display:flex;gap:var(--s2);flex-wrap:wrap;}
+.lvlbtn{border:1px solid var(--hairline);background:var(--surface-1);border-radius:8px;padding:8px 14px;font-weight:700;font-family:var(--font-display);color:var(--text);min-height:40px;}
+.lvlbtn[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent);}
+.suffix{display:flex;align-items:center;gap:8px;}
+.suffix .u{font-size:13px;color:var(--text-muted);}
+
+/* preview */
+.preview{background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;padding:var(--s4);margin-top:var(--s2);}
+.preview .pt{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:700;margin-bottom:6px;}
+.preview .pl{font-size:14px;color:var(--text-strong);line-height:1.6;}
+.preview .pl b{font-family:var(--font-display);}
+.preview .arrow{color:var(--accent);font-weight:700;}
+
+.valid{display:flex;flex-direction:column;gap:8px;margin-top:var(--s2);}
+.vmsg{display:none;align-items:flex-start;gap:8px;font-size:13px;border-radius:9px;padding:10px 12px;line-height:1.4;}
+.vmsg.show{display:flex;}
+.vmsg.err{background:color-mix(in srgb,var(--color-error) 9%,transparent);color:var(--color-error);border:1px solid color-mix(in srgb,var(--color-error) 35%,transparent);}
+.vmsg.warn{background:color-mix(in srgb,var(--color-warning) 11%,transparent);color:var(--color-warning);border:1px solid color-mix(in srgb,var(--color-warning) 35%,transparent);}
+
+.foot{margin-top:var(--s4);display:flex;flex-direction:column;gap:var(--s3);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;font-weight:600;font-size:14px;min-height:var(--tap);padding:0 16px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);}
+.btn:hover{background:var(--surface-2);}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 16px -8px var(--accent);}
+.btn-primary:hover{background:#4338ca;}
+.btn-block{width:100%;}.btn-sm{min-height:38px;font-size:13px;padding:0 12px;}
+.btn-danger{color:var(--color-error);border-color:color-mix(in srgb,var(--color-error) 45%,transparent);background:transparent;}
+.btn-danger:hover{background:color-mix(in srgb,var(--color-error) 8%,transparent);}
+.sec-actions{display:flex;gap:var(--s2);flex-wrap:wrap;}
+.sec-actions .btn{flex:1 1 auto;}
+.danger-note{font-size:11.5px;color:var(--text-muted);margin-top:6px;}
+
+.addrule{margin-top:var(--s3);}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--brand-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);transition:opacity .25s,transform .25s;z-index:80;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{background:var(--color-success);}
+
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+@media (max-width:1080px){:root{--rail-w:64px;}.nav-item span.t{display:none;}.nav-item{justify-content:center;}.rail .grp{display:none;}.nav-item .badge{position:absolute;margin:0;transform:translate(14px,-12px);}.cols{grid-template-columns:1fr;}}
+@media (max-width:640px){.rail{display:none;}.ctx .field.hide-sm{display:none;}}
+</style>
+</head>
+<body data-view="filled">
+
+<header class="topbar">
+  <div class="logo"><span class="mark">D</span><span data-i18n="brand.name">Klub Pływacki Delfin<small data-i18n="brand.role">Panel organizatora</small></span></div>
+  <div class="spacer"></div>
+  <div class="ctx">
+    <div class="field"><label for="mode" data-i18n="ctx.mode">Tryb</label><select id="mode"><option data-i18n="mode.classes">Zajęcia</option><option data-i18n="mode.events">Zawody</option></select></div>
+    <div class="field hide-sm"><label for="facility" data-i18n="ctx.facility">Placówka</label><select id="facility"><option>Klub Pływacki Delfin</option><option>Szkoła Pływania Nurek</option></select></div>
+    <div class="field"><label for="lang" data-i18n="ctx.lang">Język</label><select id="lang"><option value="pl-PL">Polski</option><option value="en-GB">English</option></select></div>
+    <div class="acct">JN</div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Nawigacja panelu">
+    <div class="grp" data-i18n="nav.section">Zajęcia</div>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="t" data-i18n="nav.dashboard">Pulpit</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="18" cy="9" r="2"/></svg><span class="t" data-i18n="nav.groups">Grupy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span class="t" data-i18n="nav.schedule">Grafik</span></a>
+    <a class="nav-item active" href="#" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8M5 12v7h14"/></svg><span class="t" data-i18n="nav.makeup">Odrabianie</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="t" data-i18n="nav.participants">Uczestnicy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span class="t" data-i18n="nav.payments">Płatności</span><span class="badge tnum">4</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span class="t" data-i18n="nav.settings">Ustawienia</span></a>
+  </nav>
+
+  <main class="main">
+    <div class="wrap">
+      <div class="demobar" role="group" aria-label="Podgląd stanu makiety">
+        <span class="lbl" data-i18n="demo.label">Podgląd stanu</span>
+        <div class="seg">
+          <button id="st-filled" aria-pressed="true" data-i18n="demo.filled">Wypełniony</button>
+          <button id="st-conflict" aria-pressed="false" data-i18n="demo.conflict">Sprzeczne reguły</button>
+        </div>
+      </div>
+
+      <div class="pagehead">
+        <h1 data-i18n="page.title">Reguły odrabiania nieobecności</h1>
+        <div class="sub" data-i18n="page.sub">Ustaw zasady, a system sam zaproponuje rodzicowi termin odrobienia.</div>
+      </div>
+
+      <div class="conflict" id="conflict" role="alert">
+        <span>⚠</span>
+        <span>
+          <span data-i18n="conflict.a">Dwie aktywne reguły obejmują poziom</span> <b>P2</b>:
+          <b id="cf-a">„Zgłoszenie 24h przed zajęciami"</b> <span data-i18n="conflict.and">i</span> <b id="cf-b">„Okno 48h dla P2/P3"</b>.
+          <span class="win" id="cf-win">Pierwszeństwo ma reguła bardziej restrykcyjna: krótsze okno zgłoszenia (24 h) i niższy limit. Zwycięża „Zgłoszenie 24h przed zajęciami".</span>
+        </span>
+      </div>
+
+      <div class="cols">
+        <!-- LIST -->
+        <section class="panel">
+          <div class="p-head"><h2 data-i18n="list.title">Aktywne reguły</h2><span class="ghint" id="ruleCount"></span></div>
+          <div class="p-body" id="ruleList"><!-- generated --></div>
+          <div class="p-body" style="padding-top:0">
+            <button class="btn btn-block btn-sm addrule" id="addRule" data-i18n="action.template">+ Utwórz z gotowego szablonu</button>
+          </div>
+        </section>
+
+        <!-- FORM -->
+        <section class="panel">
+          <div class="p-head"><h2 id="formTitle" data-i18n="form.title">Reguła odrabiania</h2></div>
+          <div class="p-body">
+            <div class="f">
+              <label for="f-name" data-i18n="f.name">Nazwa reguły (widoczna dla rodzica)</label>
+              <input type="text" id="f-name" value="Zgłoszenie 24h przed zajęciami">
+            </div>
+            <div class="row2">
+              <div class="f">
+                <label for="f-window" data-i18n="f.window">Okno zgłoszenia nieobecności</label>
+                <div class="suffix"><input type="number" id="f-window" value="24" min="0"><span class="u" data-i18n="u.hours">godz. przed zajęciami</span></div>
+                <span class="help" data-i18n="f.window.help">Ile wcześniej rodzic musi zgłosić nieobecność, żeby liczyła się do odrobienia.</span>
+              </div>
+              <div class="f">
+                <label for="f-limit" data-i18n="f.limit">Limit odrobień na semestr</label>
+                <div class="suffix"><input type="number" id="f-limit" value="3" min="0" step="1"><span class="u" data-i18n="u.times">odrobień</span></div>
+              </div>
+            </div>
+            <div class="f">
+              <label data-i18n="f.levels">Poziomy objęte regułą</label>
+              <div class="levels" id="levels" role="group" aria-label="Poziomy">
+                <button class="lvlbtn" data-lvl="P1" aria-pressed="true">P1</button>
+                <button class="lvlbtn" data-lvl="P2" aria-pressed="true">P2</button>
+                <button class="lvlbtn" data-lvl="P3" aria-pressed="false">P3</button>
+              </div>
+              <span class="help" data-i18n="f.levels.help">Odrabiać można zwykle w grupie o tym samym poziomie.</span>
+            </div>
+            <div class="f">
+              <label for="f-valid" data-i18n="f.valid">Ważność prawa do odrobienia</label>
+              <div class="suffix"><input type="number" id="f-valid" value="30" min="0"><span class="u" data-i18n="u.days">dni od nieobecności</span></div>
+              <span class="help" data-i18n="f.valid.help">To inny czas niż okno zgłoszenia — po nim prawo do odrobienia wygasa.</span>
+            </div>
+
+            <div class="preview" aria-live="polite">
+              <div class="pt" data-i18n="preview.title">Podgląd na przykładzie</div>
+              <div class="pl" id="previewLine"></div>
+            </div>
+
+            <div class="valid" aria-live="polite">
+              <div class="vmsg err" id="v-window"><span>⚠</span><span data-i18n="v.window">Okno zgłoszenia nie może być ujemne.</span></div>
+              <div class="vmsg err" id="v-limit"><span>⚠</span><span data-i18n="v.limit">Limit odrobień musi być liczbą całkowitą.</span></div>
+              <div class="vmsg warn" id="v-levels"><span>⚠</span><span data-i18n="v.levels">Nie wskazano poziomu. Czy reguła obejmuje wszystkie poziomy?</span></div>
+            </div>
+
+            <div class="foot">
+              <button class="btn btn-primary btn-block" id="saveRule" data-i18n="action.save">Zapisz regułę</button>
+              <div class="sec-actions">
+                <button class="btn btn-sm" data-act="deact" data-i18n="action.deact">Dezaktywuj</button>
+                <button class="btn btn-sm" data-act="clone" data-i18n="action.clone">Sklonuj na inny poziom</button>
+                <button class="btn btn-sm" data-act="test" data-i18n="action.test">Przetestuj na uczestniku</button>
+              </div>
+              <div>
+                <button class="btn btn-danger btn-block btn-sm" id="delRule" data-i18n="action.delete">Usuń regułę</button>
+                <p class="danger-note" data-i18n="delete.note">Aktywne prawa do odrobienia oparte na tej regule zostaną zachowane aż do wygaśnięcia.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "brand.name":"Klub Pływacki Delfin","brand.role":"Panel organizatora",
+  "ctx.mode":"Tryb","ctx.facility":"Placówka","ctx.lang":"Język","mode.classes":"Zajęcia","mode.events":"Zawody",
+  "nav.section":"Zajęcia","nav.dashboard":"Pulpit","nav.groups":"Grupy","nav.schedule":"Grafik","nav.makeup":"Odrabianie","nav.participants":"Uczestnicy","nav.payments":"Płatności","nav.settings":"Ustawienia",
+  "demo.label":"Podgląd stanu","demo.filled":"Wypełniony","demo.conflict":"Sprzeczne reguły",
+  "page.title":"Reguły odrabiania nieobecności","page.sub":"Ustaw zasady, a system sam zaproponuje rodzicowi termin odrobienia.",
+  "conflict.a":"Dwie aktywne reguły obejmują poziom","conflict.and":"i",
+  "list.title":"Aktywne reguły","action.template":"+ Utwórz z gotowego szablonu",
+  "form.title":"Reguła odrabiania","f.name":"Nazwa reguły (widoczna dla rodzica)",
+  "f.window":"Okno zgłoszenia nieobecności","u.hours":"godz. przed zajęciami","f.window.help":"Ile wcześniej rodzic musi zgłosić nieobecność, żeby liczyła się do odrobienia.",
+  "f.limit":"Limit odrobień na semestr","u.times":"odrobień","f.levels":"Poziomy objęte regułą","f.levels.help":"Odrabiać można zwykle w grupie o tym samym poziomie.",
+  "f.valid":"Ważność prawa do odrobienia","u.days":"dni od nieobecności","f.valid.help":"To inny czas niż okno zgłoszenia — po nim prawo do odrobienia wygasa.",
+  "preview.title":"Podgląd na przykładzie",
+  "v.window":"Okno zgłoszenia nie może być ujemne.","v.limit":"Limit odrobień musi być liczbą całkowitą.","v.levels":"Nie wskazano poziomu. Czy reguła obejmuje wszystkie poziomy?",
+  "action.save":"Zapisz regułę","action.deact":"Dezaktywuj","action.activate":"Aktywuj","action.clone":"Sklonuj na inny poziom","action.test":"Przetestuj na uczestniku","action.delete":"Usuń regułę",
+  "delete.note":"Aktywne prawa do odrobienia oparte na tej regule zostaną zachowane aż do wygaśnięcia.",
+  "toast.saved":"Zapisano regułę","toast.deact":"Dezaktywowano regułę","toast.act":"Aktywowano regułę","toast.clone":"Sklonowano regułę na inny poziom","toast.test":"Test: dziecko z P2 może odrobić w grupie P2","toast.del":"Usunięto regułę — aktywne prawa zostają do wygaśnięcia","toast.template":"Dodano regułę z szablonu",
+  "preview.body":"Dziecko z poziomu <b>{lvl}</b>, nieobecne <b>{from}</b>, zgłoszone najpóźniej {win}h przed zajęciami, <span class='arrow'>→</span> może odrobić do <b>{to}</b> (limit {limit}/semestr).",
+  "preview.nolvl":"wszystkie poziomy",
+  "rule.active":"aktywna","rule.inactive":"nieaktywna","count":"reguły",
+  "win.label":"Pierwszeństwo ma reguła bardziej restrykcyjna: krótsze okno zgłoszenia ({h} h) i niższy limit. Zwycięża"
+ },
+ "en-GB":{
+  "brand.name":"Delfin Swim Club","brand.role":"Organiser panel",
+  "ctx.mode":"Mode","ctx.facility":"Facility","ctx.lang":"Language","mode.classes":"Classes","mode.events":"Events",
+  "nav.section":"Classes","nav.dashboard":"Dashboard","nav.groups":"Groups","nav.schedule":"Schedule","nav.makeup":"Make-up","nav.participants":"Participants","nav.payments":"Payments","nav.settings":"Settings",
+  "demo.label":"State preview","demo.filled":"Populated","demo.conflict":"Conflicting rules",
+  "page.title":"Make-up rules for absences","page.sub":"Set the rules and the system will propose a make-up slot to the parent.",
+  "conflict.a":"Two active rules cover level","conflict.and":"and",
+  "list.title":"Active rules","action.template":"+ Create from a template",
+  "form.title":"Make-up rule","f.name":"Rule name (visible to parents)",
+  "f.window":"Absence notice window","u.hours":"h before the class","f.window.help":"How far ahead a parent must report an absence for it to count towards a make-up.",
+  "f.limit":"Make-ups per term","u.times":"make-ups","f.levels":"Levels covered by the rule","f.levels.help":"Make-ups usually happen in a group of the same level.",
+  "f.valid":"Validity of the make-up right","u.days":"days from the absence","f.valid.help":"This is a different time from the notice window — after it the right to a make-up expires.",
+  "preview.title":"Preview on an example",
+  "v.window":"The notice window cannot be negative.","v.limit":"The make-up limit must be a whole number.","v.levels":"No level selected. Does the rule cover all levels?",
+  "action.save":"Save rule","action.deact":"Deactivate","action.activate":"Activate","action.clone":"Clone to another level","action.test":"Test on a participant","action.delete":"Delete rule",
+  "delete.note":"Active make-up rights based on this rule will be kept until they expire.",
+  "toast.saved":"Rule saved","toast.deact":"Rule deactivated","toast.act":"Rule activated","toast.clone":"Rule cloned to another level","toast.test":"Test: a P2 child can make up in a P2 group","toast.del":"Rule deleted — active rights kept until expiry","toast.template":"Rule added from template",
+  "preview.body":"A child at level <b>{lvl}</b>, absent on <b>{from}</b>, reported at least {win}h before the class, <span class='arrow'>→</span> may make up by <b>{to}</b> (limit {limit}/term).",
+  "preview.nolvl":"all levels",
+  "rule.active":"active","rule.inactive":"inactive","count":"rules",
+  "win.label":"The more restrictive rule wins: shorter notice window ({h} h) and lower limit. Winner:"
+ }
+};
+const FALLBACK="en-GB",FACILITY_REGION="pl-PL";let lang="pl-PL";
+const RTL=new Set(["ar","he","fa","ur"]);
+function t(k){const d=I18N[lang]||{};if(k in d)return d[k];const f=I18N[FALLBACK]||{};return (k in f)?f[k]:k;}
+
+let RULES=[
+ {id:1,name:"Zgłoszenie 24h przed zajęciami",active:true,window:24,limit:3,levels:["P1","P2"],valid:30},
+ {id:2,name:"Max 3 odrobienia / semestr",active:true,window:12,limit:3,levels:["P3"],valid:45},
+ {id:3,name:"Tylko ten sam poziom",active:false,window:24,limit:2,levels:["P1","P2","P3"],valid:30}
+];
+let selId=1, conflictMode=false;
+
+function fmtDate(dd,mm){return new Intl.DateTimeFormat(FACILITY_REGION,{day:"numeric",month:"long"}).format(new Date(2025,mm-1,dd));}
+
+function renderList(){
+  const host=document.getElementById("ruleList");
+  host.innerHTML=RULES.map(r=>{
+    const chips=r.levels.map(l=>`<span class="chip">${l}</span>`).join("")
+      +`<span class="chip">${r.window}h</span><span class="chip">${r.limit}/sem</span>`;
+    return `<div class="rule ${r.active?'':'inactive'} ${r.id===selId?'selected':''}" data-id="${r.id}" tabindex="0">
+      <label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" ${r.active?'checked':''} data-tog="${r.id}" aria-label="Aktywna"></label>
+      <div class="rmain"><div class="rn">${r.name}</div>
+      <div class="rd">${r.active?t("rule.active"):t("rule.inactive")} · ${t("f.valid")}: ${r.valid} ${t("u.days")}</div>
+      <div class="chips">${chips}</div></div></div>`;
+  }).join("");
+  host.querySelectorAll(".rule").forEach(el=>{
+    el.addEventListener("click",()=>selectRule(+el.dataset.id));
+    el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectRule(+el.dataset.id);}});
+  });
+  host.querySelectorAll("[data-tog]").forEach(c=>c.addEventListener("change",e=>{
+    const r=RULES.find(x=>x.id===+c.dataset.tog);r.active=e.target.checked;
+    toast(t(r.active?"toast.act":"toast.deact"),true);renderList();checkConflict();
+  }));
+  document.getElementById("ruleCount").textContent=RULES.length+" "+t("count");
+}
+
+function selectRule(id){
+  selId=id;const r=RULES.find(x=>x.id===id);if(!r)return;
+  document.getElementById("formTitle").textContent=r.name;
+  document.getElementById("f-name").value=r.name;
+  document.getElementById("f-window").value=r.window;
+  document.getElementById("f-limit").value=r.limit;
+  document.getElementById("f-valid").value=r.valid;
+  document.querySelectorAll(".lvlbtn").forEach(b=>b.setAttribute("aria-pressed",r.levels.includes(b.dataset.lvl)));
+  renderList();validate();
+}
+
+function getLevels(){return [...document.querySelectorAll('.lvlbtn[aria-pressed="true"]')].map(b=>b.dataset.lvl);}
+
+function validate(){
+  const win=+document.getElementById("f-window").value;
+  const lim=+document.getElementById("f-limit").value;
+  const levels=getLevels();
+  const vWin=win<0;
+  const vLim=!Number.isInteger(lim)||lim<0;
+  const vLvl=levels.length===0;
+  document.getElementById("v-window").classList.toggle("show",vWin);
+  document.getElementById("v-limit").classList.toggle("show",vLim);
+  document.getElementById("v-levels").classList.toggle("show",vLvl);
+  document.getElementById("f-window").setAttribute("aria-invalid",vWin);
+  document.getElementById("f-limit").setAttribute("aria-invalid",vLim);
+  document.getElementById("saveRule").disabled=(vWin||vLim);
+  renderPreview();
+  return {vWin,vLim,vLvl};
+}
+
+function renderPreview(){
+  const win=+document.getElementById("f-window").value||0;
+  const lim=+document.getElementById("f-limit").value||0;
+  const valid=+document.getElementById("f-valid").value||0;
+  const levels=getLevels();
+  const lvl=levels.length?levels.join("/"):t("preview.nolvl");
+  const from=fmtDate(5,5);
+  const toD=new Date(2025,4,5+valid);
+  const to=new Intl.DateTimeFormat(FACILITY_REGION,{day:"numeric",month:"long"}).format(toD);
+  const body=t("preview.body").replace("{lvl}",lvl).replace("{from}",from).replace("{win}",win).replace("{to}",to).replace("{limit}",lim);
+  document.getElementById("previewLine").innerHTML=body;
+}
+
+function checkConflict(){
+  // conflict = two active rules sharing any level
+  const active=RULES.filter(r=>r.active);
+  let pair=null;
+  for(let i=0;i<active.length&&!pair;i++)for(let j=i+1;j<active.length;j++){
+    if(active[i].levels.some(l=>active[j].levels.includes(l))){pair=[active[i],active[j]];break;}
+  }
+  const box=document.getElementById("conflict");
+  if(pair && conflictMode){
+    const shared=pair[0].levels.find(l=>pair[1].levels.includes(l));
+    // winner = more restrictive: shorter window, then lower limit
+    const win = (pair[0].window!==pair[1].window)
+      ? (pair[0].window<pair[1].window?pair[0]:pair[1])
+      : (pair[0].limit<=pair[1].limit?pair[0]:pair[1]);
+    box.querySelector("b").textContent=shared;
+    document.getElementById("cf-a").textContent="„"+pair[0].name+"\u201D";
+    document.getElementById("cf-b").textContent="„"+pair[1].name+"\u201D";
+    document.getElementById("cf-win").textContent=t("win.label").replace("{h}",win.window)+" „"+win.name+"\u201D.";
+    box.classList.add("show");
+  }else{
+    box.classList.remove("show");
+  }
+}
+
+function applyLang(){
+  document.documentElement.lang=lang.split("-")[0];
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(n=>{
+    const k=n.getAttribute("data-i18n");
+    if(k==="brand.name"){n.firstChild.textContent=t(k);return;}
+    n.textContent=t(k);
+  });
+  renderList();selectRule(selId);checkConflict();
+}
+function toast(msg,ok){const el=document.getElementById("toast");el.textContent=msg;el.className="toast show"+(ok?" ok":"");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2400);}
+
+document.getElementById("lang").addEventListener("change",e=>{lang=e.target.value;applyLang();});
+["f-window","f-limit","f-valid"].forEach(id=>document.getElementById(id).addEventListener("input",validate));
+document.querySelectorAll(".lvlbtn").forEach(b=>b.addEventListener("click",()=>{b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");validate();}));
+document.getElementById("saveRule").addEventListener("click",()=>{const v=validate();if(v.vWin||v.vLim)return;toast(t("toast.saved"),true);});
+document.getElementById("addRule").addEventListener("click",()=>{
+  const id=Math.max(...RULES.map(r=>r.id))+1;
+  RULES.push({id,name:lang==="pl-PL"?"Nowa reguła odrabiania":"New make-up rule",active:false,window:24,limit:3,levels:["P1"],valid:30});
+  selectRule(id);toast(t("toast.template"),true);
+});
+document.querySelectorAll('.sec-actions [data-act]').forEach(b=>b.addEventListener("click",()=>{
+  const a=b.dataset.act;const r=RULES.find(x=>x.id===selId);
+  if(a==="deact"){r.active=!r.active;renderList();checkConflict();toast(t(r.active?"toast.act":"toast.deact"),true);}
+  else if(a==="clone"){toast(t("toast.clone"),true);}
+  else if(a==="test"){toast(t("toast.test"));}
+}));
+document.getElementById("delRule").addEventListener("click",()=>{
+  RULES=RULES.filter(r=>r.id!==selId);if(RULES.length){selId=RULES[0].id;selectRule(selId);}renderList();checkConflict();toast(t("toast.del"),true);
+});
+
+document.getElementById("st-filled").addEventListener("click",()=>setView("filled"));
+document.getElementById("st-conflict").addEventListener("click",()=>setView("conflict"));
+function setView(v){
+  document.getElementById("st-filled").setAttribute("aria-pressed",v==="filled");
+  document.getElementById("st-conflict").setAttribute("aria-pressed",v==="conflict");
+  conflictMode=(v==="conflict");
+  if(conflictMode){
+    // stage: add an active P2/P3 rule with a longer window to clash with rule 1 on P2
+    if(!RULES.some(r=>r.id===99)){
+      RULES.push({id:99,name:"Okno 48h dla P2/P3",active:true,window:48,limit:5,levels:["P2","P3"],valid:60});
+    }
+    selectRule(1);
+  }else{
+    RULES=RULES.filter(r=>r.id!==99);
+    selectRule(1);
+  }
+  renderList();checkConflict();
+}
+
+// init
+applyLang();
+selectRule(1);
+</script>
+</body>
+</html>

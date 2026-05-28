@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VOL-05 · Wydawanie pakietów</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600..800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#11161c;
+  --accent:#0b69d4;
+
+  --color-success:#0a7d35;
+  --color-warning:#b45309;
+  --color-error:#c4181f;
+  --color-info:#0b69d4;
+
+  --paper:#f1f4f8;
+  --surface-1:#ffffff;
+  --surface-2:#e9eef4;
+  --surface-3:#dbe3ec;
+  --hairline:#c5cfdb;
+  --text-strong:#11161c;
+  --text:#33404e;
+  --text-muted:#5d6b7c;
+  --on-accent:#ffffff;
+  --tint-success-bg:#ecfdf3;
+  --tint-success-border:#a6e0bd;
+  --tint-success-text:#075c28;
+  --tint-warning-bg:#fff7ed;
+  --tint-warning-border:#f2c79a;
+  --tint-warning-text:#7c3d05;
+  --tint-error-bg:#fdeaea;
+  --tint-error-border:#f0b4b4;
+  --tint-error-text:#8a1318;
+  --tint-info-bg:#eaf2fc;
+  --tint-info-border:#b8d3f3;
+  --tint-info-text:#0a4a96;
+
+  --hivis:#f3b50a;
+  --hivis-rgb:243,181,10;
+
+  --verdict-ok:#0a7d35;
+  --verdict-no:#c4181f;
+  --status-paid:#0a7d35;
+  --status-unpaid:#b45309;
+  --status-check:#5d6b7c;
+
+  --font-display:"Archivo", system-ui, sans-serif;
+  --font-body:"IBM Plex Sans", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:14px;
+  --shadow:0 10px 26px -14px rgba(17,22,28,.34);
+  --tap:56px;
+  --tap-primary:64px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);color:var(--text);
+  background:repeating-linear-gradient(135deg,#e6ebf2 0 14px,#eaeef4 14px 28px);
+  -webkit-font-smoothing:antialiased;display:flex;justify-content:center;min-height:100vh}
+
+.statebar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;gap:var(--s2);align-items:center;
+  justify-content:center;padding:var(--s2);background:var(--brand-ink);color:#fff;font:600 12px/1 var(--font-body)}
+.statebar span{opacity:.7;letter-spacing:.04em;text-transform:uppercase}
+.statebar button{font:600 12px/1 var(--font-body);color:#fff;background:transparent;
+  border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:7px 12px;cursor:pointer}
+.statebar button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+
+.shell{width:100%;max-width:480px;min-height:100vh;background:var(--paper);margin-top:36px;
+  display:flex;flex-direction:column;box-shadow:0 0 40px -10px rgba(17,22,28,.25)}
+.hivis{height:6px;background:repeating-linear-gradient(135deg,var(--hivis) 0 12px,#11161c 12px 24px)}
+
+header.app{position:sticky;top:0;z-index:20;background:var(--surface-1);border-bottom:1px solid var(--hairline);
+  display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.task{flex:1;min-width:0}
+.task .kicker{font:600 10px/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted)}
+.task .name{font:700 16px/1.15 var(--font-display);color:var(--text-strong);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.counter{flex:0 0 auto;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:62px;height:44px;border-radius:10px;background:var(--surface-2);border:1px solid var(--hairline);padding:0 8px}
+.counter b{font:800 17px/1 var(--font-display);color:var(--text-strong);font-variant-numeric:tabular-nums}
+.counter small{font:600 9px/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-top:2px}
+.lang{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 11px;
+  border:1px solid var(--hairline);border-radius:10px;background:var(--surface-2);color:var(--text-strong);
+  font:600 13px/1 var(--font-body);cursor:pointer}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.lang .chev{font-size:10px;color:var(--text-muted)}
+
+main{padding:var(--s4);display:flex;flex-direction:column;gap:var(--s4);flex:1}
+
+.scan{background:var(--brand-ink);border-radius:var(--radius);padding:var(--s4);box-shadow:var(--shadow)}
+.reticle{position:relative;aspect-ratio:1/.42;border-radius:10px;
+  background:radial-gradient(120% 90% at 50% 40%,#1d2935 0%,#11161c 70%);overflow:hidden}
+.reticle .corner{position:absolute;width:26px;height:26px;border:4px solid var(--hivis)}
+.reticle .tl{top:10px;left:10px;border-right:0;border-bottom:0;border-radius:6px 0 0 0}
+.reticle .tr{top:10px;right:10px;border-left:0;border-bottom:0;border-radius:0 6px 0 0}
+.reticle .bl{bottom:10px;left:10px;border-right:0;border-top:0;border-radius:0 0 0 6px}
+.reticle .br{bottom:10px;right:10px;border-left:0;border-top:0;border-radius:0 0 6px 0}
+.reticle .laser{position:absolute;left:10px;right:10px;height:3px;background:var(--hivis);
+  box-shadow:0 0 14px 2px rgba(var(--hivis-rgb),.7);border-radius:3px;top:20%;animation:sweep 2.4s ease-in-out infinite}
+.reticle .hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font:500 12px/1 var(--font-body);color:#aebccd}
+@keyframes sweep{0%,100%{top:20%}50%{top:74%}}
+
+.who{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4);
+  padding:0 var(--s1)}
+.who .nm{font:700 20px/1.1 var(--font-display);color:var(--text-strong)}
+.who .bib{font:800 30px/.9 var(--font-display);color:var(--accent);font-variant-numeric:tabular-nums}
+
+/* ROZMIAR - największy element ekranu */
+.size{position:relative;background:var(--brand-ink);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:var(--s5) var(--s4) var(--s6);text-align:center;overflow:hidden;
+  opacity:0;transform:translateY(8px);animation:rise .35s ease forwards}
+.size::before{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(135deg,rgba(var(--hivis-rgb),.08) 0 18px,transparent 18px 36px);pointer-events:none}
+.size .lab{font:700 13px/1 var(--font-display);letter-spacing:.28em;text-transform:uppercase;color:var(--hivis)}
+.size .val{font:800 132px/.85 var(--font-display);color:#fff;margin-top:var(--s3);letter-spacing:-.02em}
+.size .note{margin-top:var(--s3);font:500 13px/1 var(--font-body);color:#aebccd}
+
+.pack{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:var(--s4)}
+.pack h3{font:700 12px/1 var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--s3)}
+.items{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
+.items li{display:flex;align-items:center;gap:10px;padding:var(--s3);border-radius:10px;background:var(--surface-2);
+  font:600 15px/1 var(--font-body);color:var(--text-strong)}
+.items .box{width:24px;height:24px;flex:0 0 auto;border-radius:6px;border:2px solid var(--hairline);
+  display:grid;place-items:center;font:800 15px/1 var(--font-display);color:#fff}
+.items li.on .box{background:var(--color-success);border-color:var(--color-success)}
+.items li.off{color:var(--text-muted)}
+.stock{display:flex;justify-content:space-between;gap:var(--s4);margin-top:var(--s3);padding-top:var(--s3);
+  border-top:1px solid var(--hairline);font:500 14px/1 var(--font-body)}
+.stock .k{color:var(--text-muted)}
+.stock b{font:700 14px/1 var(--font-display);color:var(--text-strong);font-variant-numeric:tabular-nums}
+.stock .issued-no{color:var(--color-warning)} .stock .issued-yes{color:var(--color-success)}
+
+.warnline{padding:var(--s3) var(--s4);border-radius:10px;background:var(--tint-warning-bg);border:1px solid var(--tint-warning-border);
+  color:var(--tint-warning-text);font:500 14px/1.4 var(--font-body)}
+.warnline strong{display:block;font-weight:600;margin-bottom:1px}
+
+.btn{width:100%;border:0;border-radius:12px;cursor:pointer;font:700 16px/1 var(--font-display);
+  display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn:focus-visible{outline:3px solid var(--hivis);outline-offset:3px}
+.btn-primary{height:var(--tap-primary);background:var(--accent);color:var(--on-accent)}
+.btn-warn{height:var(--tap-primary);background:var(--color-warning);color:#fff}
+.btn:active{transform:translateY(1px)}
+.subrow{display:flex;gap:var(--s3);margin-top:var(--s3)}
+.subrow button{flex:1;height:var(--tap);border:1px solid var(--hairline);border-radius:12px;background:var(--surface-2);
+  color:var(--text-strong);cursor:pointer;font:600 14px/1 var(--font-body)}
+.subrow button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn-danger{width:100%;height:var(--tap);margin-top:var(--s3);border-radius:12px;cursor:pointer;
+  background:#fff;border:2px solid var(--color-error);color:var(--color-error);font:700 15px/1 var(--font-display)}
+.btn-danger:focus-visible{outline:3px solid var(--color-error);outline-offset:2px}
+
+footer.app{position:sticky;bottom:0;background:var(--surface-1);border-top:1px solid var(--hairline);
+  padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom))}
+.statusline{display:flex;align-items:center;gap:8px;justify-content:center;font:500 12px/1.3 var(--font-body);
+  color:var(--text-muted);text-align:center}
+.statusline .d{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.statusline.offline .d{background:var(--color-warning)}
+.statusline .q{font-weight:600;font-variant-numeric:tabular-nums}
+
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.size{animation:none;opacity:1;transform:none}.reticle .laser{animation:none;top:48%}}
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+
+<div class="statebar" role="group" aria-label="Przełącznik stanu makiety">
+  <span data-i18n="mk.state">Stan</span>
+  <button id="st-ready" aria-pressed="true" data-i18n="mk.ready">Do wydania</button>
+  <button id="st-issued" aria-pressed="false" data-i18n="mk.issued">Już wydany</button>
+</div>
+
+<div class="shell">
+  <div class="hivis" aria-hidden="true"></div>
+  <header class="app">
+    <div class="task">
+      <div class="kicker" data-i18n="hdr.kicker">Wydawanie</div>
+      <div class="name" data-i18n="hdr.sector">Sektor B</div>
+    </div>
+    <div class="counter" id="counterBox" role="status" aria-label="Wydanych 61 ze 120">
+      <b>61/120</b><small data-i18n="hdr.issued">wydane</small>
+    </div>
+    <button class="lang" id="langBtn" data-i18n-aria="aria.lang" aria-label="Zmień język">
+      <span id="langLabel">PL</span><span class="chev" aria-hidden="true">▾</span>
+    </button>
+  </header>
+
+  <main>
+    <section class="scan" data-i18n-aria="aria.scanSection" aria-label="Skaner kodu QR">
+      <div class="reticle" role="img" data-i18n-aria="aria.scanner" aria-label="Pole skanera kodu QR">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <span class="laser" aria-hidden="true"></span>
+        <span class="hint" data-i18n="scan.hint">Skieruj na kod startowy uczestnika</span>
+      </div>
+    </section>
+
+    <div class="who">
+      <span class="nm">Jan Kowalski</span>
+      <span class="bib">#142</span>
+    </div>
+
+    <!-- ostrzeżenie: pakiet już wydany (stan alternatywny) -->
+    <div class="warnline" id="issuedWarn" hidden role="status">
+      <strong data-i18n="issued.title">Pakiet już wydany</strong>
+      <span id="issued-desc">Wydano 09:20. Potwierdź świadomie, jeśli chcesz wydać ponownie.</span>
+    </div>
+
+    <section class="size" data-i18n-aria="aria.size" aria-label="Rozmiar koszulki">
+      <div class="lab" data-i18n="size.label">Rozmiar koszulki</div>
+      <div class="val" aria-live="polite">M</div>
+      <div class="note" data-i18n="size.note">Sprawdź rozmiar przed wydaniem</div>
+    </section>
+
+    <section class="pack" aria-labelledby="pack-h">
+      <h3 id="pack-h" data-i18n="pack.title">Zawartość pakietu</h3>
+      <ul class="items">
+        <li class="on"><span class="box" aria-hidden="true">✓</span><span data-i18n="pack.shirt">Koszulka M</span></li>
+        <li class="on"><span class="box" aria-hidden="true">✓</span><span data-i18n="pack.bib">Numer</span></li>
+        <li class="off"><span class="box" aria-hidden="true"></span><span data-i18n="pack.medal">Medal</span></li>
+        <li class="off"><span class="box" aria-hidden="true"></span><span data-i18n="pack.chip">Chip</span></li>
+      </ul>
+      <div class="stock">
+        <span><span class="k" data-i18n="stock.size">Magazyn M:</span> <b>38</b> <span class="k" data-i18n="stock.pcs">szt.</span></span>
+        <span><span class="k" data-i18n="stock.issued">Wydany:</span> <b id="issuedFlag" class="issued-no" data-i18n="val.no">NIE</b></span>
+      </div>
+    </section>
+
+    <div>
+      <button class="btn btn-primary" id="primaryBtn" data-i18n="cta.issue">Potwierdź wydanie</button>
+      <div class="subrow" id="subrowReady">
+        <button data-i18n="sec.changeSize">Zmień rozmiar</button>
+        <button data-i18n="sec.noStock">Brak rozmiaru?</button>
+      </div>
+      <button class="btn-danger" id="undoBtn" hidden data-i18n="cta.undo">Cofnij wydanie (z powodem)</button>
+    </div>
+  </main>
+
+  <footer class="app">
+    <div class="statusline offline" role="status">
+      <span class="d" aria-hidden="true"></span>
+      <span data-i18n="status.offline">Offline: zabezpieczenie przed podwójnym wydaniem na tym telefonie</span>
+      <span>·</span>
+      <span class="q"><span id="qCount">1</span> <span data-i18n="status.queue">w kolejce</span></span>
+    </div>
+  </footer>
+</div>
+
+<script>
+const I18N={
+  "pl-PL":{
+    "aria.lang":"Zmień język","aria.scanSection":"Skaner kodu QR","aria.scanner":"Pole skanera kodu QR","aria.size":"Rozmiar koszulki","aria.counterIssued":"Wydanych {done} ze {total}",
+    "hdr.kicker":"Wydawanie","hdr.sector":"Sektor B","hdr.issued":"wydane",
+    "scan.hint":"Skieruj na kod startowy uczestnika",
+    "size.label":"Rozmiar koszulki","size.note":"Sprawdź rozmiar przed wydaniem",
+    "pack.title":"Zawartość pakietu","pack.shirt":"Koszulka M","pack.bib":"Numer","pack.medal":"Medal","pack.chip":"Chip",
+    "stock.size":"Magazyn M:","stock.pcs":"szt.","stock.issued":"Wydany:","val.no":"NIE","val.yes":"TAK",
+    "issued.title":"Pakiet już wydany","issued.descA":"Wydano","issued.descB":"Potwierdź świadomie, jeśli chcesz wydać ponownie.",
+    "cta.issue":"Potwierdź wydanie","cta.reissue":"Potwierdź ponowne wydanie","cta.undo":"Cofnij wydanie (z powodem)",
+    "sec.changeSize":"Zmień rozmiar","sec.noStock":"Brak rozmiaru?",
+    "status.offline":"Offline: zabezpieczenie przed podwójnym wydaniem na tym telefonie","status.queue":"w kolejce",
+    "mk.state":"Stan","mk.ready":"Do wydania","mk.issued":"Już wydany"
+  },
+  "en-GB":{
+    "aria.lang":"Change language","aria.scanSection":"QR code scanner","aria.scanner":"QR code scanner field","aria.size":"Shirt size","aria.counterIssued":"Issued {done} of {total}",
+    "hdr.kicker":"Handout","hdr.sector":"Sector B","hdr.issued":"issued",
+    "scan.hint":"Point at the participant's bib code",
+    "size.label":"Shirt size","size.note":"Check the size before handing out",
+    "pack.title":"Pack contents","pack.shirt":"Shirt M","pack.bib":"Bib","pack.medal":"Medal","pack.chip":"Chip",
+    "stock.size":"Stock M:","stock.pcs":"pcs","stock.issued":"Issued:","val.no":"NO","val.yes":"YES",
+    "issued.title":"Pack already issued","issued.descA":"Issued at","issued.descB":"Confirm deliberately if you want to issue again.",
+    "cta.issue":"Confirm handout","cta.reissue":"Confirm re-issue","cta.undo":"Undo handout (with reason)",
+    "sec.changeSize":"Change size","sec.noStock":"Out of size?",
+    "status.offline":"Offline: double-issue blocked on this phone","status.queue":"queued",
+    "mk.state":"State","mk.ready":"To issue","mk.issued":"Already issued"
+  }
+};
+const FALLBACK="en-GB";
+const RTL=new Set(["ar","he","fa","ur"]);
+const ORDER=["pl-PL","en-GB"];
+let lang="pl-PL", issued=false;
+const ISSUED_AT=new Date(2026,3,12,9,20);
+
+function t(k){const d=I18N[lang]||{};return (k in d)?d[k]:(I18N[FALLBACK][k]??k);}
+function hm(date){return new Intl.DateTimeFormat(lang,{hour:"2-digit",minute:"2-digit",hour12:false}).format(date);}
+
+function render(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"));});
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>{el.setAttribute("aria-label",t(el.getAttribute("data-i18n-aria")));});
+  const nf=new Intl.NumberFormat(lang);
+  document.getElementById("counterBox").setAttribute("aria-label",
+    t("aria.counterIssued").replace("{done}",nf.format(61)).replace("{total}",nf.format(120)));
+  document.getElementById("issued-desc").textContent=t("issued.descA")+" "+hm(ISSUED_AT)+". "+t("issued.descB");
+  document.getElementById("langLabel").textContent=lang.split("-")[0].toUpperCase();
+  // przywróć właściwą etykietę przycisku głównego wg stanu
+  document.getElementById("primaryBtn").textContent=issued?t("cta.reissue"):t("cta.issue");
+  document.getElementById("issuedFlag").textContent=issued?t("val.yes"):t("val.no");
+  const p=lang.split("-")[0];
+  document.documentElement.dir=RTL.has(p)?"rtl":"ltr";
+  document.documentElement.lang=p;
+}
+document.getElementById("langBtn").addEventListener("click",()=>{lang=ORDER[(ORDER.indexOf(lang)+1)%ORDER.length];render();});
+
+const bReady=document.getElementById("st-ready"), bIssued=document.getElementById("st-issued");
+function setIssued(v){
+  issued=v;
+  bReady.setAttribute("aria-pressed",String(!v));
+  bIssued.setAttribute("aria-pressed",String(v));
+  document.getElementById("issuedWarn").hidden=!v;
+  document.getElementById("subrowReady").hidden=v;
+  document.getElementById("undoBtn").hidden=!v;
+  const pb=document.getElementById("primaryBtn");
+  pb.className="btn "+(v?"btn-warn":"btn-primary");
+  const flag=document.getElementById("issuedFlag");
+  flag.className=v?"issued-yes":"issued-no";
+  render();
+}
+bReady.addEventListener("click",()=>setIssued(false));
+bIssued.addEventListener("click",()=>setIssued(true));
+
+render();
+setIssued(false);
+</script>
+</body>
+</html>

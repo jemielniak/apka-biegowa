@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<!--
+  ATH-03 - formularz zapisu z polami warunkowymi (panel zawodnika, moduł zawodów)
+  Stan domyślny: krok formularza z progresywnym odsłanianiem pól, przypięte podsumowanie ceny, wskaźnik postępu.
+  Stan alternatywny: wyczerpane miejsca - kierunek na listę rezerwową zamiast zapisu nie do opłacenia.
+  Pola warunkowe odsłaniane progresywnie zamiast wyszarzane (Wroblewski, 2008).
+  Napisy = klucze tłumaczeń BCP 47 (pl-PL domyślny, en-GB zapasowy). Motywowanie tylko przez zmienne CSS.
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zapis na bieg · ATH-03</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#10141b;--accent:#d6f622;
+  --color-success:#3ddc84;--color-warning:#ffb84d;--color-error:#ff6b5e;--color-info:#6aa9ff;
+  --surface-1:#181e28;--surface-2:#1f2733;--surface-3:#283241;--hairline:#313c4c;
+  --text-strong:#f2f5f7;--text:#cdd5df;--text-muted:#8c97a6;--on-accent:#10141b;--paper:#f4f5ef;
+  --font-display:"Saira Condensed",system-ui;--font-body:"Barlow",system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);
+  --radius:14px;--shadow:0 10px 30px -12px rgba(0,0,0,.65);--tap:48px;
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 60% at 80% -10%,rgba(214,246,34,.10),transparent 60%),var(--brand-ink);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+[dir="rtl"] body{direction:rtl}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 64px);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 80%,transparent)}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:150px}
+header.bar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(16,20,27,.96),rgba(16,20,27,.86));backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);box-shadow:0 1px 0 rgba(214,246,34,.18)}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--accent);position:relative;overflow:hidden}
+.mark::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 38%,var(--on-accent) 38% 50%,transparent 50% 60%,var(--on-accent) 60% 72%,transparent 72%)}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:15px;line-height:1.05}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+.lang{margin-inline-start:auto;position:relative}
+.lang select{appearance:none;-webkit-appearance:none;font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* wskaźnik postępu */
+.steps{display:flex;align-items:center;gap:6px;padding:var(--s2) var(--s4) var(--s3)}
+.step{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-muted);white-space:nowrap}
+.step .n{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:12px;background:var(--surface-3);color:var(--text-muted)}
+.step.active .n{background:var(--accent);color:var(--on-accent)}
+.step.active{color:var(--text-strong)}
+.step .ln{flex:1;height:1px;background:var(--hairline);min-width:10px}
+.seg{display:flex;gap:var(--s2);padding:var(--s2) var(--s4) var(--s2)}
+.seg button{flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.3px;background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);transition:all .18s}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 18px -8px rgba(214,246,34,.6)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding:var(--s2) var(--s4) 0;animation:rise .4s ease both}
+/* przypięte podsumowanie ceny */
+.price{position:sticky;top:128px;z-index:10;margin-top:var(--s2);border-radius:var(--radius);border:1px solid var(--hairline);background:linear-gradient(160deg,var(--surface-2),var(--surface-1));padding:var(--s3) var(--s4);box-shadow:var(--shadow)}
+.price .pr-top{display:flex;align-items:baseline;gap:var(--s3)}
+.price .pr-dist{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong)}
+.price .pr-amt{margin-inline-start:auto;font-family:var(--font-display);font-weight:800;font-size:24px;color:var(--accent);font-variant-numeric:tabular-nums}
+.price .pr-meta{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);margin-top:4px;font-size:12px;color:var(--text-muted)}
+.price .pr-meta .seats b{color:var(--color-warning);font-variant-numeric:tabular-nums}
+.tier-note{display:none;margin-top:var(--s2);font-size:12.5px;color:var(--color-warning);align-items:flex-start;gap:6px}
+.tier-note.show{display:flex}
+.tier-note svg{flex:0 0 auto;margin-top:2px}
+.group{margin-top:var(--s5)}
+.group > h2{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-muted);margin:0 0 var(--s2)}
+.field{margin-top:var(--s3)}
+.field label{display:block;font-size:12.5px;font-weight:700;letter-spacing:.2px;color:var(--text);margin-bottom:5px}
+.field .prefill{font-size:11px;color:var(--color-success);font-weight:600;margin-inline-start:6px}
+.field input,.field select{width:100%;min-height:var(--tap);background:var(--surface-1);border:1px solid var(--hairline);border-radius:12px;color:var(--text-strong);font:inherit;font-size:16px;padding:0 14px}
+.field select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238c97a6' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-inline-end:36px}
+[dir="rtl"] .field select{background-position:left 14px center}
+.field input:focus-visible,.field select:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-color:var(--accent)}
+.field.bad input,.field.bad select{border-color:var(--color-error);background:rgba(255,107,94,.06)}
+.field .hint{font-size:12px;color:var(--text-muted);margin-top:5px}
+.field .err{display:none;margin-top:6px;font-size:12.5px;color:var(--color-error);align-items:flex-start;gap:6px}
+.field .err svg{flex:0 0 auto;margin-top:2px}
+.field.bad .err{display:flex}
+.two{display:flex;gap:var(--s3)}.two .field{flex:1;margin-top:var(--s3)}
+.cat-auto{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--color-info);font-weight:600;margin-inline-start:6px}
+.choice{display:flex;gap:var(--s2);margin-top:5px}
+.choice button{flex:1;min-height:var(--tap);border-radius:12px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text);font:inherit;font-weight:600;font-size:14px;cursor:pointer;padding:0 var(--s2)}
+.choice button[aria-pressed="true"]{border-color:var(--accent);background:rgba(214,246,34,.1);color:var(--text-strong)}
+.choice button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.cond{overflow:hidden;max-height:0;opacity:0;transition:max-height .25s ease,opacity .2s ease,margin .2s ease;margin-top:0}
+.cond.open{max-height:340px;opacity:1;margin-top:var(--s3)}
+.cond-inner{padding:var(--s3) var(--s4);border-radius:12px;border:1px dashed var(--hairline);background:rgba(106,169,255,.05)}
+.cond-inner .ci-note{font-size:12.5px;color:var(--text-muted)}
+.toggle-row{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s3);padding:var(--s3) var(--s4);border-radius:12px;border:1px solid var(--hairline);background:var(--surface-1)}
+.toggle-row .tr{flex:1;font-size:13.5px;color:var(--text)}
+.switch{flex:0 0 auto;width:50px;height:30px;border-radius:999px;background:var(--surface-3);border:1px solid var(--hairline);position:relative;cursor:pointer;padding:0}
+.switch::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:24px;height:24px;border-radius:50%;background:var(--text-muted);transition:all .18s}
+.switch[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+.switch[aria-checked="true"]::after{inset-inline-start:22px;background:var(--on-accent)}
+.switch:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* stan alternatywny: wyczerpane miejsca */
+.full{padding-top:var(--s6);text-align:center}
+.full .ic{width:76px;height:76px;border-radius:50%;margin:0 auto var(--s4);display:grid;place-items:center;background:var(--surface-2);border:1px solid rgba(255,184,77,.5);color:var(--color-warning)}
+.full h2{font-family:var(--font-display);font-weight:800;font-size:23px;color:var(--text-strong);margin:0 0 var(--s2)}
+.full p{font-size:14px;color:var(--text);margin:0 auto var(--s4);max-width:36ch}
+.full .wl{margin-top:var(--s2);padding:var(--s4);border-radius:var(--radius);border:1px solid rgba(106,169,255,.35);background:rgba(106,169,255,.08);text-align:start}
+.full .wl h3{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--text-strong);margin:0 0 4px}
+.full .wl p{margin:0;font-size:13px;color:var(--text-muted);max-width:none}
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:linear-gradient(180deg,rgba(16,20,27,.4),var(--brand-ink) 40%);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+.inner{max-width:480px;margin:0 auto}
+.status-line{display:none;align-items:flex-start;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600;text-align:center}
+.status-line svg{flex:0 0 auto;margin-top:2px}
+.status-line.show{display:flex}.status-line.warn{color:var(--color-warning)}
+.sec-actions{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-bottom:var(--s3)}
+.sec-actions button{background:none;border:none;color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hairline)}
+.sec-actions button:hover{color:var(--text)}.sec-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.cta{width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.4px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s}
+.cta:active{transform:translateY(1px) scale(.995)}
+.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}
+.hidden{display:none !important}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}.cond{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo"><div class="mark" aria-hidden="true"></div>
+        <div class="org"><b data-i18n="title">Zapis na bieg</b><span id="orgName">Stołeczny Klub Biegacza</span></div></div>
+      <div class="lang"><label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language"><option value="pl-PL">PL</option><option value="en-GB">EN</option></select></div>
+    </div>
+    <div class="steps" aria-label="Postęp zapisu">
+      <span class="step active"><span class="n">1</span><span data-i18n="step1">Dane</span></span><span class="ln"></span>
+      <span class="step"><span class="n">2</span><span data-i18n="step2">Dodatki</span></span><span class="ln"></span>
+      <span class="step"><span class="n">3</span><span data-i18n="step3">Płatność</span></span>
+    </div>
+  </header>
+
+  <div class="seg" role="group" aria-label="Stan ekranu">
+    <button id="segForm" aria-pressed="true" data-i18n="segForm">Formularz</button>
+    <button id="segFull" aria-pressed="false" data-i18n="segFull">Brak miejsc</button>
+  </div>
+
+  <!-- STAN DOMYŚLNY -->
+  <main id="viewForm">
+    <div class="price">
+      <div class="pr-top"><span class="pr-dist" id="prDist">10 km</span><span class="pr-amt" id="prAmt"></span></div>
+      <div class="pr-meta">
+        <span data-i18n="tierLabel">próg II</span>
+        <span class="seats"><span data-i18n="seatsLabel">miejsca:</span> <b id="seatsVal">12</b></span>
+        <span id="tierCd"></span>
+      </div>
+      <div class="tier-note" id="tierNote"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="tierNoteText"></span></div>
+    </div>
+
+    <div class="group">
+      <h2 data-i18n="grpWho">Zawodnik</h2>
+      <div class="two">
+        <div class="field"><label for="fName">Imię <span class="prefill" data-i18n="fromAccount">z konta</span></label><input id="fName" value="Kasia" autocomplete="given-name"></div>
+        <div class="field"><label for="lName">Nazwisko <span class="prefill" data-i18n="fromAccount">z konta</span></label><input id="lName" value="Wójcik" autocomplete="family-name"></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="dob" data-i18n="dobLabel">Data urodzenia</label><input id="dob" type="date" value="1984-04-12"><div class="err" id="dobErr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="dobErrText"></span></div></div>
+        <div class="field"><label for="sex" data-i18n="sexLabel">Płeć (klasyfikacja)</label><select id="sex"><option value="K" data-i18n="sexK">Kobieta</option><option value="M" data-i18n="sexM">Mężczyzna</option></select></div>
+      </div>
+      <div class="field"><label for="cat" data-i18n="catLabel">Kategoria <span class="cat-auto" data-i18n="catAuto">dobrana z daty urodzenia</span></label>
+        <select id="cat"></select>
+        <div class="hint" data-i18n="catHint">Możesz zmienić ręcznie, jeśli startujesz w innej kategorii.</div>
+        <div class="err" id="catErr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="catErrText"></span></div>
+      </div>
+      <div class="field"><label for="club" data-i18n="clubLabel">Klub (opcjonalnie)</label><input id="club" placeholder="—"></div>
+    </div>
+
+    <div class="group">
+      <h2 data-i18n="grpType">Zgłoszenie</h2>
+      <div class="field"><label data-i18n="typeLabel">Zapisuję</label>
+        <div class="choice" role="group" aria-label="Typ zgłoszenia">
+          <button id="tSelf" aria-pressed="true" data-i18n="typeSelf">Siebie</button>
+          <button id="tOther" aria-pressed="false" data-i18n="typeOther">Inną osobę</button>
+          <button id="tRelay" aria-pressed="false" data-i18n="typeRelay">Sztafetę</button>
+        </div>
+      </div>
+      <div class="cond" id="condOther"><div class="cond-inner"><div class="ci-note" data-i18n="otherNote">Część pól (oświadczenie zdrowotne, zgoda na wizerunek) uzupełni sama osoba docelowa po otrzymaniu zaproszenia. Reguły transferu ustala organizator.</div></div></div>
+      <div class="cond" id="condRelay"><div class="cond-inner">
+        <div class="field" style="margin-top:0"><label for="relayN" data-i18n="relayCountLabel">Liczba zawodników w sztafecie</label><input id="relayN" type="number" min="2" max="6" value="4" inputmode="numeric"></div>
+        <div class="ci-note" style="margin-top:8px" data-i18n="relayNote">Dane pozostałych zawodników zbierzemy w kolejnym kroku, po jednym zestawie pól na osobę.</div>
+      </div></div>
+
+      <div class="toggle-row">
+        <div class="tr"><span data-i18n="paraLabel">Startuję w klasyfikacji z niepełnosprawnością</span></div>
+        <button class="switch" id="paraSw" role="switch" aria-checked="false" aria-label="Klasyfikacja z niepełnosprawnością"></button>
+      </div>
+      <div class="cond" id="condPara"><div class="cond-inner">
+        <div class="field" style="margin-top:0"><label for="paraClass" data-i18n="paraClassLabel">Klasa startowa</label>
+          <select id="paraClass"><option value="" data-i18n="choose">Wybierz…</option><option>T11–T13</option><option>T54</option><option>T62–T64</option></select>
+          <div class="err" id="paraErr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="paraErrText"></span></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="group">
+      <h2 data-i18n="grpEmg">Kontakt alarmowy</h2>
+      <div class="two">
+        <div class="field"><label for="emgName" data-i18n="emgNameLabel">Imię i nazwisko</label><input id="emgName" placeholder="np. Marek Wójcik"><div class="err" id="emgNameErr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="emgNameErrText"></span></div></div>
+        <div class="field"><label for="emgPhone" data-i18n="emgPhoneLabel">Telefon</label><input id="emgPhone" type="tel" inputmode="tel" placeholder="+48 600 100 200"><div class="err" id="emgPhoneErr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="emgPhoneErrText"></span></div></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- STAN ALTERNATYWNY: wyczerpane miejsca -->
+  <main id="viewFull" class="hidden">
+    <div class="full">
+      <div class="ic" aria-hidden="true"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h2 data-i18n="fullHeading">Miejsca na 10 km są wyczerpane</h2>
+      <p data-i18n="fullBody">Limit zapełnił się w trakcie. Nie pozwalamy dokończyć zapisu, którego nie dałoby się opłacić. Zamiast tego możesz wejść na listę rezerwową.</p>
+      <div class="wl">
+        <h3 data-i18n="wlTitle">Lista rezerwowa</h3>
+        <p data-i18n="wlBody">Zwolnione miejsce dostaniesz jako ofertę z odliczaniem. Cena będzie z progu obowiązującego w chwili przyjęcia oferty. Zapis na listę jest darmowy i nie blokuje innych startów.</p>
+      </div>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="inner">
+      <div class="status-line" id="statusLine"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="statusText"></span></div>
+      <div class="sec-actions" id="secForm">
+        <button id="secDist" data-i18n="secDist">Zmień dystans</button>
+        <button id="secDraft" data-i18n="secDraft">Zapisz wersję roboczą</button>
+        <button id="secTier" data-i18n="secTier">Symuluj zmianę progu ceny</button>
+      </div>
+      <div class="sec-actions hidden" id="secFull">
+        <button id="secOther" data-i18n="secOther">Zobacz inne dystanse</button>
+      </div>
+      <button class="cta" id="mainCta"><span class="spinner" aria-hidden="true"></span><span id="ctaLabel"></span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const I18N={
+ "pl-PL":{title:"Zapis na bieg",langLabel:"Język",
+  step1:"Dane",step2:"Dodatki",step3:"Płatność",segForm:"Formularz",segFull:"Brak miejsc",
+  tierLabel:"próg II",seatsLabel:"miejsca:",tierCdTpl:"do zmiany ceny: {d} dni",
+  grpWho:"Zawodnik",fromAccount:"z konta",dobLabel:"Data urodzenia",sexLabel:"Płeć (klasyfikacja)",sexK:"Kobieta",sexM:"Mężczyzna",
+  catLabel:"Kategoria",catAuto:"dobrana z daty urodzenia",catHint:"Możesz zmienić ręcznie, jeśli startujesz w innej kategorii.",clubLabel:"Klub (opcjonalnie)",
+  grpType:"Zgłoszenie",typeLabel:"Zapisuję",typeSelf:"Siebie",typeOther:"Inną osobę",typeRelay:"Sztafetę",
+  otherNote:"Część pól (oświadczenie zdrowotne, zgoda na wizerunek) uzupełni sama osoba docelowa po otrzymaniu zaproszenia. Reguły transferu ustala organizator.",
+  relayCountLabel:"Liczba zawodników w sztafecie",relayNote:"Dane pozostałych zawodników zbierzemy w kolejnym kroku, po jednym zestawie pól na osobę.",
+  paraLabel:"Startuję w klasyfikacji z niepełnosprawnością",paraClassLabel:"Klasa startowa",choose:"Wybierz…",
+  grpEmg:"Kontakt alarmowy",emgNameLabel:"Imię i nazwisko",emgPhoneLabel:"Telefon",
+  ctaNext:"Przejdź do dodatków i gadżetów",ctaWaitlist:"Zapisz się na listę rezerwową",processingTxt:"Sprawdzam…",
+  secDist:"Zmień dystans",secDraft:"Zapisz wersję roboczą",secTier:"Symuluj zmianę progu ceny",secOther:"Zobacz inne dystanse",
+  errEmptyName:"Podaj imię i nazwisko kontaktu alarmowego.",errEmptyPhone:"Podaj numer kontaktu alarmowego.",errPhoneFmt:"Sprawdź numer - to nie wygląda na poprawny telefon.",
+  errParaClass:"Wybierz klasę startową albo wyłącz klasyfikację z niepełnosprawnością.",
+  errAge:"Ten dystans ma ograniczenie wieku (18+). 5 km jest otwarte dla Twojego rocznika - chcesz przejść na 5 km?",
+  errCatMismatch:"Wybrana kategoria nie pasuje do daty urodzenia i płci. Zostaw dobraną automatycznie albo popraw dane.",
+  draftSaved:"Zapisano wersję roboczą. Wrócisz do niej z pulpitu, dane zostają.",
+  tierChanged:"Cena progu zmieniła się w trakcie. Nowa kwota: {amt}. Pokazujemy ją przed przejściem dalej.",
+  goNext:"Dane kompletne. Przechodzę do dodatków i gadżetów (ATH-04).",
+  goWaitlist:"Zapisuję na listę rezerwową (ATH-08).",goDist:"Wracam do listy dystansów.",goOther:"Otwieram inne dystanse wydarzenia."},
+ "en-GB":{title:"Race registration",langLabel:"Language",
+  step1:"Details",step2:"Add-ons",step3:"Payment",segForm:"Form",segFull:"Sold out",
+  tierLabel:"tier II",seatsLabel:"places:",tierCdTpl:"price changes in: {d} days",
+  grpWho:"Athlete",fromAccount:"from account",dobLabel:"Date of birth",sexLabel:"Sex (classification)",sexK:"Female",sexM:"Male",
+  catLabel:"Category",catAuto:"set from date of birth",catHint:"Change it manually if you race in a different category.",clubLabel:"Club (optional)",
+  grpType:"Registration",typeLabel:"Registering",typeSelf:"Myself",typeOther:"Another person",typeRelay:"A relay",
+  otherNote:"Some fields (health declaration, image consent) are filled by the target person after they get the invitation. The organiser sets the transfer rules.",
+  relayCountLabel:"Number of relay runners",relayNote:"We'll collect the other runners' details in the next step, one set of fields per person.",
+  paraLabel:"I race in the para classification",paraClassLabel:"Start class",choose:"Choose…",
+  grpEmg:"Emergency contact",emgNameLabel:"Full name",emgPhoneLabel:"Phone",
+  ctaNext:"Go to add-ons and merchandise",ctaWaitlist:"Join the wait-list",processingTxt:"Checking…",
+  secDist:"Change distance",secDraft:"Save draft",secTier:"Simulate a price-tier change",secOther:"See other distances",
+  errEmptyName:"Enter the emergency contact's name.",errEmptyPhone:"Enter the emergency contact's number.",errPhoneFmt:"Check the number - it doesn't look like a valid phone.",
+  errParaClass:"Pick a start class or turn off the para classification.",
+  errAge:"This distance has an age limit (18+). The 5 km is open for your year - switch to 5 km?",
+  errCatMismatch:"The chosen category doesn't match the date of birth and sex. Keep the auto-set one or correct the details.",
+  draftSaved:"Draft saved. You can return to it from the dashboard, your data stays.",
+  tierChanged:"The tier price changed while you filled in. New amount: {amt}. We show it before you move on.",
+  goNext:"Details complete. Going to add-ons and merchandise (ATH-04).",
+  goWaitlist:"Joining the wait-list (ATH-08).",goDist:"Back to the distance list.",goOther:"Opening other distances for the event."}
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL",price:120,tierDays:2,minAge:18,tierBumped:false};
+const UI={view:"form",type:"self"};
+const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function t(k){const L=I18N[DATA.locale]||{},F=I18N["en-GB"];return (k in L)?L[k]:(F[k]??k);}
+function tpl(k,m){let s=t(k);for(const x in m)s=s.replace(new RegExp("{"+x+"}","g"),m[x]);return s;}
+function applyStatic(){$$("[data-i18n]").forEach(e=>e.textContent=t(e.getAttribute("data-i18n")));}
+const fmtMoney=(v)=>new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN"}).format(v);
+function ageFrom(dobStr){if(!dobStr)return null;const d=new Date(dobStr),n=new Date("2026-05-26");let a=n.getFullYear()-d.getFullYear();const m=n.getMonth()-d.getMonth();if(m<0||(m===0&&n.getDate()<d.getDate()))a--;return a;}
+function bandFor(age,sex){if(age==null)return"";const base=sex==="K"?"K":"M";if(age<20)return base+"20";if(age<30)return base+"OPEN";if(age<40)return base+"30";if(age<50)return base+"40";if(age<60)return base+"50";return base+"60";}
+function fillCategories(sel){const sex=$("#sex").value;const labels=sex==="K"?["K20","KOPEN","K30","K40","K50","K60"]:["M20","MOPEN","M30","M40","M50","M60"];const cat=$("#cat");cat.innerHTML="";labels.forEach(l=>{const o=document.createElement("option");o.value=l;o.textContent=l.replace("OPEN"," OPEN");cat.appendChild(o);});if(sel&&labels.includes(sel))cat.value=sel;}
+function renderPrice(){$("#prAmt").textContent=fmtMoney(DATA.price);$("#tierCd").textContent=tpl("tierCdTpl",{d:DATA.tierDays});}
+function autoCategory(){const age=ageFrom($("#dob").value);const sex=$("#sex").value;const b=bandFor(age,sex);fillCategories(b);}
+function renderCta(){const l=$("#ctaLabel"),c=$("#mainCta");c.classList.toggle("ghost",false);l.textContent=UI.view==="form"?t("ctaNext"):t("ctaWaitlist");}
+let st=null;
+function showStatus(x,warn){const s=$("#statusLine");$("#statusText").textContent=x;s.classList.add("show");s.classList.toggle("warn",!!warn);}
+function hideStatus(){$("#statusLine").classList.remove("show");}
+function runProcessing(done){const c=$("#mainCta"),l=$("#ctaLabel");c.disabled=true;c.classList.add("processing");l.textContent=t("processingTxt");$(".spinner").style.display="inline-block";clearTimeout(st);st=setTimeout(()=>{c.classList.remove("processing");c.disabled=false;renderCta();done();},900);}
+function clearFieldErr(id){$("#"+id).classList.remove("bad");}
+function setFieldErr(fieldId,textId,msg){$("#"+fieldId).classList.add("bad");$("#"+textId).textContent=msg;}
+function validateForm(){
+  let firstBad=null;
+  ["fName","lName","dob","sex","cat","club","emgName","emgPhone","paraClass"].forEach(id=>{const e=$("#"+id);if(e)e.closest(".field").classList.remove("bad");});
+  // wiek vs ograniczenie dystansu
+  const age=ageFrom($("#dob").value);
+  if(age!=null&&age<DATA.minAge){setFieldErr("dob","dobErr","dobErrText");$("#dobErrText").textContent=t("errAge");firstBad=firstBad||$("#dob");}
+  // spójność kategorii
+  const sex=$("#sex").value,b=bandFor(age,sex);
+  if(age!=null&&$("#cat").value&&b&&$("#cat").value!==b){setFieldErr("cat","catErr","catErrText");$("#catErrText").textContent=t("errCatMismatch");firstBad=firstBad||$("#cat");}
+  // klasa startowa gdy para włączone
+  if($("#paraSw").getAttribute("aria-checked")==="true"&&!$("#paraClass").value){setFieldErr("paraClass","paraErr","paraErrText");$("#paraErrText").textContent=t("errParaClass");firstBad=firstBad||$("#paraClass");}
+  // kontakt alarmowy wymagany
+  if(!$("#emgName").value.trim()){setFieldErr("emgName","emgNameErr","emgNameErrText");$("#emgNameErrText").textContent=t("errEmptyName");firstBad=firstBad||$("#emgName");}
+  const ph=$("#emgPhone").value.trim();
+  if(!ph){setFieldErr("emgPhone","emgPhoneErr","emgPhoneErrText");$("#emgPhoneErrText").textContent=t("errEmptyPhone");firstBad=firstBad||$("#emgPhone");}
+  else if(!/^\+?[0-9 ()-]{9,}$/.test(ph)){setFieldErr("emgPhone","emgPhoneErr","emgPhoneErrText");$("#emgPhoneErrText").textContent=t("errPhoneFmt");firstBad=firstBad||$("#emgPhone");}
+  return firstBad;
+}
+function setType(tp){UI.type=tp;$("#tSelf").setAttribute("aria-pressed",tp==="self");$("#tOther").setAttribute("aria-pressed",tp==="other");$("#tRelay").setAttribute("aria-pressed",tp==="relay");
+  $("#condOther").classList.toggle("open",tp==="other");$("#condRelay").classList.toggle("open",tp==="relay");}
+function setView(v){UI.view=v;$("#segForm").setAttribute("aria-pressed",v==="form");$("#segFull").setAttribute("aria-pressed",v==="full");
+  $("#viewForm").classList.toggle("hidden",v!=="form");$("#viewFull").classList.toggle("hidden",v!=="full");
+  $("#secForm").classList.toggle("hidden",v!=="form");$("#secFull").classList.toggle("hidden",v!=="full");hideStatus();renderCta();}
+function setLocale(loc){DATA.locale=loc;document.documentElement.lang=loc;document.documentElement.dir=RTL.has(loc.split("-")[0])?"rtl":"ltr";const cur=$("#cat").value;applyStatic();fillCategories(cur);renderPrice();renderCta();}
+document.addEventListener("DOMContentLoaded",()=>{
+  fillCategories("M40");$("#cat").value="M40";
+  setLocale("pl-PL");$("#langSel").value="pl-PL";
+  $("#langSel").addEventListener("change",e=>setLocale(e.target.value));
+  $("#segForm").addEventListener("click",()=>setView("form"));
+  $("#segFull").addEventListener("click",()=>setView("full"));
+  $("#tSelf").addEventListener("click",()=>setType("self"));
+  $("#tOther").addEventListener("click",()=>setType("other"));
+  $("#tRelay").addEventListener("click",()=>setType("relay"));
+  $("#paraSw").addEventListener("click",e=>{const on=e.currentTarget.getAttribute("aria-checked")==="true";e.currentTarget.setAttribute("aria-checked",String(!on));$("#condPara").classList.toggle("open",!on);if(on){$("#paraClass").closest(".field").classList.remove("bad");}});
+  $("#dob").addEventListener("change",()=>{autoCategory();$("#dob").closest(".field").classList.remove("bad");});
+  $("#sex").addEventListener("change",()=>autoCategory());
+  ["emgName","emgPhone","paraClass","cat"].forEach(id=>$("#"+id).addEventListener("input",()=>$("#"+id).closest(".field").classList.remove("bad")));
+  $("#mainCta").addEventListener("click",()=>{
+    if(UI.view==="full"){runProcessing(()=>showStatus(t("goWaitlist")));return;}
+    const bad=validateForm();
+    if(bad){bad.focus({preventScroll:false});bad.scrollIntoView({behavior:"smooth",block:"center"});return;}
+    runProcessing(()=>showStatus(t("goNext")));
+  });
+  $("#secDist").addEventListener("click",()=>showStatus(t("goDist")));
+  $("#secDraft").addEventListener("click",()=>showStatus(t("draftSaved")));
+  $("#secTier").addEventListener("click",()=>{if(!DATA.tierBumped){DATA.tierBumped=true;DATA.price=149;DATA.tierDays=0;renderPrice();}$("#tierNoteText").textContent=tpl("tierChanged",{amt:fmtMoney(DATA.price)});$("#tierNote").classList.add("show");showStatus(tpl("tierChanged",{amt:fmtMoney(DATA.price)}),true);});
+  $("#secOther").addEventListener("click",()=>showStatus(t("goOther")));
+});
+</script>
+</body>
+</html>

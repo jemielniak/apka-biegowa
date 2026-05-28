@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOL-07 · Zgłoszenie na wolontariat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600..800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#11161c;
+  --accent:#0b69d4;
+
+  --color-success:#0a7d35;
+  --color-warning:#b45309;
+  --color-error:#c4181f;
+  --color-info:#0b69d4;
+
+  --paper:#f1f4f8;
+  --surface-1:#ffffff;
+  --surface-2:#e9eef4;
+  --surface-3:#dbe3ec;
+  --hairline:#c5cfdb;
+  --text-strong:#11161c;
+  --text:#33404e;
+  --text-muted:#5d6b7c;
+  --on-accent:#ffffff;
+  --hivis:#f3b50a;
+  --hivis-rgb:243,181,10;
+  --tint-success-bg:#ecfdf3;
+  --tint-success-border:#a6e0bd;
+  --tint-success-text:#075c28;
+  --tint-warning-bg:#fff7ed;
+  --tint-warning-border:#f2c79a;
+  --tint-warning-text:#7c3d05;
+  --tint-error-bg:#fdeaea;
+  --tint-error-border:#f0b4b4;
+  --tint-error-text:#8a1318;
+  --tint-info-bg:#eaf2fc;
+  --tint-info-border:#b8d3f3;
+  --tint-info-text:#0a4a96;
+
+
+  --verdict-ok:#0a7d35;
+  --verdict-no:#c4181f;
+  --status-paid:#0a7d35;
+  --status-unpaid:#b45309;
+  --status-check:#5d6b7c;
+
+  --font-display:"Archivo", system-ui, sans-serif;
+  --font-body:"IBM Plex Sans", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:14px;
+  --shadow:0 10px 26px -14px rgba(17,22,28,.34);
+  --tap:56px;
+  --tap-primary:64px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font-body);background:var(--brand-ink);color:var(--text);line-height:1.45;min-height:100vh}
+
+.demo-bar{position:sticky;top:0;z-index:50;background:var(--brand-ink);color:#cdd7e3;display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);border-bottom:1px solid #2a333f;font-size:12px}
+.demo-bar b{color:#fff;font-family:var(--font-display);font-weight:700;letter-spacing:.02em}
+.seg{margin-left:auto;display:flex;background:#1c242e;border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:#9fb0c2;font-family:var(--font-body);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;min-height:32px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.seg button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+.frame{max-width:480px;margin:0 auto;background:var(--paper);min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+header.app{position:sticky;top:43px;z-index:30;background:var(--surface-1);border-bottom:1px solid var(--hairline)}
+.head-row{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4)}
+.head-title{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong);flex:1}
+.lang{display:flex;align-items:center;gap:4px;min-height:var(--tap);background:transparent;border:1px solid var(--hairline);border-radius:10px;padding:0 10px;font-family:var(--font-body);font-weight:600;font-size:14px;color:var(--text-strong);cursor:pointer}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* nagłówek wydarzenia */
+.event{padding:var(--s4);background:var(--surface-1);border-bottom:1px solid var(--hairline);display:flex;flex-direction:column;gap:6px}
+.event .ttl{font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--text-strong)}
+.event .meta{font-size:13px;color:var(--text-muted)}
+.event .seek{font-size:13.5px;color:var(--text);font-weight:500}
+.event .temp{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin-top:4px;background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--text-muted);font-weight:600}
+
+main{flex:1;padding:var(--s4);padding-bottom:150px;display:flex;flex-direction:column;gap:var(--s5)}
+
+.field-label{font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--text-strong);margin-bottom:var(--s2);display:block}
+
+/* wybór stanowiska i zmiany */
+.options{display:flex;flex-direction:column;gap:var(--s2)}
+.opt{display:flex;align-items:center;gap:var(--s3);background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:12px;padding:var(--s3) var(--s4);min-height:var(--tap);cursor:pointer;position:relative}
+.opt:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.opt input{position:absolute;opacity:0;width:0;height:0}
+.opt .radio{width:24px;height:24px;border-radius:50%;border:2px solid var(--hairline);flex-shrink:0;display:grid;place-items:center}
+.opt input:checked ~ .radio{border-color:var(--accent)}
+.opt input:checked ~ .radio::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.opt.selected{border-color:var(--accent);background:#f5f9fe}
+.opt .o-name{font-weight:600;font-size:16px;color:var(--text-strong)}
+.opt .o-time{font-size:13px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.opt .o-body{flex:1;display:flex;flex-direction:column;gap:2px}
+.opt .avail{font-family:var(--font-display);font-weight:700;font-size:12px;padding:4px 9px;border-radius:7px;white-space:nowrap}
+.opt .avail.free{background:var(--tint-success-bg);color:var(--color-success)}
+.opt .avail.last{background:var(--tint-warning-bg);color:var(--color-warning)}
+.opt .avail.full{background:var(--surface-2);color:var(--text-muted)}
+.opt.disabled{opacity:.6;cursor:not-allowed;background:var(--surface-2)}
+.opt.disabled .o-name{color:var(--text-muted)}
+/* podświetlenie kolizji na wybranej zmianie depozytu */
+.opt.collide.selected{border-color:var(--color-warning);background:var(--tint-warning-bg)}
+
+/* ostrzeżenie o kolizji */
+.collision{display:none;gap:10px;background:var(--tint-warning-bg);border:1.5px solid var(--tint-warning-border);border-radius:var(--radius);padding:var(--s4);font-size:13.5px;color:var(--tint-warning-text);font-weight:500}
+body.is-alt .collision{display:flex}
+.collision .ico{font-size:20px;flex-shrink:0;color:var(--color-warning)}
+.collision a{color:var(--tint-warning-text);font-weight:700}
+
+textarea{width:100%;min-height:88px;border:1.5px solid var(--hairline);border-radius:12px;padding:var(--s3) var(--s4);font-family:var(--font-body);font-size:16px;color:var(--text-strong);background:var(--surface-1);resize:vertical}
+textarea:focus{outline:3px solid var(--accent);outline-offset:2px}
+
+/* dane rodzica (dziedziczone, odczyt) */
+.inherited{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);padding:var(--s4);display:flex;align-items:center;gap:var(--s3)}
+.inherited .av{width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:17px;flex-shrink:0}
+.inherited .who{flex:1;display:flex;flex-direction:column}
+.inherited .who b{font-weight:600;font-size:16px;color:var(--text-strong)}
+.inherited .who span{font-size:13px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.inherited .who small{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:2px}
+.inherited .edit{min-height:44px;border:1px solid var(--hairline);background:var(--surface-1);border-radius:10px;padding:0 14px;font-weight:600;font-size:13px;color:var(--accent);cursor:pointer}
+.inherited .edit:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* zgoda */
+.consent{display:flex;gap:var(--s3);align-items:flex-start;background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:var(--radius);padding:var(--s4);cursor:pointer}
+.consent:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.consent input{position:absolute;opacity:0;width:0;height:0}
+.consent .box{width:26px;height:26px;border-radius:7px;border:2px solid var(--hairline);flex-shrink:0;display:grid;place-items:center;margin-top:1px}
+.consent input:checked ~ .box{background:var(--accent);border-color:var(--accent)}
+.consent input:checked ~ .box::after{content:"✓";color:#fff;font-weight:700;font-size:16px}
+.consent .txt{font-size:14px;color:var(--text)}
+.consent .txt a{color:var(--accent);font-weight:600}
+
+/* dolny pasek akcji */
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;max-width:480px;margin:0 auto;background:var(--surface-1);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) var(--s4);display:flex;flex-direction:column;gap:var(--s2)}
+.btn-primary{width:100%;min-height:var(--tap-primary);background:var(--accent);color:var(--on-accent);border:0;border-radius:12px;font-family:var(--font-display);font-weight:700;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary:focus-visible{outline:3px solid var(--hivis);outline-offset:3px}
+.btn-primary:active{transform:translateY(1px)}
+.sec-row{display:flex;gap:var(--s2);align-items:center}
+.btn-link{flex:1;min-height:var(--tap);background:transparent;border:1px solid var(--hairline);border-radius:10px;font-family:var(--font-body);font-weight:600;font-size:14px;color:var(--text-strong);cursor:pointer}
+.btn-link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn-danger{min-height:var(--tap);background:transparent;border:0;color:var(--color-error);font-family:var(--font-body);font-weight:600;font-size:14px;cursor:pointer;padding:0 14px}
+.btn-danger:focus-visible{outline:3px solid var(--color-error);outline-offset:2px;border-radius:8px}
+.send-state{font-size:12px;color:var(--text-muted);text-align:center}
+
+@media (prefers-reduced-motion:no-preference){
+  main>*{animation:rise .4s both}
+  main>*:nth-child(1){animation-delay:.04s}
+  main>*:nth-child(2){animation-delay:.09s}
+  main>*:nth-child(3){animation-delay:.14s}
+  main>*:nth-child(4){animation-delay:.19s}
+  main>*:nth-child(5){animation-delay:.24s}
+}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">
+  <b>VOL-07</b><span data-i18n="demo.name">most rodzic → wolontariusz</span>
+  <div class="seg" role="group" aria-label="Podgląd stanu ekranu">
+    <button id="b-default" aria-pressed="true" data-i18n="demo.default">Stan domyślny</button>
+    <button id="b-alt" aria-pressed="false" data-i18n="demo.alt">Kolizja ze startem dziecka</button>
+  </div>
+</div>
+
+<div class="frame">
+  <header class="app">
+    <div class="head-row">
+      <div class="head-title" data-i18n="head.title">Zgłoś się na wolontariat</div>
+      <button class="lang" id="langBtn" data-i18n-aria="aria.lang" aria-label="Zmień język"><span id="langLabel">PL</span><span aria-hidden="true">▾</span></button>
+    </div>
+  </header>
+
+  <div class="event">
+    <div class="ttl" data-i18n="ev.title">Bieg Wiosenny 2026</div>
+    <div class="meta t-date">12 kwietnia 2026</div>
+    <div class="seek" data-i18n="ev.seek">Szukamy pomocy: brama, depozyt, punkt wody.</div>
+    <span class="temp" data-i18n="ev.temp">⏳ Rola tymczasowa — wygasa po wydarzeniu</span>
+  </div>
+
+  <main>
+    <fieldset style="border:0">
+      <legend class="field-label" data-i18n="f.station">Wybierz stanowisko i zmianę</legend>
+      <div class="options">
+        <label class="opt selected">
+          <input type="radio" name="shift" value="brama" checked>
+          <span class="radio" aria-hidden="true"></span>
+          <span class="o-body">
+            <span class="o-name" data-i18n="o.gate">Brama</span>
+            <span class="o-time t-gate">09:00–11:00</span>
+          </span>
+          <span class="avail free"><span class="t-free3">3 wolne</span></span>
+        </label>
+
+        <label class="opt collide">
+          <input type="radio" name="shift" value="depozyt">
+          <span class="radio" aria-hidden="true"></span>
+          <span class="o-body">
+            <span class="o-name" data-i18n="o.depot">Depozyt</span>
+            <span class="o-time t-depot">11:00–14:00</span>
+          </span>
+          <span class="avail last"><span class="t-free1">1 wolne</span></span>
+        </label>
+
+        <label class="opt disabled">
+          <input type="radio" name="shift" value="woda" disabled>
+          <span class="radio" aria-hidden="true"></span>
+          <span class="o-body">
+            <span class="o-name" data-i18n="o.water">Punkt wody</span>
+            <span class="o-time t-water">14:00–16:00</span>
+          </span>
+          <span class="avail full" data-i18n="avail.full">PEŁNE</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="collision" role="alert">
+      <span class="ico" aria-hidden="true">⚠</span>
+      <span>
+        <span data-i18n="collision">Ta zmiana koliduje ze startem Twojego dziecka o 13:40. Wybierz inny termin albo sprawdź zapisy dziecka.</span>
+        <a href="#" data-i18n="collision.link">Zobacz start dziecka</a>
+      </span>
+    </div>
+
+    <div>
+      <label class="field-label" for="notes" data-i18n="f.notes">Uwagi i preferencje (opcjonalnie)</label>
+      <textarea id="notes" placeholder="Np. mogę zostać dłużej, mam własną kamizelkę." data-i18n-ph="notes.ph"></textarea>
+    </div>
+
+    <div>
+      <span class="field-label" data-i18n="f.data">Twoje dane (z konta rodzinnego)</span>
+      <div class="inherited">
+        <span class="av" aria-hidden="true">MK</span>
+        <span class="who">
+          <small data-i18n="data.read">tylko odczyt</small>
+          <b>Maria Kowalska</b>
+          <span class="t-phone">+48 600 123 456</span>
+        </span>
+        <button class="edit" data-i18n="data.edit">Edytuj</button>
+      </div>
+    </div>
+
+    <label class="consent">
+      <input type="checkbox" id="reg">
+      <span class="box" aria-hidden="true"></span>
+      <span class="txt"><span data-i18n="consent.a">Akceptuję</span> <a href="#" data-i18n="consent.link">regulamin wolontariusza</a> <span data-i18n="consent.b">i politykę prywatności.</span></span>
+    </label>
+  </main>
+
+  <div class="actionbar">
+    <button class="btn-primary" data-i18n="cta.send">Wyślij zgłoszenie</button>
+    <div class="sec-row">
+      <button class="btn-link" data-i18n="cta.draft">Zapisz roboczą</button>
+      <button class="btn-danger" data-i18n="cta.cancel">Wycofaj</button>
+    </div>
+    <div class="send-state" data-i18n="send.state">Po wysłaniu zgłoszenie czeka na akceptację organizatora.</div>
+  </div>
+</div>
+
+<script>
+const RTL = new Set(["ar","he","fa","ur"]);
+const I18N = {
+  "pl-PL":{
+    "demo.name":"most rodzic → wolontariusz","demo.default":"Stan domyślny","demo.alt":"Kolizja ze startem dziecka",
+    "aria.lang":"Zmień język",
+    "head.title":"Zgłoś się na wolontariat","ev.title":"Bieg Wiosenny 2026","ev.seek":"Szukamy pomocy: brama, depozyt, punkt wody.","ev.temp":"⏳ Rola tymczasowa — wygasa po wydarzeniu",
+    "f.station":"Wybierz stanowisko i zmianę","o.gate":"Brama","o.depot":"Depozyt","o.water":"Punkt wody","avail.full":"PEŁNE",
+    "collision":"Ta zmiana koliduje ze startem Twojego dziecka o 13:40. Wybierz inny termin albo sprawdź zapisy dziecka.","collision.link":"Zobacz start dziecka",
+    "f.notes":"Uwagi i preferencje (opcjonalnie)","notes.ph":"Np. mogę zostać dłużej, mam własną kamizelkę.",
+    "f.data":"Twoje dane (z konta rodzinnego)","data.read":"tylko odczyt","data.edit":"Edytuj",
+    "consent.a":"Akceptuję","consent.link":"regulamin wolontariusza","consent.b":"i politykę prywatności.",
+    "cta.send":"Wyślij zgłoszenie","cta.draft":"Zapisz roboczą","cta.cancel":"Wycofaj","send.state":"Po wysłaniu zgłoszenie czeka na akceptację organizatora."
+  },
+  "en-GB":{
+    "demo.name":"parent → volunteer bridge","demo.default":"Default","demo.alt":"Clash with child’s start",
+    "aria.lang":"Change language",
+    "head.title":"Sign up to volunteer","ev.title":"Spring Run 2026","ev.seek":"Help wanted: gate, baggage, water point.","ev.temp":"⏳ Temporary role — expires after the event",
+    "f.station":"Choose a station and shift","o.gate":"Gate","o.depot":"Baggage","o.water":"Water point","avail.full":"FULL",
+    "collision":"This shift clashes with your child’s start at 13:40. Pick another slot or check the child’s entry.","collision.link":"View child’s start",
+    "f.notes":"Notes and preferences (optional)","notes.ph":"E.g. I can stay longer, I have my own vest.",
+    "f.data":"Your details (from the family account)","data.read":"read only","data.edit":"Edit",
+    "consent.a":"I accept the","consent.link":"volunteer terms","consent.b":"and privacy policy.",
+    "cta.send":"Send application","cta.draft":"Save draft","cta.cancel":"Withdraw","send.state":"Once sent, the application waits for the organiser’s approval."
+  }
+};
+
+let lang="pl-PL";
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.getElementById("langLabel").textContent=lang.split("-")[0].toUpperCase();
+  const dict=I18N[lang]||I18N["en-GB"];
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.innerHTML=dict[el.getAttribute("data-i18n")]??(I18N["en-GB"][el.getAttribute("data-i18n")]||el.innerHTML)});
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{el.placeholder=dict[el.getAttribute("data-i18n-ph")]||el.placeholder});
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>{const k=el.getAttribute("data-i18n-aria");el.setAttribute("aria-label",dict[k]??(I18N["en-GB"][k]||el.getAttribute("aria-label")));});
+  // daty/godziny/telefon wg regionu
+  const dfmt=new Intl.DateTimeFormat(lang,{day:"numeric",month:"long",year:"numeric"});
+  document.querySelector(".t-date").textContent=dfmt.format(new Date(2026,3,12));
+  const tf=new Intl.DateTimeFormat(lang,{hour:"2-digit",minute:"2-digit"});
+  const span=(h1,m1,h2,m2)=>tf.format(new Date(2026,3,12,h1,m1))+"–"+tf.format(new Date(2026,3,12,h2,m2));
+  document.querySelector(".t-gate").textContent=span(9,0,11,0);
+  document.querySelector(".t-depot").textContent=span(11,0,14,0);
+  document.querySelector(".t-water").textContent=span(14,0,16,0);
+  // telefon: zapis międzynarodowy bez wariantu regionalnego dla tej demonstracji
+  document.querySelector(".t-phone").textContent = "+48 600 123 456";
+  // liczba mnoga: PL pełny zakres (1, 2-4 = "wolne"; 0, 5+ = "wolnych"), EN: spot/spots
+  const free=(n)=>{
+    if(lang==="en-GB") return n+(n===1?" spot":" spots");
+    if(n===1) return "1 wolne";
+    const t2=n%100;
+    const useWolne = (n%10>=2 && n%10<=4) && !(t2>=12 && t2<=14);
+    return n+(useWolne?" wolne":" wolnych");
+  };
+  document.querySelector(".t-free3").textContent=free(3);
+  document.querySelector(".t-free1").textContent=free(1);
+}
+document.getElementById("langBtn").addEventListener("click",()=>{lang=lang==="pl-PL"?"en-GB":"pl-PL";applyLang()});
+
+// zaznaczanie opcji
+document.querySelectorAll('input[name="shift"]').forEach(r=>r.addEventListener("change",()=>{
+  document.querySelectorAll(".opt").forEach(o=>o.classList.remove("selected"));
+  r.closest(".opt").classList.add("selected");
+}));
+
+// przełącznik stanu: alt = wybrana zmiana Depozyt z kolizją
+function setState(alt){
+  document.body.classList.toggle("is-alt",alt);
+  document.getElementById("b-default").setAttribute("aria-pressed",String(!alt));
+  document.getElementById("b-alt").setAttribute("aria-pressed",String(alt));
+  const gate=document.querySelector('input[value="brama"]');
+  const depot=document.querySelector('input[value="depozyt"]');
+  if(alt){depot.checked=true;depot.dispatchEvent(new Event("change"));}
+  else{gate.checked=true;gate.dispatchEvent(new Event("change"));}
+}
+document.getElementById("b-default").addEventListener("click",()=>setState(false));
+document.getElementById("b-alt").addEventListener("click",()=>setState(true));
+
+setState(false);
+applyLang();
+</script>
+</body>
+</html>

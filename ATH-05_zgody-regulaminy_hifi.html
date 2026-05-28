@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<!--
+  ATH-05 - zgody i regulaminy (panel zawodnika, moduł zawodów)
+  Stan domyślny: zgody wymagane i dobrowolne z licznikiem, wizerunek jako zgoda dobrowolna ze skutkiem.
+  Stan alternatywny: ponowna akceptacja po zmianie wersji regulaminu (v3 -> v4), z listą zmian.
+  Napisy = klucze tłumaczeń BCP 47 (pl-PL domyślny, en-GB zapasowy). Motywowanie tylko przez zmienne CSS.
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zgody i regulaminy · ATH-05</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#10141b;--accent:#d6f622;
+  --color-success:#3ddc84;--color-warning:#ffb84d;--color-error:#ff6b5e;--color-info:#6aa9ff;
+  --surface-1:#181e28;--surface-2:#1f2733;--surface-3:#283241;--hairline:#313c4c;
+  --text-strong:#f2f5f7;--text:#cdd5df;--text-muted:#8c97a6;--on-accent:#10141b;--paper:#f4f5ef;
+  --font-display:"Saira Condensed",system-ui;--font-body:"Barlow",system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);
+  --radius:14px;--shadow:0 10px 30px -12px rgba(0,0,0,.65);--tap:48px;
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 60% at 80% -10%,rgba(214,246,34,.10),transparent 60%),var(--brand-ink);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+[dir="rtl"] body{direction:rtl}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 64px);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 80%,transparent)}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:150px}
+header.bar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(16,20,27,.96),rgba(16,20,27,.86));backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);box-shadow:0 1px 0 rgba(214,246,34,.18)}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--accent);position:relative;overflow:hidden}
+.mark::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 38%,var(--on-accent) 38% 50%,transparent 50% 60%,var(--on-accent) 60% 72%,transparent 72%)}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:15px;line-height:1.05}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+.lang{margin-inline-start:auto;position:relative}
+.lang select{appearance:none;-webkit-appearance:none;font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.steps{display:flex;align-items:center;gap:6px;padding:var(--s2) var(--s4) var(--s3)}
+.step{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-muted);white-space:nowrap}
+.step .n{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:12px;background:var(--surface-3);color:var(--text-muted)}
+.step.active .n{background:var(--accent);color:var(--on-accent)}.step.active{color:var(--text-strong)}
+.step .ln{flex:1;height:1px;background:var(--hairline);min-width:8px}
+.counter{display:flex;align-items:center;gap:8px;padding:0 var(--s4) var(--s3);font-size:12.5px}
+.counter .pill{font-family:var(--font-display);font-weight:800;font-size:12px;padding:2px 10px;border-radius:999px;background:var(--color-warning);color:var(--on-accent)}
+.counter .pill.done{background:var(--color-success)}
+.counter span{color:var(--text-muted)}
+.seg{display:flex;gap:var(--s2);padding:var(--s2) var(--s4) var(--s2)}
+.seg button{flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:.3px;background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);transition:all .18s;padding:0 var(--s2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 18px -8px rgba(214,246,34,.6)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding:var(--s2) var(--s4) 0;animation:rise .4s ease both}
+.sec-h{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-muted);margin:var(--s5) 0 var(--s2);display:flex;align-items:center;gap:8px}
+.sec-h .req{font-size:10px;color:var(--color-warning);border:1px solid currentColor;border-radius:999px;padding:1px 7px;letter-spacing:.3px}
+.sec-h .opt{font-size:10px;color:var(--text-muted);border:1px solid var(--hairline);border-radius:999px;padding:1px 7px;letter-spacing:.3px}
+.consent{margin-top:var(--s2);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1);padding:var(--s3) var(--s4)}
+.consent.missing{border-color:rgba(255,184,77,.5)}
+.consent .crow{display:flex;align-items:flex-start;gap:var(--s3)}
+.consent .cb{flex:0 0 auto;width:26px;height:26px;border-radius:8px;border:2px solid var(--hairline);background:var(--surface-2);cursor:pointer;display:grid;place-items:center;padding:0;margin-top:1px}
+.consent .cb svg{opacity:0;color:var(--on-accent)}
+.consent .cb[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+.consent .cb[aria-checked="true"] svg{opacity:1}
+.consent .cb:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.consent .cc{flex:1;min-width:0}
+.consent .ct{font-weight:700;color:var(--text-strong);font-size:14.5px}
+.consent .cs{font-size:12.5px;color:var(--text-muted);margin-top:2px}
+.consent .cmeta{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s3);margin-top:8px;font-size:11.5px;color:var(--text-muted);font-variant-numeric:tabular-nums;align-items:center}
+.consent .cmeta a{color:var(--color-info);font-weight:600;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.consent .effect{margin-top:8px;font-size:12px;color:var(--color-info);display:flex;gap:6px;align-items:flex-start}
+.consent .effect svg{flex:0 0 auto;margin-top:2px}
+/* oświadczenie zdrowotne - osobne wejście */
+.health{margin-top:var(--s2);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1);overflow:hidden}
+.health .hh{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);cursor:pointer;width:100%;background:none;border:none;color:inherit;font:inherit;text-align:start}
+.health .hh:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.health .hh .hi{flex:0 0 auto;color:var(--color-warning)}
+.health .hh .ht{flex:1}.health .hh .ht b{display:block;color:var(--text-strong);font-size:14.5px}.health .hh .ht small{color:var(--text-muted);font-size:12px}
+.health .hh .chev{transition:transform .2s}
+.health.open .hh .chev{transform:rotate(90deg)}
+.health .hbody{display:none;padding:0 var(--s4) var(--s4)}
+.health.open .hbody{display:block}
+.health .hbody p{font-size:13px;color:var(--text);margin:0 0 var(--s3)}
+.health .confirm{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3);border-radius:12px;border:1px solid var(--hairline);background:var(--surface-2)}
+/* modal treści */
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(8,10,14,.7)}
+.modal.show{display:flex}
+.sheet{width:100%;max-width:480px;max-height:80vh;background:var(--surface-2);border-radius:18px 18px 0 0;border:1px solid var(--hairline);display:flex;flex-direction:column;animation:up .25s ease}
+@keyframes up{from{transform:translateY(20px);opacity:.6}to{transform:none;opacity:1}}
+.sheet .sh{display:flex;align-items:center;gap:var(--s3);padding:var(--s4);border-bottom:1px solid var(--hairline)}
+.sheet .sh b{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--text-strong)}
+.sheet .sh button{margin-inline-start:auto;background:var(--surface-3);border:1px solid var(--hairline);color:var(--text);border-radius:10px;min-height:38px;padding:0 14px;font:inherit;font-weight:600;cursor:pointer}
+.sheet .sb{padding:var(--s4);overflow:auto;font-size:13.5px;color:var(--text);line-height:1.6}
+.sheet .sb p{margin:0 0 var(--s3)}
+.sheet .sf{padding:var(--s3) var(--s4);border-top:1px solid var(--hairline)}
+.sheet .sf button{width:100%;min-height:46px;border-radius:10px;background:var(--surface-3);border:1px solid var(--hairline);color:var(--text-strong);font:inherit;font-weight:600;cursor:pointer}
+/* alt: ponowna akceptacja */
+.reaccept{margin-top:var(--s4)}
+.reaccept .rb{display:flex;gap:var(--s3);padding:var(--s4);border-radius:var(--radius);border:1px solid rgba(106,169,255,.4);background:rgba(106,169,255,.08)}
+.reaccept .rb svg{flex:0 0 auto;color:var(--color-info);margin-top:1px}
+.reaccept .rb .rt b{color:var(--text-strong)}.reaccept .rb .rt{font-size:13.5px;color:var(--text)}
+.changes{margin-top:var(--s4);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1);overflow:hidden}
+.changes .chh{padding:var(--s3) var(--s4);font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--hairline)}
+.changes ul{margin:0;padding:var(--s3) var(--s4) var(--s3) calc(var(--s4) + 16px);font-size:13.5px;color:var(--text)}
+.changes li{margin-bottom:8px}.changes li:last-child{margin-bottom:0}
+.changes li b{color:var(--text-strong)}
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:linear-gradient(180deg,rgba(16,20,27,.4),var(--brand-ink) 40%);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+.inner{max-width:480px;margin:0 auto}
+.status-line{display:none;align-items:flex-start;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600;text-align:center}
+.status-line svg{flex:0 0 auto;margin-top:2px}.status-line.show{display:flex}.status-line.warn{color:var(--color-warning)}
+.sec-actions{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-bottom:var(--s3)}
+.sec-actions button{background:none;border:none;color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hairline)}
+.sec-actions button:hover{color:var(--text)}.sec-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.cta{width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.4px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s,opacity .2s}
+.cta:active{transform:translateY(1px) scale(.995)}.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.cta.locked{opacity:.5}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}
+.hidden{display:none !important}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo"><div class="mark" aria-hidden="true"></div>
+        <div class="org"><b data-i18n="title">Zgody i regulaminy</b><span id="orgName">Stołeczny Klub Biegacza</span></div></div>
+      <div class="lang"><label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language"><option value="pl-PL">PL</option><option value="en-GB">EN</option></select></div>
+    </div>
+    <div class="steps" aria-label="Postęp zapisu">
+      <span class="step"><span class="n">1</span><span data-i18n="step1">Dane</span></span><span class="ln"></span>
+      <span class="step active"><span class="n">2</span><span data-i18n="step2">Zgody</span></span><span class="ln"></span>
+      <span class="step"><span class="n">3</span><span data-i18n="step3">Płatność</span></span>
+    </div>
+    <div class="counter"><span class="pill" id="reqPill">1</span><span id="counterText"></span></div>
+  </header>
+
+  <div class="seg" role="group" aria-label="Stan ekranu">
+    <button id="segNew" aria-pressed="true" data-i18n="segNew">Zgody do startu</button>
+    <button id="segReaccept" aria-pressed="false" data-i18n="segReaccept">Zmiana regulaminu</button>
+  </div>
+
+  <!-- STAN DOMYŚLNY -->
+  <main id="viewNew">
+    <div class="sec-h"><span data-i18n="reqHead">Wymagane do startu</span><span class="req" data-i18n="reqTag">wymagane</span></div>
+
+    <div class="consent" id="cTerms" data-req="1">
+      <div class="crow"><button class="cb" role="checkbox" aria-checked="true" aria-label="Regulamin wydarzenia"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="cc"><div class="ct" data-i18n="termsT">Regulamin wydarzenia</div>
+          <div class="cs" data-i18n="termsS">Zasady udziału, klasyfikacji i odbioru pakietu.</div>
+          <div class="cmeta"><span id="verTerms"></span><a data-doc="terms" data-i18n="readFull">przeczytaj treść</a><a data-i18n="download">pobierz</a></div></div></div>
+    </div>
+
+    <div class="consent" id="cPrivacy" data-req="1">
+      <div class="crow"><button class="cb" role="checkbox" aria-checked="false" aria-label="Polityka prywatności"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="cc"><div class="ct" data-i18n="privT">Polityka prywatności</div>
+          <div class="cs" data-i18n="privS">Jak organizator przetwarza dane potrzebne do startu (RODO).</div>
+          <div class="cmeta"><span id="verPriv"></span><a data-doc="priv" data-i18n="readFull">przeczytaj treść</a><a data-i18n="download">pobierz</a></div></div></div>
+    </div>
+
+    <div class="health" id="health">
+      <button class="hh" id="healthHead" aria-expanded="false">
+        <span class="hi" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.4-7 10-7 10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v4M10 11h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+        <span class="ht"><b data-i18n="healthT">Oświadczenie o stanie zdrowia</b><small data-i18n="healthSub">wymagane dla tego dystansu · osobne wejście</small></span>
+        <span class="chev" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </button>
+      <div class="hbody">
+        <p data-i18n="healthBody">To dane szczególnej kategorii. Zbieramy je osobno i tylko po to, by dopuścić Cię do startu. Potwierdź, że znasz swój stan zdrowia i nie ma przeciwwskazań do wysiłku.</p>
+        <div class="confirm"><button class="cb" id="healthCb" role="checkbox" aria-checked="false" aria-label="Potwierdzam oświadczenie zdrowotne"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="cc"><div class="ct" data-i18n="healthConfirm">Oświadczam, że jestem zdolny do startu.</div></div></div>
+      </div>
+    </div>
+
+    <div class="sec-h"><span data-i18n="optHead">Dobrowolne</span><span class="opt" data-i18n="optTag">odmowa nie blokuje startu</span></div>
+
+    <div class="consent" id="cImage">
+      <div class="crow"><button class="cb" role="checkbox" aria-checked="false" aria-label="Zgoda na wizerunek"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="cc"><div class="ct" data-i18n="imgT">Zgoda na wykorzystanie wizerunku</div>
+          <div class="cs" data-i18n="imgS">Zdjęcia i transmisja z biegu (galeria RunPixie).</div>
+          <div class="effect"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span data-i18n="imgEffect">Bez tej zgody nadal startujesz. Twoje zdjęcia z numerem nie pojawią się w galerii ani nie będą udostępniane.</span></div></div></div>
+    </div>
+  </main>
+
+  <!-- STAN ALTERNATYWNY: ponowna akceptacja po zmianie wersji -->
+  <main id="viewReaccept" class="hidden">
+    <div class="reaccept">
+      <div class="rb"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="rt"><b data-i18n="reTitle">Regulamin zmienił się po Twoim zapisie.</b> <span data-i18n="reBody">Zaktualizowaliśmy go z wersji 3 na 4. Zanim wrócisz do startu, przejrzyj zmiany i zaakceptuj nową wersję. Bez tego nie wydamy pakietu.</span></div></div>
+
+      <div class="changes">
+        <div class="chh" data-i18n="changesHead">Co się zmieniło (v3 → v4)</div>
+        <ul>
+          <li data-i18n="chg1"><b>Punkt odbioru pakietu:</b> z hali A na halę C, godziny bez zmian.</li>
+          <li data-i18n="chg2"><b>Limit czasu na trasie:</b> wydłużony z 2:00 do 2:15 dla 10 km.</li>
+          <li data-i18n="chg3"><b>Zwroty:</b> doprecyzowano, że środki wracają do portfela jako kredyt u organizatora.</li>
+        </ul>
+      </div>
+
+      <div class="consent" id="cReaccept" data-req="1" style="margin-top:var(--s4)">
+        <div class="crow"><button class="cb" role="checkbox" aria-checked="false" aria-label="Akceptuję regulamin w wersji 4"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="cc"><div class="ct" data-i18n="reAcceptT">Akceptuję regulamin w wersji 4</div>
+            <div class="cmeta"><span id="verReaccept"></span><a data-doc="terms4" data-i18n="readFull">przeczytaj treść</a><a data-i18n="download">pobierz</a></div></div></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="inner">
+      <div class="status-line" id="statusLine"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="statusText"></span></div>
+      <div class="sec-actions" id="secNew"><button id="secBackAdd" data-i18n="secBackAdd">Wróć do dodatków</button></div>
+      <div class="sec-actions hidden" id="secRe"><button id="secWhatChanged" data-i18n="secWhatChanged">Pokaż pełną treść zmian</button></div>
+      <button class="cta locked" id="mainCta"><span class="spinner" aria-hidden="true"></span><span id="ctaLabel"></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- modal pełnej treści -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="sheet">
+    <div class="sh"><b id="modalTitle"></b><button id="modalClose" data-i18n="close">Zamknij</button></div>
+    <div class="sb" id="modalBody"></div>
+    <div class="sf"><button id="modalDownload" data-i18n="download">pobierz</button></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const I18N={
+ "pl-PL":{title:"Zgody i regulaminy",langLabel:"Język",step1:"Dane",step2:"Zgody",step3:"Płatność",
+  segNew:"Zgody do startu",segReaccept:"Zmiana regulaminu",
+  reqHead:"Wymagane do startu",reqTag:"wymagane",optHead:"Dobrowolne",optTag:"odmowa nie blokuje startu",
+  termsT:"Regulamin wydarzenia",termsS:"Zasady udziału, klasyfikacji i odbioru pakietu.",verTpl:"wersja {v} · {date}",
+  privT:"Polityka prywatności",privS:"Jak organizator przetwarza dane potrzebne do startu (RODO).",
+  healthT:"Oświadczenie o stanie zdrowia",healthSub:"wymagane dla tego dystansu · osobne wejście",
+  healthBody:"To dane szczególnej kategorii. Zbieramy je osobno i tylko po to, by dopuścić Cię do startu. Potwierdź, że znasz swój stan zdrowia i nie ma przeciwwskazań do wysiłku.",
+  healthConfirm:"Oświadczam, że jestem zdolny do startu.",
+  imgT:"Zgoda na wykorzystanie wizerunku",imgS:"Zdjęcia i transmisja z biegu (galeria RunPixie).",
+  imgEffect:"Bez tej zgody nadal startujesz. Twoje zdjęcia z numerem nie pojawią się w galerii ani nie będą udostępniane.",
+  readFull:"przeczytaj treść",download:"pobierz",close:"Zamknij",
+  reTitle:"Regulamin zmienił się po Twoim zapisie.",reBody:"Zaktualizowaliśmy go z wersji 3 na 4. Zanim wrócisz do startu, przejrzyj zmiany i zaakceptuj nową wersję. Bez tego nie wydamy pakietu.",
+  changesHead:"Co się zmieniło (v3 → v4)",
+  chg1:"Punkt odbioru pakietu: z hali A na halę C, godziny bez zmian.",chg2:"Limit czasu na trasie: wydłużony z 2:00 do 2:15 dla 10 km.",chg3:"Zwroty: doprecyzowano, że środki wracają do portfela jako kredyt u organizatora.",
+  reAcceptT:"Akceptuję regulamin w wersji 4",
+  counterDoneTxt:"wszystkie wymagane zaznaczone",counterLeftTpl:"wymaganych do zaznaczenia: {n}",
+  ctaNext:"Zaakceptuj i przejdź do płatności",ctaReaccept:"Zaakceptuj wersję 4 i wróć do startu",processingTxt:"Zapisuję zgody…",
+  secBackAdd:"Wróć do dodatków",secWhatChanged:"Pokaż pełną treść zmian",
+  errMissing:"Brakuje zgody wymaganej do startu. Zaznaczyliśmy, której - uzupełnij ją powyżej.",
+  goNext:"Zgody zapisane z wersją i datą. Przechodzę do podsumowania i płatności (ATH-06).",
+  goReaccept:"Zaakceptowano wersję 4. Wracasz do startu, pakiet znów możliwy do wydania.",
+  imgOff:"Zapamiętane: bez zgody na wizerunek. Możesz ją włączyć później w ustawieniach.",
+  backAdd:"Wracam do dodatków i gadżetów (ATH-04).",
+  docTermsBody:"To skrócony podgląd treści regulaminu na potrzeby makiety. Pełny dokument organizator publikuje w wersji do pobrania. Streszczenie podajemy językiem zawodnika, a pełna treść jest pod przyciskiem pobierania.",
+  docPrivBody:"Podgląd polityki prywatności na potrzeby makiety. Opisuje, jakie dane i po co przetwarza organizator, na jakiej podstawie i jak długo. Pełna wersja dostępna do pobrania.",
+  docTerms4Body:"Podgląd regulaminu w wersji 4. Różnice względem wersji 3 wypunktowaliśmy na ekranie. Pełną treść pobierzesz przyciskiem poniżej.",
+  downloaded:"Przygotowaliśmy dokument do pobrania."},
+ "en-GB":{title:"Consents and terms",langLabel:"Language",step1:"Details",step2:"Consents",step3:"Payment",
+  segNew:"Race consents",segReaccept:"Terms changed",
+  reqHead:"Required to start",reqTag:"required",optHead:"Optional",optTag:"declining doesn't block your start",
+  termsT:"Event terms",termsS:"Rules of entry, classification and pack collection.",verTpl:"version {v} · {date}",
+  privT:"Privacy policy",privS:"How the organiser processes data needed to start (GDPR).",
+  healthT:"Health declaration",healthSub:"required for this distance · separate entry",
+  healthBody:"This is special-category data. We collect it separately and only to clear you to start. Confirm you know your health status and have no contraindications to exertion.",
+  healthConfirm:"I declare that I'm fit to start.",
+  imgT:"Image use consent",imgS:"Photos and broadcast from the race (RunPixie gallery).",
+  imgEffect:"You still start without this consent. Your numbered photos won't appear in the gallery or be shared.",
+  readFull:"read the text",download:"download",close:"Close",
+  reTitle:"The terms changed after you registered.",reBody:"We updated them from version 3 to 4. Before you return to your start, review the changes and accept the new version. We can't issue the pack without it.",
+  changesHead:"What changed (v3 → v4)",
+  chg1:"Pack collection point: from hall A to hall C, hours unchanged.",chg2:"Course time limit: extended from 2:00 to 2:15 for the 10 km.",chg3:"Refunds: clarified that funds return to the wallet as organiser credit.",
+  reAcceptT:"I accept the terms, version 4",
+  counterDoneTxt:"all required ones ticked",counterLeftTpl:"required still to tick: {n}",
+  ctaNext:"Accept and go to payment",ctaReaccept:"Accept v4 and return to your start",processingTxt:"Saving consents…",
+  secBackAdd:"Back to add-ons",secWhatChanged:"Show the full change text",
+  errMissing:"A consent required to start is missing. We've marked which one - tick it above.",
+  goNext:"Consents saved with version and date. Going to the summary and payment (ATH-06).",
+  goReaccept:"Version 4 accepted. You're back to your start, the pack can be issued again.",
+  imgOff:"Noted: no image consent. You can turn it on later in settings.",
+  backAdd:"Back to add-ons and merchandise (ATH-04).",
+  docTermsBody:"This is a short preview of the terms for the mock-up. The organiser publishes the full document as a download. We summarise in the athlete's language and the full text sits behind the download button.",
+  docPrivBody:"Privacy policy preview for the mock-up. It describes what data the organiser processes and why, on what basis and for how long. The full version is downloadable.",
+  docTerms4Body:"Preview of the terms, version 4. The differences from version 3 are bulleted on screen. Download the full text with the button below.",
+  downloaded:"We've prepared the document for download."}
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL",docs:{terms:{v:3,date:new Date("2026-05-02")},priv:{v:2,date:new Date("2026-04-10")},terms4:{v:4,date:new Date("2026-05-22")}}};
+const UI={view:"new"};
+const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function t(k){const L=I18N[DATA.locale]||{},F=I18N["en-GB"];return (k in L)?L[k]:(F[k]??k);}
+function tpl(k,m){let s=t(k);for(const x in m)s=s.replace(new RegExp("{"+x+"}","g"),m[x]);return s;}
+function applyStatic(){$$("[data-i18n]").forEach(e=>e.textContent=t(e.getAttribute("data-i18n")));}
+const fmtDate=(d)=>new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit",year:"numeric"}).format(d);
+function renderVersions(){const d=DATA.docs;
+  $("#verTerms").textContent=tpl("verTpl",{v:d.terms.v,date:fmtDate(d.terms.date)});
+  $("#verPriv").textContent=tpl("verTpl",{v:d.priv.v,date:fmtDate(d.priv.date)});
+  $("#verReaccept").textContent=tpl("verTpl",{v:d.terms4.v,date:fmtDate(d.terms4.date)});}
+function reqBoxes(){return UI.view==="new"?[$("#cTerms .cb"),$("#cPrivacy .cb"),$("#healthCb")]:[$("#cReaccept .cb")];}
+function reqLeft(){return reqBoxes().filter(b=>b.getAttribute("aria-checked")!=="true").length;}
+function renderCounter(){const left=reqLeft();const pill=$("#reqPill");pill.textContent=left;pill.classList.toggle("done",left===0);
+  $("#counterText").textContent=left===0?t("counterDoneTxt"):tpl("counterLeftTpl",{n:left});}
+function renderCta(){const c=$("#mainCta"),l=$("#ctaLabel");l.textContent=UI.view==="new"?t("ctaNext"):t("ctaReaccept");c.classList.toggle("locked",reqLeft()>0);}
+let st=null;
+function showStatus(x,warn){const s=$("#statusLine");$("#statusText").textContent=x;s.classList.add("show");s.classList.toggle("warn",!!warn);}
+function hideStatus(){$("#statusLine").classList.remove("show");}
+function runProcessing(done){const c=$("#mainCta"),l=$("#ctaLabel");c.disabled=true;c.classList.add("processing");l.textContent=t("processingTxt");$(".spinner").style.display="inline-block";clearTimeout(st);st=setTimeout(()=>{c.classList.remove("processing");c.disabled=false;renderCta();done();},850);}
+function toggleBox(btn){const on=btn.getAttribute("aria-checked")==="true";btn.setAttribute("aria-checked",String(!on));
+  const c=btn.closest(".consent");if(c)c.classList.remove("missing");renderCounter();renderCta();hideStatus();}
+function firstMissing(){return reqBoxes().find(b=>b.getAttribute("aria-checked")!=="true");}
+function attemptNext(){
+  const miss=firstMissing();
+  if(miss){const c=miss.closest(".consent");if(c)c.classList.add("missing");
+    if(miss.id==="healthCb"){$("#health").classList.add("open");$("#healthHead").setAttribute("aria-expanded","true");}
+    showStatus(t("errMissing"),true);(c||$("#health")).scrollIntoView({behavior:"smooth",block:"center"});return;}
+  if(UI.view==="new"){const img=$("#cImage .cb").getAttribute("aria-checked")==="true";runProcessing(()=>showStatus(img?t("goNext"):t("goNext")));if(!img){/* nota dobrowolna pozostaje */}}
+  else runProcessing(()=>showStatus(t("goReaccept")));
+}
+function openModal(doc){const map={terms:["termsT","docTermsBody"],priv:["privT","docPrivBody"],terms4:["reAcceptT","docTerms4Body"]};const m=map[doc]||map.terms;
+  $("#modalTitle").textContent=t(m[0]);$("#modalBody").innerHTML="<p>"+t(m[1])+"</p>";$("#modal").classList.add("show");}
+function closeModal(){$("#modal").classList.remove("show");}
+function setView(v){UI.view=v;$("#segNew").setAttribute("aria-pressed",v==="new");$("#segReaccept").setAttribute("aria-pressed",v==="reaccept");
+  $("#viewNew").classList.toggle("hidden",v!=="new");$("#viewReaccept").classList.toggle("hidden",v!=="reaccept");
+  $("#secNew").classList.toggle("hidden",v!=="new");$("#secRe").classList.toggle("hidden",v!=="reaccept");hideStatus();renderCounter();renderCta();}
+function setLocale(loc){DATA.locale=loc;document.documentElement.lang=loc;document.documentElement.dir=RTL.has(loc.split("-")[0])?"rtl":"ltr";applyStatic();renderVersions();renderCounter();renderCta();}
+document.addEventListener("DOMContentLoaded",()=>{
+  setLocale("pl-PL");$("#langSel").value="pl-PL";
+  $("#langSel").addEventListener("change",e=>setLocale(e.target.value));
+  $("#segNew").addEventListener("click",()=>setView("new"));
+  $("#segReaccept").addEventListener("click",()=>setView("reaccept"));
+  $$(".cb").forEach(b=>{if(b.id==="modalClose")return;b.addEventListener("click",()=>{
+    if(b===$("#cImage .cb")){toggleBox(b);if(b.getAttribute("aria-checked")!=="true")showStatus(t("imgOff"));return;}
+    toggleBox(b);});});
+  $("#healthHead").addEventListener("click",()=>{const open=$("#health").classList.toggle("open");$("#healthHead").setAttribute("aria-expanded",String(open));});
+  $$("[data-doc]").forEach(a=>a.addEventListener("click",()=>openModal(a.dataset.doc)));
+  $$(".cmeta a").forEach(a=>{if(!a.dataset.doc)a.addEventListener("click",()=>showStatus(t("downloaded")));});
+  $("#modalClose").addEventListener("click",closeModal);
+  $("#modalDownload").addEventListener("click",()=>{closeModal();showStatus(t("downloaded"));});
+  $("#modal").addEventListener("click",e=>{if(e.target===$("#modal"))closeModal();});
+  $("#mainCta").addEventListener("click",attemptNext);
+  $("#secBackAdd").addEventListener("click",()=>showStatus(t("backAdd")));
+  $("#secWhatChanged").addEventListener("click",()=>openModal("terms4"));
+});
+</script>
+</body>
+</html>

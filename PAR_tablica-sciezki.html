@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR · tablica ścieżki użytkownika</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;
+  --accent:#ef5a3c;
+
+  --color-success:#1f9d57;
+  --color-warning:#c47d0a;
+  --color-error:#d6402a;
+  --color-info:#2f72d6;
+
+  --paper:#faf5ee;
+  --surface-1:#ffffff;
+  --surface-2:#fff9f2;
+  --surface-3:#f3ebe0;
+  --hairline:#e7ddcf;
+  --text-strong:#241c17;
+  --text:#4a4039;
+  --text-muted:#8a7d70;
+  --on-accent:#fff7f3;
+
+  --kid-1:#ef5a3c;
+  --kid-2:#1f9d8f;
+  --kid-3:#7a5cd6;
+  --kid-4:#c47d0a;
+
+  --font-display:"Fraunces", Georgia, serif;
+  --font-body:"Hanken Grotesk", system-ui;
+
+  --u:4px;
+  --radius:20px;
+  --shadow:0 14px 34px -16px rgba(60,40,30,.28);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  font-family:var(--font-body);
+  color:var(--text);
+  background:
+    radial-gradient(120% 80% at 80% -10%, #fff 0%, transparent 55%),
+    radial-gradient(90% 70% at -10% 110%, #fff4ea 0%, transparent 60%),
+    var(--paper);
+  font-size:16px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  padding:32px 24px 80px;
+  overflow-x:auto;
+}
+
+/* nagłówek nad tablicą */
+header.head{
+  max-width:1620px;margin:0 auto 32px;
+  display:flex;flex-wrap:wrap;gap:32px;align-items:flex-end;justify-content:space-between;
+}
+.head .titlebox h1{
+  font-family:var(--font-display);font-weight:600;font-size:42px;
+  color:var(--text-strong);letter-spacing:-.01em;line-height:1;
+}
+.head .titlebox p{color:var(--text);font-size:15px;margin-top:8px;max-width:48ch}
+.head .titlebox p b{color:var(--text-strong);font-weight:600}
+
+.legend{
+  display:flex;gap:18px;flex-wrap:wrap;
+  background:var(--surface-1);border:1px solid var(--hairline);border-radius:14px;
+  padding:14px 18px;box-shadow:var(--shadow);font-size:13px;color:var(--text);
+}
+.legend .item{display:flex;align-items:center;gap:8px;font-weight:500}
+.legend .swatch{width:36px;height:0;border-top:2px solid var(--text-strong);position:relative;flex:none}
+.legend .swatch::after{
+  content:"";position:absolute;right:-2px;top:-4px;
+  border:4px solid transparent;border-left-color:var(--text-strong);
+}
+.legend .swatch.back{border-top-style:dashed;border-top-color:var(--text-muted)}
+.legend .swatch.back::after{border-left-color:var(--text-muted)}
+.legend .swatch.err{border-top-style:dashed;border-top-color:var(--color-error)}
+.legend .swatch.err::after{border-left-color:var(--color-error)}
+.legend .swatch.ext{border-top-color:var(--text-muted)}
+.legend .swatch.ext::after{border-left-color:var(--text-muted)}
+
+/* canvas tablicy */
+.canvas{
+  position:relative;
+  width:1620px;height:2040px;
+  margin:0 auto;
+}
+
+/* miniatura - klikalne łącze */
+.mini{
+  position:absolute;
+  width:200px;
+  text-decoration:none;
+  color:inherit;
+  z-index:2;
+  transition:transform .18s ease, filter .18s ease;
+}
+.mini:hover{transform:translateY(-4px);filter:drop-shadow(0 18px 24px rgba(60,40,30,.18))}
+.mini:focus-visible{outline:3px solid var(--accent);outline-offset:6px;border-radius:24px}
+
+.frame{
+  width:200px;height:320px;
+  background:var(--surface-1);
+  border:1.5px solid var(--hairline);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  padding:8px;
+  position:relative;
+  overflow:hidden;
+}
+.frame::before{
+  /* notch / dynamic island */
+  content:"";position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  width:46px;height:8px;border-radius:999px;background:var(--surface-3);
+}
+.screen{
+  width:100%;height:100%;
+  border-radius:18px;
+  background:linear-gradient(170deg,var(--surface-2) 0%,#fff 70%);
+  padding:16px 11px 11px;
+  display:flex;flex-direction:column;gap:5px;
+  position:relative;overflow:hidden;
+}
+.screen .tt{
+  font-family:var(--font-display);font-weight:600;font-size:11px;
+  color:var(--text-strong);line-height:1.15;
+  margin-top:4px;
+}
+.screen .ph{
+  height:8px;border-radius:4px;background:var(--surface-3);
+}
+.screen .ph.short{width:55%}
+.screen .ph.med{width:75%}
+.screen .ph.long{width:92%}
+.screen .row{
+  display:flex;gap:4px;
+}
+.screen .chip{
+  font-size:8px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  background:var(--surface-3);color:var(--text-muted);
+  padding:2px 5px;border-radius:999px;
+}
+.screen .card{
+  background:var(--surface-1);border:1px solid var(--hairline);border-radius:6px;
+  padding:5px 6px;display:flex;flex-direction:column;gap:3px;
+}
+.screen .card .line{height:5px;border-radius:3px;background:var(--surface-3)}
+.screen .card .line.k{background:var(--accent);width:30%;opacity:.6}
+.screen .cta{
+  margin-top:auto;
+  background:var(--accent);color:var(--on-accent);
+  font-size:8px;font-weight:700;letter-spacing:.02em;
+  border-radius:7px;padding:5px 6px;text-align:center;
+  line-height:1.1;
+}
+.screen .cta.warn{background:var(--color-warning)}
+.screen .cta.err{background:var(--color-error)}
+.screen .cta.ghost{background:transparent;color:var(--text-strong);border:1px solid var(--hairline)}
+.screen .kbar{display:flex;gap:3px;margin-top:1px}
+.screen .kbar i{
+  width:14px;height:14px;border-radius:50%;display:grid;place-items:center;
+  font-style:normal;font-size:8px;font-weight:700;color:#fff;
+}
+.screen .kbar i.z{background:var(--kid-2)}
+.screen .kbar i.j{background:var(--kid-1)}
+.screen .kbar i.a{background:var(--brand-ink)}
+.screen .alert{
+  background:#fdeee9;border:1px solid #f3c9bd;border-radius:6px;padding:4px 5px;
+  font-size:8px;color:#8f2c1c;font-weight:600;line-height:1.2;
+}
+.screen .ok{
+  background:#e6f6ec;border:1px solid #b9e0c6;border-radius:6px;padding:4px 5px;
+  font-size:8px;color:#0e6b3a;font-weight:600;line-height:1.2;
+}
+.screen .info{
+  background:#e8f1fc;border:1px solid #c2d8f4;border-radius:6px;padding:4px 5px;
+  font-size:8px;color:#1f4f9a;font-weight:600;line-height:1.2;
+}
+.screen .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.screen .grid .cell{height:18px;border-radius:4px;background:var(--surface-3)}
+
+/* caption pod ramką */
+.caption{
+  text-align:center;margin-top:8px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.caption .id{
+  font-family:var(--font-body);font-weight:700;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--accent);
+}
+.caption .nm{
+  font-family:var(--font-display);font-weight:600;font-size:14px;
+  color:var(--text-strong);line-height:1.1;
+}
+
+/* SVG nakładka ze strzałkami */
+svg.flow{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:1;
+}
+.flow .path{
+  fill:none;stroke:var(--text-strong);stroke-width:1.6;
+  opacity:.78;
+}
+.flow .path.err{stroke:var(--color-error);stroke-dasharray:7 5;opacity:.92}
+.flow .path.back{stroke:var(--text-muted);stroke-dasharray:4 4;opacity:.7}
+.flow .path.bi{stroke:var(--text-strong)}
+.flow .label{
+  font-family:var(--font-body);font-weight:600;font-size:11px;
+  fill:var(--text-strong);
+  paint-order:stroke;stroke:var(--paper);stroke-width:4;stroke-linejoin:round;
+}
+.flow .label.err{fill:var(--color-error)}
+.flow .label.back{fill:var(--text-muted)}
+
+/* sekcje grupujące - delikatne etykiety zostre */
+.lane{
+  position:absolute;
+  font-family:var(--font-body);font-weight:700;font-size:10.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);
+  background:var(--surface-2);border:1px dashed var(--hairline);
+  padding:4px 10px;border-radius:999px;
+  z-index:0;
+}
+
+/* lista pełna pod tablicą - "wszystkie przejścia" */
+.fullList{
+  max-width:1620px;margin:48px auto 0;
+  background:var(--surface-1);border:1px solid var(--hairline);border-radius:18px;
+  box-shadow:var(--shadow);
+  padding:28px 32px;
+}
+.fullList h2{
+  font-family:var(--font-display);font-weight:600;font-size:24px;
+  color:var(--text-strong);margin-bottom:6px;
+}
+.fullList p.sub{color:var(--text-muted);font-size:13.5px;margin-bottom:18px;max-width:60ch}
+.fullList .cols{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 32px;font-size:13.5px}
+.fullList .row{
+  display:grid;grid-template-columns:90px 1fr 90px;gap:12px;align-items:center;
+  padding:6px 0;border-bottom:1px dashed var(--hairline);
+}
+.fullList .row:last-child{border-bottom:0}
+.fullList .pill{
+  font-family:var(--font-body);font-weight:700;font-size:11px;
+  background:var(--surface-3);color:var(--text-strong);
+  padding:3px 8px;border-radius:999px;text-align:center;
+}
+.fullList .arrow{color:var(--text-muted);font-size:13px;text-align:center;font-weight:700}
+.fullList .arrow.err{color:var(--color-error)}
+.fullList .arrow.back{color:var(--text-muted)}
+.fullList .lab{color:var(--text);font-weight:500}
+
+@media (max-width: 900px){
+  .head{flex-direction:column;align-items:flex-start}
+  body{padding:16px 8px 60px}
+  .canvas{transform-origin:top left}
+  .fullList .cols{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="titlebox">
+    <h1>PAR · tablica ścieżki</h1>
+    <p>Konto rodzinne, 16 ekranów. Każda miniatura otwiera odpowiednią makietę hi-fi. Strzałki opisują akcję, która prowadzi z jednego ekranu na drugi. <b>Czerwone, przerywane</b> pokazują rozgałęzienia (np. błąd płatności wracający do podsumowania).</p>
+  </div>
+  <div class="legend" aria-label="Legenda strzałek">
+    <div class="item"><span class="swatch"></span>przejście</div>
+    <div class="item"><span class="swatch back"></span>powrót / dwukierunkowe</div>
+    <div class="item"><span class="swatch err"></span>rozgałęzienie błędu</div>
+    <div class="item"><span class="swatch ext"></span>poza grupą PAR</div>
+  </div>
+</header>
+
+<div class="canvas" id="canvas" role="img" aria-label="Tablica ścieżki użytkownika grupy PAR">
+
+  <!-- etykiety torów -->
+  <div class="lane" style="top:780px;left:24px">konto rodziny</div>
+  <div class="lane" style="top:780px;left:660px">moduł zajęć</div>
+  <div class="lane" style="top:780px;left:1260px">moduł zawodów</div>
+  <div class="lane" style="top:1580px;left:24px">pamiątka</div>
+
+  <!-- SVG ze strzałkami -->
+  <svg class="flow" id="flow" viewBox="0 0 1620 2040" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="#241c17"/>
+      </marker>
+      <marker id="arrBack" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="#8a7d70"/>
+      </marker>
+      <marker id="arrErr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="#d6402a"/>
+      </marker>
+      <marker id="arrBackStart" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#8a7d70"/>
+      </marker>
+    </defs>
+  </svg>
+
+</div>
+
+<section class="fullList" aria-labelledby="allFlows">
+  <h2 id="allFlows">Wszystkie przejścia w grupie</h2>
+  <p class="sub">Skrót wszystkich ścieżek - tych pokazanych na tablicy i tych implicit, które domyka spec ekranów.</p>
+  <div class="cols" id="flowsList"></div>
+</section>
+
+<script>
+/* model ekranów: id, slug do pliku, pozycja top-left, krótki tytuł, mock-config */
+const SCREENS = [
+  {id:"PAR-01", nm:"logowanie",   href:"PAR-01_logowanie-konto-rodzinne_hifi.html",  x:700, y:20,  kind:"login"},
+  {id:"PAR-02", nm:"dashboard",   href:"PAR-02_dashboard-rodzica_hifi.html",         x:400, y:420, kind:"dash"},
+  {id:"PAR-10", nm:"płatności",   href:"PAR-10_platnosci-portfel-faktury_hifi.html", x:1000,y:420, kind:"pay"},
+
+  {id:"PAR-03", nm:"profile dzieci",href:"PAR-03_profile-dzieci_hifi.html",          x:100, y:820, kind:"profiles"},
+  {id:"PAR-09", nm:"dokumenty",   href:"PAR-09_dokumenty-dziecka_hifi.html",         x:400, y:820, kind:"docs"},
+  {id:"PAR-04", nm:"zapis na grupę",href:"PAR-04_zapis-na-grupe_hifi.html",          x:700, y:820, kind:"signup"},
+  {id:"PAR-11", nm:"zapis na zawody",href:"PAR-11_zapis-na-zawody_hifi.html",        x:1300,y:820, kind:"race"},
+
+  {id:"PAR-16", nm:"ustawienia",  href:"PAR-16_ustawienia-i-zgody_hifi.html",        x:100, y:1220,kind:"settings"},
+  {id:"PAR-05", nm:"nieobecność", href:"PAR-05_zgloszenie-nieobecnosci_hifi.html",   x:700, y:1220,kind:"absence"},
+  {id:"PAR-12", nm:"lekcja 1:1",  href:"PAR-12_rezerwacja-lekcji-1na1_hifi.html",    x:1000,y:1220,kind:"lesson"},
+  {id:"PAR-14", nm:"wolontariat", href:"PAR-14_wolontariat_hifi.html",               x:1300,y:1220,kind:"vol"},
+
+  {id:"PAR-13", nm:"paszport sportowy",href:"PAR-13_paszport-sportowy_hifi.html",    x:100, y:1620,kind:"passport"},
+  {id:"PAR-06", nm:"odrabianie",  href:"PAR-06_zapis-na-odrabianie_hifi.html",       x:400, y:1620,kind:"makeup"},
+  {id:"PAR-08", nm:"postępy",     href:"PAR-08_postepy-umiejetnosci_hifi.html",      x:700, y:1620,kind:"progress"},
+  {id:"PAR-07", nm:"lista rezerwowa",href:"PAR-07_lista-rezerwowa_hifi.html",        x:1000,y:1620,kind:"waitlist"},
+  {id:"PAR-15", nm:"galeria",     href:"PAR-15_galeria-zdjec_hifi.html",             x:1300,y:1620,kind:"gallery"}
+];
+
+/* mock content każdego ekranu - minimalna sygnatura wizualna */
+function mockHTML(kind){
+  switch(kind){
+    case "login": return `
+      <div class="tt">Jedno konto dla całej rodziny</div>
+      <div class="ph long"></div>
+      <div class="ph med"></div>
+      <div class="cta">Wyślij link bez hasła</div>
+    `;
+    case "dash": return `
+      <div class="kbar"><i class="z">Z</i><i class="j">J</i><i class="a">+</i></div>
+      <div class="tt">Najpilniejsze</div>
+      <div class="alert">⚠ Zaległa płatność · 89 zł</div>
+      <div class="info">⏱ Oferta · 04:58</div>
+      <div class="cta">Zapłać 89 zł</div>
+    `;
+    case "pay": return `
+      <div class="tt">Do zapłaty</div>
+      <div class="card"><div class="line"></div><div class="line k"></div></div>
+      <div class="card"><div class="line"></div><div class="line"></div></div>
+      <div class="ph short"></div>
+      <div class="cta">Zapłać zaznaczone</div>
+    `;
+    case "profiles": return `
+      <div class="row"><div class="kbar"><i class="z">Z</i></div><div class="kbar"><i class="j">J</i></div></div>
+      <div class="tt">Aktywne dziecko: Zofia</div>
+      <div class="ph long"></div>
+      <div class="ph med"></div>
+      <div class="cta">Przełącz na Zofię</div>
+    `;
+    case "docs": return `
+      <div class="tt">Dokumenty Jana</div>
+      <div class="alert">⚠ Karta pływacka · BRAK</div>
+      <div class="card"><div class="line"></div></div>
+      <div class="cta">Wgraj brakujący</div>
+    `;
+    case "signup": return `
+      <div class="tt">Dostępne grupy · poz. 3</div>
+      <div class="card"><div class="line"></div><div class="line"></div></div>
+      <div class="card"><div class="line"></div><div class="line k"></div></div>
+      <div class="cta">Zapisz i zapłać · 150 zł</div>
+    `;
+    case "race": return `
+      <div class="chip">zawody</div>
+      <div class="tt">Bieg Wiosenny · dystans</div>
+      <div class="card"><div class="line"></div><div class="line k"></div></div>
+      <div class="cta">Zapisz na dystans · 39 zł</div>
+    `;
+    case "settings": return `
+      <div class="tt">Ustawienia i zgody</div>
+      <div class="ph long"></div>
+      <div class="ph med"></div>
+      <div class="ph long"></div>
+      <div class="cta ghost">Zapisz zmiany</div>
+    `;
+    case "absence": return `
+      <div class="tt">Nieobecność Zofii</div>
+      <div class="card"><div class="line"></div><div class="line"></div></div>
+      <div class="ok">✓ Uprawnia do odrobienia</div>
+      <div class="cta">Zgłoś nieobecność</div>
+    `;
+    case "lesson": return `
+      <div class="tt">Lekcja 1:1 · Zofia</div>
+      <div class="grid"><div class="cell"></div><div class="cell" style="background:var(--accent);opacity:.6"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+      <div class="cta">Zarezerwuj · 50 zł</div>
+    `;
+    case "vol": return `
+      <div class="chip">wolontariat</div>
+      <div class="tt">Wybór zmiany</div>
+      <div class="card"><div class="line"></div><div class="line"></div></div>
+      <div class="alert">⚠ kolizja ze startem Jana</div>
+      <div class="cta warn">Weź inną zmianę</div>
+    `;
+    case "passport": return `
+      <div class="tt">Paszport Zofii</div>
+      <div class="card"><div class="line k"></div><div class="line"></div><div class="line"></div></div>
+      <div class="ok">3 osiągnięcia</div>
+      <div class="cta">Eksportuj PDF</div>
+    `;
+    case "makeup": return `
+      <div class="tt">Odrabianie · wolne terminy</div>
+      <div class="card"><div class="line"></div><div class="line k"></div></div>
+      <div class="card"><div class="line"></div></div>
+      <div class="cta">Zapisz na termin</div>
+    `;
+    case "progress": return `
+      <div class="tt">Postępy Zofii</div>
+      <div class="ok">★ Gotowa do wyższej grupy</div>
+      <div class="ph long"></div>
+      <div class="ph med"></div>
+      <div class="cta">Zobacz wyższą grupę</div>
+    `;
+    case "waitlist": return `
+      <div class="tt">Lista rezerwowa</div>
+      <div class="info">Pozycja 1 · ⏱ 04:58</div>
+      <div class="ph long"></div>
+      <div class="cta">Potwierdź miejsce</div>
+    `;
+    case "gallery": return `
+      <div class="chip">zdjęcia · #142</div>
+      <div class="grid"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+      <div class="cta">Kup pakiet · 29 zł</div>
+    `;
+    default: return "";
+  }
+}
+
+/* renderuj miniatury */
+const canvas = document.getElementById("canvas");
+SCREENS.forEach(s=>{
+  const a = document.createElement("a");
+  a.className = "mini";
+  a.id = s.id;
+  a.href = s.href;
+  a.style.left = s.x + "px";
+  a.style.top  = s.y + "px";
+  a.setAttribute("aria-label", `${s.id} ${s.nm} - otwórz makietę hi-fi`);
+  a.innerHTML = `
+    <div class="frame"><div class="screen">${mockHTML(s.kind)}</div></div>
+    <div class="caption"><span class="id">${s.id}</span><span class="nm">${s.nm}</span></div>
+  `;
+  canvas.appendChild(a);
+});
+
+/* mapa: id -> meta (do liczenia ścieżek) */
+const SMAP = Object.fromEntries(SCREENS.map(s=>[s.id, s]));
+function center(id){const s=SMAP[id]; return {cx:s.x+100, cy:s.y+160};}
+
+/* połączenia: from, to, label, kind (normal|err|back|bi), side (preferowane wejście/wyjście) */
+const FLOWS = [
+  /* wejście -> hub */
+  {f:"PAR-01", t:"PAR-02", lab:"po zalogowaniu",       kind:"normal"},
+
+  /* hub -> rozgałęzienia */
+  {f:"PAR-02", t:"PAR-03", lab:"przełącz dziecko",     kind:"normal"},
+  {f:"PAR-02", t:"PAR-09", lab:"alert dokumentu",      kind:"normal"},
+  {f:"PAR-02", t:"PAR-04", lab:"zapis na grupę",       kind:"normal"},
+  {f:"PAR-02", t:"PAR-11", lab:"kafelek startu",       kind:"normal"},
+  {f:"PAR-02", t:"PAR-10", lab:"alert płatności",      kind:"normal"},
+  {f:"PAR-10",t:"PAR-02",  lab:"sukces wraca",         kind:"back"},
+
+  /* konto rodziny */
+  {f:"PAR-03",t:"PAR-16",  lab:"ustawienia konta",     kind:"normal"},
+
+  /* moduł zajęć */
+  {f:"PAR-04",t:"PAR-10",  lab:"zapisz i zapłać",      kind:"normal"},
+  {f:"PAR-04",t:"PAR-05",  lab:"zgłoś nieobecność",    kind:"normal"},
+  {f:"PAR-04",t:"PAR-07",  lab:"grupa zapełniona",     kind:"normal"},
+  {f:"PAR-05",t:"PAR-06",  lab:"prawo do odrobienia",  kind:"normal"},
+  {f:"PAR-05",t:"PAR-12",  lab:"lekcja 1:1",           kind:"normal"},
+  {f:"PAR-12",t:"PAR-10",  lab:"zarezerwuj i zapłać",  kind:"normal"},
+  {f:"PAR-12",t:"PAR-08",  lab:"postęp po lekcji",     kind:"back"},
+  {f:"PAR-08",t:"PAR-13",  lab:"eksport paszportu",    kind:"normal"},
+  {f:"PAR-08",t:"PAR-04",  lab:"wyższa grupa",         kind:"back"},
+
+  /* moduł zawodów */
+  {f:"PAR-11",t:"PAR-10",  lab:"zapisz i zapłać",      kind:"normal"},
+  {f:"PAR-11",t:"PAR-14",  lab:"wolontariat",          kind:"normal"},
+  {f:"PAR-11",t:"PAR-15",  lab:"po starcie",           kind:"normal"},
+  {f:"PAR-15",t:"PAR-10",  lab:"zakup zdjęć",          kind:"normal"},
+
+  /* rozgałęzienia błędu płatności - czerwone, wracające */
+  {f:"PAR-10",t:"PAR-04",  lab:"błąd płatności",       kind:"err"},
+  {f:"PAR-10",t:"PAR-11",  lab:"błąd płatności",       kind:"err"}
+];
+
+/* router: zwraca SVG path orthogonal między dwoma miniaturami i punkt etykiety */
+function route(fromId, toId, opts={}){
+  const a = SMAP[fromId], b = SMAP[toId];
+  const acx = a.x+100, acy = a.y+160;
+  const bcx = b.x+100, bcy = b.y+160;
+  const dx = bcx-acx, dy = bcy-acy;
+  /* wybór krawędzi: większa odległość decyduje o orientacji */
+  let p1, p2, dir; // dir = "v"|"h" dominacja
+  if (Math.abs(dx) >= Math.abs(dy)){
+    dir = "h";
+    if (dx > 0){ p1=[acx+100, acy]; p2=[bcx-100, bcy]; }
+    else { p1=[acx-100, acy]; p2=[bcx+100, bcy]; }
+  } else {
+    dir = "v";
+    if (dy > 0){ p1=[acx, acy+160]; p2=[bcx, bcy-160]; }
+    else { p1=[acx, acy-160]; p2=[bcx, bcy+160]; }
+  }
+  /* offset boczny dla rozróżnienia równoległych ścieżek */
+  if (opts.lateral){
+    if (dir==="h"){ p1[1] += opts.lateral; p2[1] += opts.lateral; }
+    else { p1[0] += opts.lateral; p2[0] += opts.lateral; }
+  }
+  /* ścieżka: jeśli na linii, prosto; inaczej kolano */
+  let d, lx, ly;
+  if (p1[0]===p2[0] || p1[1]===p2[1]){
+    d = `M ${p1[0]} ${p1[1]} L ${p2[0]} ${p2[1]}`;
+    lx = (p1[0]+p2[0])/2;
+    ly = (p1[1]+p2[1])/2;
+    if (p1[0]===p2[0]) lx += 8;     // pion: label po prawej
+    else ly -= 6;                    // poziom: label nad
+  } else {
+    if (dir==="h"){
+      const mx = (p1[0]+p2[0])/2;
+      d = `M ${p1[0]} ${p1[1]} L ${mx} ${p1[1]} L ${mx} ${p2[1]} L ${p2[0]} ${p2[1]}`;
+      lx = mx + 6;
+      ly = (p1[1]+p2[1])/2 + 4;
+    } else {
+      const my = (p1[1]+p2[1])/2;
+      d = `M ${p1[0]} ${p1[1]} L ${p1[0]} ${my} L ${p2[0]} ${my} L ${p2[0]} ${p2[1]}`;
+      lx = (p1[0]+p2[0])/2;
+      ly = my - 6;
+    }
+  }
+  return {d, lx, ly};
+}
+
+/* zliczanie równoległych przejść między tą samą parą (różne kierunki) - daje offset */
+const pairCounts = {};
+FLOWS.forEach(f=>{
+  const key = [f.f,f.t].sort().join("|");
+  pairCounts[key] = (pairCounts[key]||0) + 1;
+});
+const pairSeen = {};
+
+/* rysuj wszystkie strzałki */
+const svg = document.getElementById("flow");
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+FLOWS.forEach(f=>{
+  const key = [f.f,f.t].sort().join("|");
+  const seen = (pairSeen[key]||0);
+  pairSeen[key] = seen+1;
+  /* jeśli 2 ścieżki na tej samej parze: jedna +6, druga -6 */
+  let lateral = 0;
+  if (pairCounts[key]>1) lateral = seen===0 ? -8 : 8;
+
+  /* wybrane ścieżki - ręczne korekty offsetów żeby uniknąć kolizji */
+  if (f.f==="PAR-02" && f.t==="PAR-04") lateral = -12;
+  if (f.f==="PAR-02" && f.t==="PAR-11") lateral = 12;
+  if (f.f==="PAR-02" && f.t==="PAR-03") lateral = 0;
+  if (f.f==="PAR-04" && f.t==="PAR-07") lateral = 0;
+
+  const r = route(f.f, f.t, {lateral});
+
+  const path = document.createElementNS(SVG_NS, "path");
+  path.setAttribute("d", r.d);
+  path.setAttribute("class", "path " + (f.kind==="err"?"err":f.kind==="back"?"back":""));
+  const marker = f.kind==="err" ? "arrErr" : f.kind==="back" ? "arrBack" : "arr";
+  path.setAttribute("marker-end", `url(#${marker})`);
+  svg.appendChild(path);
+
+  const text = document.createElementNS(SVG_NS, "text");
+  text.setAttribute("x", r.lx);
+  text.setAttribute("y", r.ly);
+  text.setAttribute("class", "label " + (f.kind==="err"?"err":f.kind==="back"?"back":""));
+  text.setAttribute("text-anchor", "middle");
+  text.textContent = f.lab;
+  svg.appendChild(text);
+});
+
+/* pełna lista przejść pod tablicą - z dodanymi implicit przejściami */
+const ALL = FLOWS.concat([
+  {f:"PAR-03",t:"PAR-09",lab:"dokumenty z profilu",kind:"normal"},
+  {f:"PAR-03",t:"PAR-04",lab:"zapisz dziecko",     kind:"normal"},
+  {f:"PAR-03",t:"PAR-11",lab:"zapisz na zawody",   kind:"normal"},
+  {f:"PAR-09",t:"PAR-04",lab:"dokument uzupełniony", kind:"back"},
+  {f:"PAR-09",t:"PAR-11",lab:"dokument uzupełniony", kind:"back"},
+  {f:"PAR-07",t:"PAR-04",lab:"potwierdź ofertę / alternatywy", kind:"normal"},
+  {f:"PAR-06",t:"PAR-02",lab:"po zapisie wraca do grafiku", kind:"back"},
+  {f:"PAR-02",t:"PAR-05",lab:"skrót nieobecności",  kind:"normal"},
+  {f:"PAR-02",t:"PAR-08",lab:"kafelek postępu",     kind:"normal"},
+  {f:"PAR-02",t:"PAR-15",lab:"galeria",             kind:"normal"},
+  {f:"PAR-14",t:"VOL-01",lab:"akceptacja → wejście wolontariusza", kind:"ext"},
+  {f:"PAR-16",t:"KID-01",lab:"zgoda opiekuna dla małoletniego",     kind:"ext"},
+  {f:"PAR-03",t:"KID-02",lab:"widok nastolatka",    kind:"ext"}
+]);
+
+const listEl = document.getElementById("flowsList");
+ALL.forEach(f=>{
+  const row = document.createElement("div");
+  row.className = "row";
+  const arrowSym = f.kind==="err" ? "↺" : f.kind==="back" ? "⇠" : "→";
+  const arrowCls = f.kind==="err" ? "err" : f.kind==="back" ? "back" : "";
+  row.innerHTML = `
+    <span class="pill">${f.f}</span>
+    <span class="lab">${f.lab}</span>
+    <span class="pill" style="background:${f.kind==="ext"?"var(--surface-2)":"var(--surface-3)"};color:${f.kind==="ext"?"var(--text-muted)":"var(--text-strong)"};">${f.t}</span>
+  `;
+  /* wstaw strzałkę między lab a celem */
+  const labCell = row.children[1];
+  labCell.innerHTML = `<span class="arrow ${arrowCls}">${arrowSym}</span> &nbsp; ${f.lab}`;
+  labCell.style.display = "flex";
+  labCell.style.alignItems = "center";
+  labCell.style.gap = "8px";
+  listEl.appendChild(row);
+});
+</script>
+</body>
+</html>

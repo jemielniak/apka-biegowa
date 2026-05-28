@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCL-08 · Uczestnicy i rodziny</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500..700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#1a1f2e;--accent:#4f46e5;
+  --color-success:#15803d;--color-warning:#b45309;--color-error:#dc2626;--color-info:#2563eb;
+  --paper:#f6f8fc;--surface-1:#ffffff;--surface-2:#eef1f8;--surface-3:#e3e7f1;--hairline:#d5dae6;
+  --text-strong:#1a1f2e;--text:#3b4252;--text-muted:#6b7385;--on-accent:#ffffff;
+  --font-display:"Space Grotesk", system-ui, sans-serif;--font-body:"Source Sans 3", system-ui;
+  --u:4px;--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:12px;--shadow:0 8px 24px -16px rgba(26,31,46,.30);--tap:44px;--rail-w:228px;
+}
+*{box-sizing:border-box;}html,body{margin:0;padding:0;}
+body{font-family:var(--font-body);background:var(--paper);color:var(--text);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;}
+.tnum{font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-family:var(--font-display);color:var(--text-strong);margin:0;font-weight:600;letter-spacing:-.01em;}
+button{font-family:var(--font-body);cursor:pointer;}
+
+.topbar{position:sticky;top:0;z-index:40;background:var(--surface-1);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--s4);padding:var(--s3) var(--s5);min-height:60px;}
+.logo{display:flex;align-items:center;gap:var(--s3);font-family:var(--font-display);font-weight:700;color:var(--text-strong);white-space:nowrap;}
+.logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(150deg,var(--accent),#3730a3);display:grid;place-items:center;color:#fff;font-weight:700;}
+.logo small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--text-muted);}
+.topbar .spacer{flex:1;}
+.ctx{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;}
+.field{display:flex;flex-direction:column;gap:2px;}
+.field label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600;}
+select{font-family:var(--font-body);font-size:14px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:7px 28px 7px 10px;min-height:36px;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7385' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 9px center;}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.acct{width:36px;height:36px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface-3);display:grid;place-items:center;font-weight:600;color:var(--text-strong);font-size:13px;}
+
+.shell{display:flex;min-height:calc(100vh - 60px);}
+.rail{width:var(--rail-w);flex:0 0 var(--rail-w);background:var(--surface-1);border-right:1px solid var(--hairline);padding:var(--s4) var(--s3);position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;}
+.rail .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700;padding:var(--s3) var(--s3) var(--s2);}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:9px;color:var(--text);text-decoration:none;font-weight:500;font-size:14.5px;margin-bottom:2px;min-height:40px;position:relative;}
+.nav-item:hover{background:var(--surface-2);}
+.nav-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600;}
+.nav-item .badge{margin-left:auto;background:var(--color-error);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center;}
+
+.main{flex:1;min-width:0;}
+.wrap{max-width:1280px;margin:0 auto;padding:var(--s6) var(--s6) var(--s10);}
+.demobar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--hairline);border-radius:10px;padding:var(--s2) var(--s3);margin-bottom:var(--s5);}
+.demobar .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:700;}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:8px;padding:2px;}
+.seg button{border:0;background:transparent;color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;min-height:32px;}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);}
+
+.pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s4);margin-bottom:var(--s4);flex-wrap:wrap;}
+.pagehead h1{font-size:24px;}
+.pagehead .sub{color:var(--text-muted);font-size:13.5px;margin-top:2px;}
+.viewseg{display:inline-flex;background:var(--surface-2);border:1px solid var(--hairline);border-radius:9px;padding:2px;}
+.viewseg button{border:0;background:transparent;color:var(--text);padding:8px 14px;border-radius:7px;font-size:13.5px;font-weight:600;min-height:38px;}
+.viewseg button[aria-pressed="true"]{background:var(--surface-1);color:var(--accent);box-shadow:var(--shadow);}
+
+/* duplicate banner */
+.dupbar{display:none;align-items:flex-start;gap:10px;background:color-mix(in srgb,var(--color-warning) 11%,transparent);border:1px solid color-mix(in srgb,var(--color-warning) 38%,transparent);color:var(--color-warning);border-radius:10px;padding:12px 14px;margin-bottom:var(--s4);font-size:13.5px;line-height:1.45;}
+body[data-view="duplicate"] .dupbar{display:flex;}
+.dupbar b{font-weight:700;}
+.dupbar .acts{display:flex;gap:var(--s2);margin-top:8px;}
+.dupbar .acts button{font-size:12.5px;font-weight:700;border-radius:7px;padding:6px 11px;min-height:36px;border:1px solid currentColor;background:transparent;color:inherit;}
+.dupbar .acts button.primary{background:var(--color-warning);color:#fff;border-color:var(--color-warning);}
+
+.toolbar{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s4);flex-wrap:wrap;}
+.search{position:relative;flex:1;min-width:200px;}
+.search input{width:100%;font-family:var(--font-body);font-size:14.5px;color:var(--text-strong);background:var(--surface-1);border:1px solid var(--hairline);border-radius:9px;padding:10px 12px 10px 36px;min-height:var(--tap);}
+.search input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);}
+
+/* offline + no-perms toggles */
+.offline{display:none;align-items:center;gap:10px;background:color-mix(in srgb,var(--color-warning) 12%,transparent);border:1px solid color-mix(in srgb,var(--color-warning) 35%,transparent);color:var(--color-warning);border-radius:10px;padding:10px 14px;margin-bottom:var(--s4);font-size:13.5px;font-weight:600;}
+body[data-net="offline"] .offline{display:flex;}
+
+.panel{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;padding:11px var(--s3);border-bottom:1px solid var(--hairline);background:var(--surface-2);white-space:nowrap;}
+thead th.sortable{cursor:pointer;}
+thead th .arr{opacity:.4;font-size:10px;margin-left:3px;}
+thead th[aria-sort="ascending"] .arr,thead th[aria-sort="descending"] .arr{opacity:1;color:var(--accent);}
+thead th:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+tbody td{padding:12px var(--s3);border-bottom:1px solid var(--surface-2);font-size:14px;vertical-align:middle;}
+tbody tr{cursor:pointer;}
+tbody tr:hover{background:var(--surface-2);}
+tbody tr:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+.cbcol{width:42px;text-align:center;}
+input[type=checkbox]{accent-color:var(--accent);width:17px;height:17px;}
+.child{font-weight:600;color:var(--text-strong);}
+.fam-tag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 11%,transparent);border-radius:5px;padding:1px 6px;margin-left:6px;}
+.dual-tag{font-size:10.5px;font-weight:700;color:var(--color-info);background:color-mix(in srgb,var(--color-info) 11%,transparent);border-radius:5px;padding:1px 6px;margin-left:4px;}
+.lvl{display:inline-flex;align-items:center;justify-content:center;min-width:28px;padding:1px 6px;border-radius:5px;background:var(--surface-3);color:var(--text-strong);font-weight:700;font-size:11.5px;font-family:var(--font-display);}
+.stat{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;}
+.stat .d{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
+.s-ok{color:var(--color-success);} .s-ok .d{background:var(--color-success);}
+.s-warn{color:var(--color-warning);} .s-warn .d{background:var(--color-warning);}
+.s-none{color:var(--text-muted);} .s-none .d{background:transparent;border:1.5px solid var(--text-muted);}
+.s-err{color:var(--color-error);} .s-err .d{background:var(--color-error);}
+.freq{font-variant-numeric:tabular-nums;font-weight:600;color:var(--text-strong);}
+.sensicol{transition:opacity .2s;}
+body[data-perms="limited"] .sensicol{display:none;}
+.permnote{display:none;font-size:12px;color:var(--text-muted);padding:8px var(--s3);background:var(--surface-2);}
+body[data-perms="limited"] .permnote{display:block;}
+
+/* bulk bar */
+.bulk{display:none;align-items:center;gap:var(--s3);padding:11px var(--s4);background:var(--brand-ink);color:#fff;flex-wrap:wrap;}
+.bulk.show{display:flex;}
+.bulk .cnt{font-weight:700;}
+.bulk .grow{flex:1;}
+.bulk button{border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:8px;padding:7px 13px;font-size:13px;font-weight:600;min-height:38px;}
+.bulk button:hover{background:rgba(255,255,255,.12);}
+
+/* empty filter */
+.noresults{display:none;padding:48px var(--s6);text-align:center;color:var(--text-muted);}
+.noresults.show{display:block;}
+.noresults h3{font-size:17px;color:var(--text-strong);margin-bottom:6px;}
+
+/* skeleton / empty / error */
+.sk{background:linear-gradient(90deg,var(--surface-2),var(--surface-3),var(--surface-2));background-size:200% 100%;animation:shimmer 1.4s linear infinite;border-radius:6px;height:14px;}
+@keyframes shimmer{from{background-position:200% 0;}to{background-position:-200% 0;}}
+.sk-row{display:grid;grid-template-columns:30px 1.4fr 1fr 1.2fr .9fr .9fr .8fr;gap:16px;padding:14px var(--s4);border-bottom:1px solid var(--surface-2);}
+.empty-state,.error-state{text-align:center;padding:var(--s8) var(--s5);}
+.empty-state .ill{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);display:grid;place-items:center;margin:0 auto var(--s4);}
+.error-state .ill{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--color-error) 12%,transparent);color:var(--color-error);display:grid;place-items:center;margin:0 auto var(--s4);}
+.empty-state h3,.error-state h3{font-size:18px;margin-bottom:var(--s2);color:var(--text-strong);font-family:var(--font-display);}
+.empty-state p,.error-state p{color:var(--text-muted);max-width:480px;margin:0 auto var(--s4);font-size:14px;}
+
+.actionbar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s4);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;font-weight:600;font-size:14px;min-height:var(--tap);padding:0 16px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);}
+.btn:hover{background:var(--surface-2);}.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 16px -8px var(--accent);font-size:14.5px;padding:0 20px;}
+.btn-primary:hover{background:#4338ca;}.btn-sm{min-height:40px;font-size:13.5px;}
+.btn-danger{color:var(--color-error);border-color:color-mix(in srgb,var(--color-error) 45%,transparent);background:transparent;}
+.btn-danger:hover{background:color-mix(in srgb,var(--color-error) 8%,transparent);}
+.actionbar .grow{flex:1;}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--brand-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);transition:opacity .25s,transform .25s;z-index:80;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}.toast.ok{background:var(--color-success);}.toast.warn{background:var(--color-warning);}
+
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+@media (max-width:1080px){:root{--rail-w:64px;}.nav-item span.t{display:none;}.nav-item{justify-content:center;}.rail .grp{display:none;}.nav-item .badge{position:absolute;margin:0;transform:translate(14px,-12px);}}
+@media (max-width:760px){thead th.col-freq,tbody td.col-freq{display:none;}}
+@media (max-width:640px){.rail{display:none;}.ctx .field.hide-sm{display:none;}thead th.col-parent,tbody td.col-parent{display:none;}}
+</style>
+</head>
+<body data-view="filled" data-net="online" data-perms="full">
+
+<header class="topbar">
+  <div class="logo"><span class="mark">D</span><span data-i18n="brand.name">Klub Pływacki Delfin<small data-i18n="brand.role">Panel organizatora</small></span></div>
+  <div class="spacer"></div>
+  <div class="ctx">
+    <div class="field"><label for="mode" data-i18n="ctx.mode">Tryb</label><select id="mode"><option data-i18n="mode.classes">Zajęcia</option><option data-i18n="mode.events">Zawody</option></select></div>
+    <div class="field hide-sm"><label for="facility" data-i18n="ctx.facility">Placówka</label><select id="facility"><option>Klub Pływacki Delfin</option><option>Szkoła Pływania Nurek</option></select></div>
+    <div class="field"><label for="lang" data-i18n="ctx.lang">Język</label><select id="lang"><option value="pl-PL">Polski</option><option value="en-GB">English</option></select></div>
+    <div class="acct">JN</div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Nawigacja panelu">
+    <div class="grp" data-i18n="nav.section">Zajęcia</div>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="t" data-i18n="nav.dashboard">Pulpit</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="18" cy="9" r="2"/></svg><span class="t" data-i18n="nav.groups">Grupy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span class="t" data-i18n="nav.schedule">Grafik</span></a>
+    <a class="nav-item active" href="#" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="t" data-i18n="nav.participants">Uczestnicy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span class="t" data-i18n="nav.payments">Płatności</span><span class="badge tnum">4</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-3"/></svg><span class="t" data-i18n="nav.reports">Raporty</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span class="t" data-i18n="nav.settings">Ustawienia</span></a>
+  </nav>
+
+  <main class="main">
+    <div class="wrap">
+      <div class="demobar" role="group" aria-label="Podgląd stanu makiety">
+        <span class="lbl" data-i18n="demo.label">Podgląd stanu</span>
+        <div class="seg">
+          <button id="st-filled" aria-pressed="true" data-i18n="demo.filled">Wypełniony</button>
+          <button id="st-loading" aria-pressed="false" data-i18n="demo.loading">Ładowanie</button>
+          <button id="st-empty" aria-pressed="false" data-i18n="demo.empty">Brak uczestników</button>
+          <button id="st-error" aria-pressed="false" data-i18n="demo.error">Błąd ładowania</button>
+          <button id="st-dup" aria-pressed="false" data-i18n="demo.dup">Duplikat konta</button>
+        </div>
+        <span style="margin-left:auto"></span>
+        <span class="lbl" data-i18n="demo.perms">Uprawnienia</span>
+        <div class="seg">
+          <button id="pm-full" aria-pressed="true" data-i18n="perms.full">Pełne</button>
+          <button id="pm-limited" aria-pressed="false" data-i18n="perms.limited">Ograniczone</button>
+        </div>
+      </div>
+
+      <div class="pagehead">
+        <div>
+          <h1 data-i18n="page.title">Uczestnicy i rodziny</h1>
+          <div class="sub" data-i18n="page.sub">Dane zbiorcze i statusy. Dane wrażliwe dziecka — dopiero w karcie uczestnika.</div>
+        </div>
+        <div class="viewseg" role="group" aria-label="Widok">
+          <button id="v-children" aria-pressed="true" data-i18n="view.children">Dzieci</button>
+          <button id="v-families" aria-pressed="false" data-i18n="view.families">Rodziny</button>
+        </div>
+      </div>
+
+      <div class="dupbar" role="alert">
+        <span>⚠</span>
+        <span>
+          <span data-i18n="dup.a">Wykryto możliwy duplikat konta rodzica.</span>
+          <b>J. Nowak</b> <span data-i18n="dup.email">(jan.nowak@email.pl)</span> <span data-i18n="dup.and">i</span> <b>Jan Nowak</b> <span data-i18n="dup.phone">(ten sam numer telefonu)</span> <span data-i18n="dup.b">mogą być tą samą osobą. Scalenie połączy rodzeństwo pod jednym kontem i wspólnym portfelem.</span>
+          <span class="acts">
+            <button class="primary" id="dupMerge" data-i18n="dup.merge">Scal konta</button>
+            <button id="dupKeep" data-i18n="dup.keep">To różne osoby</button>
+          </span>
+        </span>
+      </div>
+
+      <div class="offline" role="status">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M16.7 11.7A6 6 0 0 0 8 8M5 12a8 8 0 0 1 2-2M12 20h.01"/></svg>
+        <span data-i18n="offline.msg">Ostatnio wczytana lista w trybie odczytu. Akcje wstrzymane do powrotu sieci.</span>
+      </div>
+
+      <div class="toolbar">
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <input type="text" id="search" data-i18n-ph="search.ph" placeholder="Szukaj dziecka lub rodzica…" aria-label="Szukaj">
+        </div>
+        <select id="fGroup" aria-label="Grupa"><option value="" data-i18n="filter.allgroups">Wszystkie grupy</option><option>Delfiny</option><option>Żabki</option><option>Rekiny</option></select>
+        <select id="fPay" aria-label="Płatność"><option value="" data-i18n="filter.allpay">Płatność: wszystkie</option><option value="ok" data-i18n="s.ok">ok</option><option value="warn" data-i18n="s.overdue">zaległość</option></select>
+        <select id="fDoc" aria-label="Dokumenty"><option value="" data-i18n="filter.alldoc">Dokumenty: wszystkie</option><option value="ok" data-i18n="s.ok">ok</option><option value="warn" data-i18n="s.expiring">wygasają</option><option value="none" data-i18n="s.missing">brak</option></select>
+      </div>
+
+      <div class="panel">
+        <div class="permnote" data-i18n="perms.note">Masz ograniczone uprawnienia — kolumny wrażliwe (płatności, dokumenty) są ukryte.</div>
+        <div style="overflow-x:auto" id="tableWrap">
+        <table id="tbl">
+          <thead><tr>
+            <th class="cbcol"><input type="checkbox" id="selAll" aria-label="Zaznacz wszystkich"></th>
+            <th class="sortable" data-col="child" tabindex="0" aria-sort="none" data-i18n="col.child">Dziecko <span class="arr">↕</span></th>
+            <th class="sortable" data-col="group" tabindex="0" aria-sort="none" data-i18n="col.group">Grupa <span class="arr">↕</span></th>
+            <th class="col-parent" data-i18n="col.parent">Rodzic / konto</th>
+            <th class="sensicol" data-i18n="col.pay">Płatność</th>
+            <th class="sensicol" data-i18n="col.doc">Dokumenty</th>
+            <th class="sortable col-freq" data-col="freq" tabindex="0" aria-sort="none" data-i18n="col.freq">Frekwencja <span class="arr">↕</span></th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        </div>
+
+        <!-- LOADING -->
+        <div id="state-loading" class="hidden" aria-live="polite" aria-busy="true">
+          <div class="sk-row"><div class="sk" style="width:20px"></div><div class="sk" style="width:75%"></div><div class="sk" style="width:55%"></div><div class="sk" style="width:65%"></div><div class="sk" style="width:50%"></div><div class="sk" style="width:48%"></div><div class="sk" style="width:55%"></div></div>
+          <div class="sk-row"><div class="sk" style="width:20px"></div><div class="sk" style="width:65%"></div><div class="sk" style="width:60%"></div><div class="sk" style="width:70%"></div><div class="sk" style="width:55%"></div><div class="sk" style="width:50%"></div><div class="sk" style="width:60%"></div></div>
+          <div class="sk-row"><div class="sk" style="width:20px"></div><div class="sk" style="width:80%"></div><div class="sk" style="width:48%"></div><div class="sk" style="width:62%"></div><div class="sk" style="width:50%"></div><div class="sk" style="width:55%"></div><div class="sk" style="width:50%"></div></div>
+          <div class="sk-row"><div class="sk" style="width:20px"></div><div class="sk" style="width:70%"></div><div class="sk" style="width:55%"></div><div class="sk" style="width:60%"></div><div class="sk" style="width:53%"></div><div class="sk" style="width:50%"></div><div class="sk" style="width:58%"></div></div>
+        </div>
+
+        <!-- EMPTY: facility has no participants at all -->
+        <div id="state-empty-all" class="empty-state hidden">
+          <div class="ill"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+          <h3 data-i18n="emptyAll.title">W tej placówce nie ma jeszcze uczestników</h3>
+          <p data-i18n="emptyAll.body">Lista uczestników wypełni się automatycznie po pierwszych zapisach przez rodziców. Możesz też dodać dziecko ręcznie albo zaimportować listę z poprzedniego semestru.</p>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-primary" id="addParticipant" data-i18n="emptyAll.add">Dodaj uczestnika ręcznie</button>
+            <button class="btn" id="importParticipants" data-i18n="emptyAll.import">Importuj listę</button>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        <div id="state-error" class="error-state hidden" role="alert">
+          <div class="ill"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 22h20L12 2z"/><path d="M12 9v6M12 18h.01"/></svg></div>
+          <h3 data-i18n="error.title">Nie udało się załadować listy uczestników</h3>
+          <p data-i18n="error.body">Połączenie z serwerem zostało przerwane. Sprawdź sieć i spróbuj ponownie. Jeśli błąd się powtórzy, skontaktuj się z administratorem placówki.</p>
+          <button class="btn btn-primary" id="retryBtn" data-i18n="error.retry">Spróbuj ponownie</button>
+        </div>
+
+        <div class="bulk" id="bulk" role="status">
+          <span class="cnt" id="bulkCnt"></span>
+          <span class="grow"></span>
+          <button data-act="export" data-i18n="bulk.export">Eksport do arkusza</button>
+          <button data-act="message" data-i18n="bulk.message">Komunikat do segmentu</button>
+          <button data-act="move" data-i18n="bulk.move">Przenieś do grupy</button>
+        </div>
+        <div class="noresults" id="noresults">
+          <h3 data-i18n="empty.title">Żadne dziecko nie spełnia kryteriów</h3>
+          <p data-i18n="empty.body">Zmień lub wyczyść filtry, żeby zobaczyć więcej rekordów.</p>
+          <button class="btn btn-sm" id="clearFilters" data-i18n="empty.clear">Wyczyść filtry</button>
+        </div>
+      </div>
+
+      <div class="actionbar">
+        <button class="btn btn-primary" id="openCard" data-i18n="action.open">Otwórz kartę uczestnika</button>
+        <span class="grow"></span>
+        <button class="btn btn-sm" data-act="export" data-i18n="action.export">Eksport zaznaczenia</button>
+        <button class="btn btn-sm" data-act="message" data-i18n="action.message">Komunikat do segmentu</button>
+        <button class="btn btn-sm" data-act="move" data-i18n="action.move">Przenieś do grupy</button>
+        <button class="btn btn-danger btn-sm" id="unenroll" data-i18n="action.unenroll">Wypisz z grupy</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "brand.name":"Klub Pływacki Delfin","brand.role":"Panel organizatora",
+  "ctx.mode":"Tryb","ctx.facility":"Placówka","ctx.lang":"Język","mode.classes":"Zajęcia","mode.events":"Zawody",
+  "nav.section":"Zajęcia","nav.dashboard":"Pulpit","nav.groups":"Grupy","nav.schedule":"Grafik","nav.participants":"Uczestnicy","nav.payments":"Płatności","nav.reports":"Raporty","nav.settings":"Ustawienia",
+  "demo.label":"Podgląd stanu","demo.filled":"Wypełniony","demo.loading":"Ładowanie","demo.empty":"Brak uczestników","demo.error":"Błąd ładowania","demo.dup":"Duplikat konta","demo.perms":"Uprawnienia","perms.full":"Pełne","perms.limited":"Ograniczone",
+  "emptyAll.title":"W tej placówce nie ma jeszcze uczestników","emptyAll.body":"Lista uczestników wypełni się automatycznie po pierwszych zapisach przez rodziców. Możesz też dodać dziecko ręcznie albo zaimportować listę z poprzedniego semestru.","emptyAll.add":"Dodaj uczestnika ręcznie","emptyAll.import":"Importuj listę",
+  "error.title":"Nie udało się załadować listy uczestników","error.body":"Połączenie z serwerem zostało przerwane. Sprawdź sieć i spróbuj ponownie. Jeśli błąd się powtórzy, skontaktuj się z administratorem placówki.","error.retry":"Spróbuj ponownie",
+  "page.title":"Uczestnicy i rodziny","page.sub":"Dane zbiorcze i statusy. Dane wrażliwe dziecka — dopiero w karcie uczestnika.",
+  "view.children":"Dzieci","view.families":"Rodziny",
+  "dup.a":"Wykryto możliwy duplikat konta rodzica.","dup.email":"(jan.nowak@email.pl)","dup.and":"i","dup.phone":"(ten sam numer telefonu)","dup.b":"mogą być tą samą osobą. Scalenie połączy rodzeństwo pod jednym kontem i wspólnym portfelem.","dup.merge":"Scal konta","dup.keep":"To różne osoby",
+  "offline.msg":"Ostatnio wczytana lista w trybie odczytu. Akcje wstrzymane do powrotu sieci.",
+  "search.ph":"Szukaj dziecka lub rodzica…","filter.allgroups":"Wszystkie grupy","filter.allpay":"Płatność: wszystkie","filter.alldoc":"Dokumenty: wszystkie",
+  "col.child":"Dziecko","col.group":"Grupa","col.parent":"Rodzic / konto","col.pay":"Płatność","col.doc":"Dokumenty","col.freq":"Frekwencja",
+  "perms.note":"Masz ograniczone uprawnienia — kolumny wrażliwe (płatności, dokumenty) są ukryte.",
+  "s.ok":"ok","s.overdue":"zaległość","s.expiring":"wygasają","s.expired":"wygasł","s.missing":"brak",
+  "bulk.export":"Eksport do arkusza","bulk.message":"Komunikat do segmentu","bulk.move":"Przenieś do grupy","bulk.selected":"Zaznaczono",
+  "empty.title":"Żadne dziecko nie spełnia kryteriów","empty.body":"Zmień lub wyczyść filtry, żeby zobaczyć więcej rekordów.","empty.clear":"Wyczyść filtry",
+  "action.open":"Otwórz kartę uczestnika","action.export":"Eksport zaznaczenia","action.message":"Komunikat do segmentu","action.move":"Przenieś do grupy","action.unenroll":"Wypisz z grupy",
+  "dual":"zawody+zajęcia","fam":"konto Nowak",
+  "toast.merged":"Scalono konta — rodzeństwo pod jednym portfelem","toast.kept":"Zostawiono jako osobne konta","toast.export":"Wyeksportowano zaznaczenie do arkusza (cel i zakres odnotowane)","toast.message":"Otwarto komunikat do segmentu (OCL-15)","toast.move":"Przeniesiono do grupy — sprawdź zgodność poziomu","toast.movewarn":"Uwaga: docelowa grupa ma inny poziom niż dziecko","toast.open":"Otwarto kartę uczestnika (OCL-09): ","toast.unenroll":"Wypisano z grupy — wybierz, czy zachować historię i paszport","toast.skipped":"Akcja masowa: pominięto 1 rekord bez uprawnień","toast.cleared":"Wyczyszczono filtry"
+ },
+ "en-GB":{
+  "brand.name":"Delfin Swim Club","brand.role":"Organiser panel",
+  "ctx.mode":"Mode","ctx.facility":"Facility","ctx.lang":"Language","mode.classes":"Classes","mode.events":"Events",
+  "nav.section":"Classes","nav.dashboard":"Dashboard","nav.groups":"Groups","nav.schedule":"Schedule","nav.participants":"Participants","nav.payments":"Payments","nav.reports":"Reports","nav.settings":"Settings",
+  "demo.label":"State preview","demo.filled":"Populated","demo.loading":"Loading","demo.empty":"No participants","demo.error":"Load error","demo.dup":"Duplicate account","demo.perms":"Permissions","perms.full":"Full","perms.limited":"Limited",
+  "emptyAll.title":"No participants in this facility yet","emptyAll.body":"The roster fills automatically after the first parent enrolments. You can also add a child manually or import a list from the previous term.","emptyAll.add":"Add a participant manually","emptyAll.import":"Import list",
+  "error.title":"Could not load the participant list","error.body":"Server connection dropped. Check your network and try again. If the error persists, contact the facility administrator.","error.retry":"Try again",
+  "page.title":"Participants and families","page.sub":"Aggregated data and statuses. Sensitive child data — only inside the participant card.",
+  "view.children":"Children","view.families":"Families",
+  "dup.a":"A possible duplicate parent account was detected.","dup.email":"(jan.nowak@email.pl)","dup.and":"and","dup.phone":"(same phone number)","dup.b":"may be the same person. Merging links the siblings under one account and a shared wallet.","dup.merge":"Merge accounts","dup.keep":"Different people",
+  "offline.msg":"Last loaded list in read-only mode. Actions paused until the network returns.",
+  "search.ph":"Search a child or parent…","filter.allgroups":"All groups","filter.allpay":"Payment: all","filter.alldoc":"Documents: all",
+  "col.child":"Child","col.group":"Group","col.parent":"Parent / account","col.pay":"Payment","col.doc":"Documents","col.freq":"Attendance",
+  "perms.note":"You have limited permissions — sensitive columns (payments, documents) are hidden.",
+  "s.ok":"ok","s.overdue":"overdue","s.expiring":"expiring","s.expired":"expired","s.missing":"missing",
+  "bulk.export":"Export to sheet","bulk.message":"Message a segment","bulk.move":"Move to group","bulk.selected":"Selected",
+  "empty.title":"No child matches the criteria","empty.body":"Change or clear the filters to see more records.","empty.clear":"Clear filters",
+  "action.open":"Open participant card","action.export":"Export selection","action.message":"Message a segment","action.move":"Move to group","action.unenroll":"Unenrol from group",
+  "dual":"events+classes","fam":"Nowak account",
+  "toast.merged":"Accounts merged — siblings under one wallet","toast.kept":"Kept as separate accounts","toast.export":"Selection exported to a sheet (purpose and scope logged)","toast.message":"Segment message opened (OCL-15)","toast.move":"Moved to group — check level match","toast.movewarn":"Note: target group has a different level than the child","toast.open":"Participant card opened (OCL-09): ","toast.unenroll":"Unenrolled — choose whether to keep history and passport","toast.skipped":"Bulk action: 1 record skipped, no permission","toast.cleared":"Filters cleared"
+ }
+};
+const FALLBACK="en-GB",FACILITY_REGION="pl-PL";let lang="pl-PL";
+const RTL=new Set(["ar","he","fa","ur"]);
+function t(k){const d=I18N[lang]||{};if(k in d)return d[k];const f=I18N[FALLBACK]||{};return (k in f)?f[k]:k;}
+
+// children: family groups siblings via famId + shared wallet
+const KIDS=[
+ {id:1,child:"Anna Nowak",group:"Delfiny",lvl:"P2",parent:"J. Nowak",famId:"nowak",pay:"ok",doc:"ok",freq:92,dual:false,canBulk:true},
+ {id:2,child:"Piotr Nowak",group:"Żabki",lvl:"P1",parent:"J. Nowak",famId:"nowak",pay:"warn",doc:"none",freq:70,dual:true,canBulk:true},
+ {id:3,child:"Maja Wójcik",group:"Rekiny",lvl:"P3",parent:"A. Wójcik",famId:"wojcik",pay:"ok",doc:"warn",freq:85,dual:false,canBulk:false},
+ {id:4,child:"Zofia Kowalska",group:"Delfiny",lvl:"P2",parent:"M. Kowalska",famId:"kowal",pay:"ok",doc:"ok",freq:96,dual:false,canBulk:true}
+];
+let view="children",sortCol=null,sortDir=1,selected=new Set();
+
+function statHtml(kind,labelKey){
+  const map={ok:"s-ok",warn:"s-warn",none:"s-none",err:"s-err",expired:"s-err"};
+  return `<span class="stat ${map[kind]}"><span class="d"></span>${t(labelKey)}</span>`;
+}
+function payStat(p){return statHtml(p,p==="ok"?"s.ok":"s.overdue");}
+function docStat(d){return statHtml(d,d==="ok"?"s.ok":(d==="warn"?"s.expiring":"s.missing"));}
+
+function rows(){
+  const q=(document.getElementById("search").value||"").toLowerCase();
+  const fg=document.getElementById("fGroup").value;
+  const fp=document.getElementById("fPay").value;
+  const fd=document.getElementById("fDoc").value;
+  let r=KIDS.filter(k=>(k.child.toLowerCase().includes(q)||k.parent.toLowerCase().includes(q))
+    && (!fg||k.group===fg) && (!fp||k.pay===fp) && (!fd||k.doc===fd));
+  if(sortCol){
+    r=[...r].sort((a,b)=>{let va=sortCol==="freq"?a.freq:(""+a[sortCol]),vb=sortCol==="freq"?b.freq:(""+b[sortCol]);return va<vb?-1*sortDir:va>vb?sortDir:0;});
+  }
+  return r;
+}
+
+function render(){
+  const r=rows();
+  const body=document.getElementById("tbody");
+  body.innerHTML=r.map(k=>{
+    const fam=(view==="families"||k.famId==="nowak")?`<span class="fam-tag">${t("fam")}</span>`:"";
+    const dual=k.dual?`<span class="dual-tag">${t("dual")}</span>`:"";
+    return `<tr data-id="${k.id}" tabindex="0">
+      <td class="cbcol"><input type="checkbox" data-cb="${k.id}" ${selected.has(k.id)?'checked':''} aria-label="Zaznacz ${k.child}"></td>
+      <td><span class="child">${k.child}</span>${k.famId==="nowak"?fam:""}${dual}</td>
+      <td><span class="lvl">${k.lvl}</span> ${k.group}</td>
+      <td class="col-parent">${k.parent}</td>
+      <td class="sensicol">${payStat(k.pay)}</td>
+      <td class="sensicol">${docStat(k.doc)}</td>
+      <td class="col-freq freq tnum">${k.freq}%</td></tr>`;
+  }).join("");
+  document.getElementById("noresults").classList.toggle("show",r.length===0);
+  body.querySelectorAll("tr").forEach(tr=>{
+    tr.addEventListener("click",e=>{ if(e.target.closest("input"))return; openCard(+tr.dataset.id); });
+    tr.addEventListener("keydown",e=>{if(e.key==="Enter"){openCard(+tr.dataset.id);}});
+  });
+  body.querySelectorAll("[data-cb]").forEach(cb=>cb.addEventListener("change",e=>{
+    const id=+cb.dataset.cb; if(e.target.checked)selected.add(id); else selected.delete(id); syncBulk();
+  }));
+  syncBulk();
+}
+
+function syncBulk(){
+  const bulk=document.getElementById("bulk");
+  bulk.classList.toggle("show",selected.size>0);
+  document.getElementById("bulkCnt").textContent=t("bulk.selected")+": "+selected.size;
+}
+
+function openCard(id){const k=KIDS.find(x=>x.id===id);toast(t("toast.open")+(k?k.child:""));}
+
+function applyLang(){
+  document.documentElement.lang=lang.split("-")[0];
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(n=>{
+    const k=n.getAttribute("data-i18n");
+    if(k==="brand.name"){n.firstChild.textContent=t(k);return;}
+    if(n.classList.contains("sortable")){n.childNodes[0].textContent=t(k)+" ";return;}
+    n.textContent=t(k);
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach(n=>n.setAttribute("placeholder",t(n.getAttribute("data-i18n-ph"))));
+  render();
+}
+function toast(msg,kind){const el=document.getElementById("toast");el.textContent=msg;el.className="toast show"+(kind?" "+kind:"");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2700);}
+
+// filters
+["search","fGroup","fPay","fDoc"].forEach(id=>document.getElementById(id).addEventListener("input",render));
+document.getElementById("fGroup").addEventListener("change",render);
+document.getElementById("clearFilters").addEventListener("click",()=>{document.getElementById("search").value="";["fGroup","fPay","fDoc"].forEach(id=>document.getElementById(id).value="");render();toast(t("toast.cleared"));});
+document.getElementById("lang").addEventListener("change",e=>{lang=e.target.value;applyLang();});
+
+document.getElementById("selAll").addEventListener("change",e=>{
+  if(e.target.checked)rows().forEach(k=>selected.add(k.id)); else selected.clear(); render();
+});
+document.querySelectorAll("th.sortable").forEach(th=>{
+  const apply=()=>{const c=th.dataset.col;if(sortCol===c)sortDir*=-1;else{sortCol=c;sortDir=1;}
+    document.querySelectorAll("th.sortable").forEach(o=>o.setAttribute("aria-sort","none"));
+    th.setAttribute("aria-sort",sortDir===1?"ascending":"descending");render();};
+  th.addEventListener("click",apply);
+  th.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();apply();}});
+});
+
+document.getElementById("v-children").addEventListener("click",()=>setVw("children"));
+document.getElementById("v-families").addEventListener("click",()=>setVw("families"));
+function setVw(v){view=v;document.getElementById("v-children").setAttribute("aria-pressed",v==="children");document.getElementById("v-families").setAttribute("aria-pressed",v==="families");render();}
+
+document.getElementById("openCard").addEventListener("click",()=>{const id=[...selected][0]||1;openCard(id);});
+document.getElementById("unenroll").addEventListener("click",()=>toast(t("toast.unenroll"),"warn"));
+// bulk + secondary actions; skip records without permission
+function doAction(a){
+  if(a==="export")toast(t("toast.export"),"ok");
+  else if(a==="message")toast(t("toast.message"));
+  else if(a==="move"){
+    // if any selected can't be bulk-acted, explain skip
+    const skipped=[...selected].some(id=>{const k=KIDS.find(x=>x.id===id);return k&&!k.canBulk;});
+    if(skipped){toast(t("toast.skipped"),"warn");}else toast(t("toast.move"),"ok");
+  }
+}
+document.querySelectorAll('[data-act]').forEach(b=>b.addEventListener("click",()=>doAction(b.dataset.act)));
+
+// duplicate banner actions
+// state buttons (filled / loading / empty / error / dup)
+const stateBtns = ["st-filled","st-loading","st-empty","st-error","st-dup"];
+stateBtns.forEach(id=>{
+  const btn = document.getElementById(id);
+  if(!btn) return;
+  btn.addEventListener("click",()=>setView(id.slice(3)));
+});
+
+function setView(v){
+  document.body.dataset.view = (v==="dup") ? "duplicate" : v;
+  stateBtns.forEach(id=>document.getElementById(id).setAttribute("aria-pressed", id==="st-"+v));
+  const wrap = document.getElementById("tableWrap");
+  const skel = document.getElementById("state-loading");
+  const emptyAll = document.getElementById("state-empty-all");
+  const err = document.getElementById("state-error");
+  const bulk = document.getElementById("bulk");
+  const noresults = document.getElementById("noresults");
+  [skel,emptyAll,err].forEach(el=>el.classList.add("hidden"));
+  if(v==="filled" || v==="dup"){
+    wrap.style.display = "";
+    bulk.style.display = "";
+    if(v==="dup"){ document.getElementById("st-filled").setAttribute("aria-pressed",false); }
+    else { document.getElementById("st-dup").setAttribute("aria-pressed",false); }
+  } else if(v==="loading"){
+    wrap.style.display = "none"; skel.classList.remove("hidden");
+    bulk.style.display = "none"; noresults.classList.remove("show");
+  } else if(v==="empty"){
+    wrap.style.display = "none"; emptyAll.classList.remove("hidden");
+    bulk.style.display = "none"; noresults.classList.remove("show");
+  } else if(v==="error"){
+    wrap.style.display = "none"; err.classList.remove("hidden");
+    bulk.style.display = "none"; noresults.classList.remove("show");
+  }
+}
+
+document.getElementById("retryBtn").addEventListener("click",()=>{
+  setView("loading"); setTimeout(()=>setView("filled"), 900);
+});
+document.getElementById("addParticipant").addEventListener("click",()=>{ setView("filled"); toast(t("toast.merged")||"Dodano uczestnika", "ok"); });
+document.getElementById("importParticipants").addEventListener("click",()=>{ setView("loading"); setTimeout(()=>setView("filled"), 700); });
+
+document.getElementById("dupMerge").addEventListener("click",()=>{document.body.dataset.view="filled";document.getElementById("st-filled").setAttribute("aria-pressed",true);document.getElementById("st-dup").setAttribute("aria-pressed",false);toast(t("toast.merged"),"ok");});
+document.getElementById("dupKeep").addEventListener("click",()=>{document.body.dataset.view="filled";document.getElementById("st-filled").setAttribute("aria-pressed",true);document.getElementById("st-dup").setAttribute("aria-pressed",false);toast(t("toast.kept"));});
+
+// state + permission toggles
+// state handlers moved above (setView)
+document.getElementById("pm-full").addEventListener("click",()=>{document.body.dataset.perms="full";document.getElementById("pm-full").setAttribute("aria-pressed",true);document.getElementById("pm-limited").setAttribute("aria-pressed",false);});
+document.getElementById("pm-limited").addEventListener("click",()=>{document.body.dataset.perms="limited";document.getElementById("pm-limited").setAttribute("aria-pressed",true);document.getElementById("pm-full").setAttribute("aria-pressed",false);});
+
+// init
+applyLang();
+</script>
+</body>
+</html>

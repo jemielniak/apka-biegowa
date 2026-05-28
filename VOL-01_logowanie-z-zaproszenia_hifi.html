@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VOL-01 · Logowanie z zaproszenia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600..800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#11161c;
+  --accent:#0b69d4;
+
+  --color-success:#0a7d35;
+  --color-warning:#b45309;
+  --color-error:#c4181f;
+  --color-info:#0b69d4;
+
+  --paper:#f1f4f8;
+  --surface-1:#ffffff;
+  --surface-2:#e9eef4;
+  --surface-3:#dbe3ec;
+  --hairline:#c5cfdb;
+  --text-strong:#11161c;
+  --text:#33404e;
+  --text-muted:#5d6b7c;
+  --on-accent:#ffffff;
+  --tint-success-bg:#ecfdf3;
+  --tint-success-border:#a6e0bd;
+  --tint-success-text:#075c28;
+  --tint-warning-bg:#fff7ed;
+  --tint-warning-border:#f2c79a;
+  --tint-warning-text:#7c3d05;
+  --tint-error-bg:#fdeaea;
+  --tint-error-border:#f0b4b4;
+  --tint-error-text:#8a1318;
+  --tint-info-bg:#eaf2fc;
+  --tint-info-border:#b8d3f3;
+  --tint-info-text:#0a4a96;
+
+  --hivis:#f3b50a;
+  --hivis-rgb:243,181,10;
+
+  --verdict-ok:#0a7d35;
+  --verdict-no:#c4181f;
+  --status-paid:#0a7d35;
+  --status-unpaid:#b45309;
+  --status-check:#5d6b7c;
+
+  --font-display:"Archivo", system-ui, sans-serif;
+  --font-body:"IBM Plex Sans", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:14px;
+  --shadow:0 10px 26px -14px rgba(17,22,28,.34);
+  --tap:56px;
+  --tap-primary:64px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font-body);
+  color:var(--text);
+  background:
+    repeating-linear-gradient(135deg, #e6ebf2 0 14px, #eaeef4 14px 28px);
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  justify-content:center;
+  min-height:100vh;
+}
+
+/* przełącznik stanów makiety (poza interfejsem produktu) */
+.statebar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;gap:var(--s2);align-items:center;justify-content:center;
+  padding:var(--s2);
+  background:var(--brand-ink);color:#fff;
+  font:600 12px/1 var(--font-body);
+}
+.statebar span{opacity:.7;letter-spacing:.04em;text-transform:uppercase}
+.statebar button{
+  font:600 12px/1 var(--font-body);
+  color:#fff;background:transparent;border:1px solid rgba(255,255,255,.35);
+  border-radius:999px;padding:7px 12px;cursor:pointer;
+}
+.statebar button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+
+.shell{
+  width:100%;max-width:480px;min-height:100vh;
+  background:var(--paper);
+  margin-top:36px;
+  display:flex;flex-direction:column;
+  box-shadow:0 0 40px -10px rgba(17,22,28,.25);
+}
+
+/* hi-vis pasek tożsamości stanowiska */
+.hivis{height:6px;background:repeating-linear-gradient(135deg,var(--hivis) 0 12px,#11161c 12px 24px)}
+
+header.app{
+  position:sticky;top:0;z-index:20;
+  background:var(--surface-1);
+  border-bottom:1px solid var(--hairline);
+  display:flex;align-items:center;gap:var(--s3);
+  padding:var(--s3) var(--s4);
+}
+.logo{
+  width:38px;height:38px;flex:0 0 auto;border-radius:9px;
+  background:var(--accent);color:var(--on-accent);
+  font:800 16px/38px var(--font-display);text-align:center;letter-spacing:-.02em;
+}
+.evt{flex:1;min-width:0}
+.evt .kicker{font:600 10px/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted)}
+.evt .name{font:700 16px/1.15 var(--font-display);color:var(--text-strong);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.lang{
+  flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;
+  height:40px;padding:0 12px;border:1px solid var(--hairline);border-radius:10px;
+  background:var(--surface-2);color:var(--text-strong);
+  font:600 13px/1 var(--font-body);cursor:pointer;
+}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.lang .chev{font-size:10px;color:var(--text-muted)}
+
+main{padding:var(--s4);display:flex;flex-direction:column;gap:var(--s4);flex:1}
+
+/* karta meta wydarzenia */
+.meta{
+  background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);
+  padding:var(--s4);box-shadow:var(--shadow);
+  opacity:0;transform:translateY(8px);animation:rise .4s ease forwards;
+}
+.meta dl{display:grid;grid-template-columns:auto 1fr;gap:var(--s2) var(--s4);align-items:baseline}
+.meta dt{font:600 12px/1.3 var(--font-body);letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted)}
+.meta dd{font:600 15px/1.3 var(--font-body);color:var(--text-strong);text-align:right;font-variant-numeric:tabular-nums}
+.meta dd.role{color:var(--accent)}
+
+/* hero skanera */
+.scan{
+  background:var(--brand-ink);border-radius:var(--radius);padding:var(--s4);
+  box-shadow:var(--shadow);opacity:0;transform:translateY(8px);
+  animation:rise .4s ease .08s forwards;
+}
+.scan h2{font:700 13px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#fff;margin-bottom:var(--s3)}
+.reticle{
+  position:relative;aspect-ratio:1/.82;border-radius:10px;
+  background:radial-gradient(120% 90% at 50% 40%, #1d2935 0%, #11161c 70%);
+  overflow:hidden;
+}
+.reticle .corner{position:absolute;width:34px;height:34px;border:4px solid var(--hivis)}
+.reticle .tl{top:14px;left:14px;border-right:0;border-bottom:0;border-radius:6px 0 0 0}
+.reticle .tr{top:14px;right:14px;border-left:0;border-bottom:0;border-radius:0 6px 0 0}
+.reticle .bl{bottom:14px;left:14px;border-right:0;border-top:0;border-radius:0 0 0 6px}
+.reticle .br{bottom:14px;right:14px;border-left:0;border-top:0;border-radius:0 0 6px 0}
+.reticle .laser{position:absolute;left:14px;right:14px;height:3px;background:var(--hivis);
+  box-shadow:0 0 14px 2px rgba(var(--hivis-rgb),.7);border-radius:3px;top:18%;
+  animation:sweep 2.4s ease-in-out infinite}
+.reticle .hint{position:absolute;left:0;right:0;bottom:18px;text-align:center;
+  font:500 13px/1.3 var(--font-body);color:#aebccd;padding:0 24px}
+@keyframes sweep{0%,100%{top:18%}50%{top:78%}}
+
+.btn{
+  width:100%;border:0;border-radius:12px;cursor:pointer;
+  font:700 16px/1 var(--font-display);letter-spacing:.01em;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+}
+.btn-primary{height:var(--tap-primary);background:var(--accent);color:var(--on-accent);margin-top:var(--s4)}
+.btn-primary:active{transform:translateY(1px)}
+.btn:focus-visible{outline:3px solid var(--hivis);outline-offset:3px}
+
+/* alternatywa: kod jednorazowy */
+.alt{
+  background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);
+  padding:var(--s4);box-shadow:var(--shadow);
+  opacity:0;transform:translateY(8px);animation:rise .4s ease .16s forwards;
+}
+.or{display:flex;align-items:center;gap:var(--s3);color:var(--text-muted);
+  font:600 12px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;margin-bottom:var(--s4)}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--hairline)}
+.alt label{display:block;font:600 13px/1 var(--font-body);color:var(--text-strong);margin-bottom:var(--s3)}
+.code{display:flex;gap:8px;justify-content:space-between}
+.code input{
+  flex:1;min-width:0;height:54px;text-align:center;
+  font:700 24px/1 var(--font-display);color:var(--text-strong);
+  border:2px solid var(--hairline);border-radius:10px;background:var(--surface-2);
+  font-variant-numeric:tabular-nums;
+}
+.code input:focus-visible{outline:0;border-color:var(--accent);background:#fff}
+.btn-secondary{height:var(--tap);background:var(--surface-3);color:var(--text-strong);margin-top:var(--s4);font-size:15px}
+
+/* komunikat / walidacja */
+.notice{
+  border-radius:12px;padding:var(--s3) var(--s4);
+  display:flex;gap:var(--s3);align-items:flex-start;
+  font:500 14px/1.4 var(--font-body);
+}
+.notice .ic{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  font:800 15px/1 var(--font-display);color:#fff}
+.notice .body strong{display:block;font:600 14px/1.3 var(--font-body);color:var(--text-strong);margin-bottom:2px}
+.notice.err{background:var(--tint-error-bg);border:1px solid var(--tint-error-border);color:var(--tint-error-text)}
+.notice.err .ic{background:var(--color-error)}
+.notice.info{background:var(--surface-2);border:1px solid var(--hairline);color:var(--text)}
+.notice.info .ic{background:var(--color-info)}
+
+.causes{margin:var(--s3) 0 0;padding-left:18px;color:var(--text-muted);font:500 13px/1.6 var(--font-body)}
+.causes li{margin:0}
+
+.link-row{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;
+  padding-top:var(--s2)}
+.link-row a{font:600 14px/1 var(--font-body);color:var(--accent);text-decoration:none;
+  padding:10px 4px;min-height:var(--tap);display:inline-flex;align-items:center}
+.link-row a:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+footer.app{padding:var(--s3) var(--s4) var(--s8);text-align:center;
+  font:500 13px/1.4 var(--font-body);color:var(--text-muted)}
+
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){
+  .meta,.scan,.alt{animation:none;opacity:1;transform:none}
+  .reticle .laser{animation:none;top:48%}
+}
+
+[hidden]{display:none !important}
+[dir="rtl"] .meta dd{text-align:left}
+</style>
+</head>
+<body>
+
+<div class="statebar" role="group" aria-label="Przełącznik stanu makiety">
+  <span data-i18n="mk.state">Stan</span>
+  <button id="st-default" aria-pressed="true" data-i18n="mk.default">Domyślny</button>
+  <button id="st-error" aria-pressed="false" data-i18n="mk.used">Kod już użyty</button>
+</div>
+
+<div class="shell">
+  <div class="hivis" aria-hidden="true"></div>
+  <header class="app">
+    <div class="logo" aria-hidden="true">SKB</div>
+    <div class="evt">
+      <div class="kicker" data-i18n="org">Stołeczny Klub Biegacza</div>
+      <div class="name" id="evt-name">Bieg Wiosenny 2026</div>
+    </div>
+    <button class="lang" id="langBtn" data-i18n-aria="aria.lang" aria-label="Zmień język">
+      <span id="langLabel">PL</span><span class="chev" aria-hidden="true">▾</span>
+    </button>
+  </header>
+
+  <main>
+    <section class="meta" aria-labelledby="evt-name">
+      <dl>
+        <dt data-i18n="meta.event">Wydarzenie</dt><dd id="m-event">Bieg Wiosenny 2026</dd>
+        <dt data-i18n="meta.date">Data</dt><dd id="m-date">12.04.2026</dd>
+        <dt data-i18n="meta.role">Rola</dt><dd class="role" data-i18n="meta.roleVal">wolontariusz</dd>
+        <dt data-i18n="meta.scope">Zakres</dt><dd id="m-scope" data-i18n="meta.scopeVal">wydawanie pakietów · sektor B</dd>
+      </dl>
+    </section>
+
+    <section class="scan" aria-labelledby="scan-h">
+      <h2 id="scan-h" data-i18n="scan.title">Skan zaproszenia</h2>
+      <div class="reticle" role="img" data-i18n-aria="aria.scanner" aria-label="Pole skanera kodu QR">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <span class="laser" aria-hidden="true"></span>
+        <span class="hint" data-i18n="scan.hint">Skieruj telefon na kod z zaproszenia</span>
+      </div>
+      <button class="btn btn-primary" data-i18n="scan.cta">Skanuj zaproszenie</button>
+    </section>
+
+    <!-- STAN DOMYŚLNY: nota o sieci -->
+    <div class="notice info" id="note-default">
+      <span class="ic" aria-hidden="true">i</span>
+      <div class="body">
+        <strong data-i18n="net.title">Pierwsze wejście wymaga sieci</strong>
+        <span data-i18n="net.desc">Po jednorazowym zalogowaniu odprawa i wydawanie działają offline.</span>
+      </div>
+    </div>
+
+    <!-- STAN ALTERNATYWNY: kod już użyty -->
+    <div class="notice err" id="note-error" hidden>
+      <span class="ic" aria-hidden="true">!</span>
+      <div class="body">
+        <strong data-i18n="err.title">Ten kod został już użyty na innym urządzeniu</strong>
+        <span data-i18n="err.desc">Zaproszenie jest jednorazowe. Poproś koordynatora o nowy kod lub link.</span>
+      </div>
+    </div>
+
+    <section class="alt" aria-labelledby="alt-h">
+      <div class="or" id="alt-h"><span data-i18n="alt.or">albo</span></div>
+      <label for="c1" data-i18n="alt.label">Kod jednorazowy</label>
+      <div class="code">
+        <input id="c1" inputmode="numeric" maxlength="1" data-i18n-aria="aria.code1" aria-label="Cyfra 1 z 6">
+        <input inputmode="numeric" maxlength="1" data-i18n-aria="aria.code2" aria-label="Cyfra 2 z 6">
+        <input inputmode="numeric" maxlength="1" data-i18n-aria="aria.code3" aria-label="Cyfra 3 z 6">
+        <input inputmode="numeric" maxlength="1" data-i18n-aria="aria.code4" aria-label="Cyfra 4 z 6">
+        <input inputmode="numeric" maxlength="1" data-i18n-aria="aria.code5" aria-label="Cyfra 5 z 6">
+        <input inputmode="numeric" maxlength="1" data-i18n-aria="aria.code6" aria-label="Cyfra 6 z 6">
+      </div>
+      <button class="btn btn-secondary" data-i18n="alt.cta">Zaloguj bez hasła</button>
+    </section>
+
+    <div class="notice info" id="causes-box" data-i18n-aria="aria.causes" aria-label="Możliwe przyczyny odmowy">
+      <span class="ic" aria-hidden="true">?</span>
+      <div class="body">
+        <strong data-i18n="causes.title">Jeśli wejście nie działa</strong>
+        <ul class="causes">
+          <li data-i18n="causes.expired">zaproszenie wygasło</li>
+          <li data-i18n="causes.used">kod już użyty</li>
+          <li data-i18n="causes.other">zaproszenie do innego wydarzenia</li>
+          <li data-i18n="causes.revoked">dostęp odwołany przez organizatora</li>
+        </ul>
+      </div>
+    </div>
+
+    <nav class="link-row" data-i18n-aria="aria.secactions" aria-label="Akcje drugorzędne">
+      <a href="#" data-i18n="link.newcode">Poproś o nowy kod</a>
+      <a href="#" id="langLink" data-i18n="link.lang">Zmień język</a>
+      <a href="#" data-i18n="link.coord">Kontakt z koordynatorem</a>
+    </nav>
+  </main>
+
+  <footer class="app" data-i18n="foot.expire">Dostęp wygasa po zakończeniu wydarzenia.</footer>
+</div>
+
+<script>
+/* ---- Słowniki tłumaczeń (klucze BCP 47) ---- */
+const I18N = {
+  "pl-PL":{
+    "org":"Stołeczny Klub Biegacza",
+    "aria.lang":"Zmień język","aria.scanner":"Pole skanera kodu QR","aria.causes":"Możliwe przyczyny odmowy","aria.secactions":"Akcje drugorzędne",
+    "aria.code1":"Cyfra 1 z 6","aria.code2":"Cyfra 2 z 6","aria.code3":"Cyfra 3 z 6","aria.code4":"Cyfra 4 z 6","aria.code5":"Cyfra 5 z 6","aria.code6":"Cyfra 6 z 6",
+    "meta.event":"Wydarzenie","meta.date":"Data","meta.role":"Rola","meta.scope":"Zakres",
+    "meta.roleVal":"wolontariusz","meta.scopeVal":"wydawanie pakietów · sektor B",
+    "scan.title":"Skan zaproszenia","scan.hint":"Skieruj telefon na kod z zaproszenia","scan.cta":"Skanuj zaproszenie",
+    "net.title":"Pierwsze wejście wymaga sieci","net.desc":"Po jednorazowym zalogowaniu odprawa i wydawanie działają offline.",
+    "err.title":"Ten kod został już użyty na innym urządzeniu","err.desc":"Zaproszenie jest jednorazowe. Poproś koordynatora o nowy kod lub link.",
+    "alt.or":"albo","alt.label":"Kod jednorazowy","alt.cta":"Zaloguj bez hasła",
+    "causes.title":"Jeśli wejście nie działa","causes.expired":"zaproszenie wygasło","causes.used":"kod już użyty","causes.other":"zaproszenie do innego wydarzenia","causes.revoked":"dostęp odwołany przez organizatora",
+    "link.newcode":"Poproś o nowy kod","link.lang":"Zmień język","link.coord":"Kontakt z koordynatorem",
+    "foot.expire":"Dostęp wygasa po zakończeniu wydarzenia.",
+    "mk.state":"Stan","mk.default":"Domyślny","mk.used":"Kod już użyty"
+  },
+  "en-GB":{
+    "org":"Warsaw Runners' Club",
+    "aria.lang":"Change language","aria.scanner":"QR code scanner field","aria.causes":"Possible reasons for denial","aria.secactions":"Secondary actions",
+    "aria.code1":"Digit 1 of 6","aria.code2":"Digit 2 of 6","aria.code3":"Digit 3 of 6","aria.code4":"Digit 4 of 6","aria.code5":"Digit 5 of 6","aria.code6":"Digit 6 of 6",
+    "meta.event":"Event","meta.date":"Date","meta.role":"Role","meta.scope":"Scope",
+    "meta.roleVal":"volunteer","meta.scopeVal":"pack handout · sector B",
+    "scan.title":"Scan invitation","scan.hint":"Point your phone at the code on your invitation","scan.cta":"Scan invitation",
+    "net.title":"First sign-in needs a connection","net.desc":"After signing in once, check-in and handout work offline.",
+    "err.title":"This code was already used on another device","err.desc":"The invitation is single-use. Ask the coordinator for a new code or link.",
+    "alt.or":"or","alt.label":"One-time code","alt.cta":"Sign in without a password",
+    "causes.title":"If sign-in does not work","causes.expired":"invitation expired","causes.used":"code already used","causes.other":"invitation for a different event","causes.revoked":"access revoked by the organiser",
+    "link.newcode":"Request a new code","link.lang":"Change language","link.coord":"Contact the coordinator",
+    "foot.expire":"Access expires after the event ends.",
+    "mk.state":"State","mk.default":"Default","mk.used":"Code already used"
+  }
+};
+const FALLBACK="en-GB";
+const RTL=new Set(["ar","he","fa","ur"]);
+const EVENT_DATE=new Date(2026,3,12); // 12.04.2026, region wydarzenia
+const ORDER=["pl-PL","en-GB"];        // lista języków dziedziczona z ustawień wydarzenia (OEV-28)
+let lang="pl-PL";
+
+function t(key){const d=I18N[lang]||{};return (key in d)?d[key]:(I18N[FALLBACK][key]??key);}
+
+function render(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"));});
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>{el.setAttribute("aria-label",t(el.getAttribute("data-i18n-aria")));});
+  // formaty regionalne przez Intl
+  const dateFmt=new Intl.DateTimeFormat(lang,{day:"2-digit",month:"2-digit",year:"numeric"});
+  document.getElementById("m-date").textContent=dateFmt.format(EVENT_DATE);
+  document.getElementById("langLabel").textContent=lang.split("-")[0].toUpperCase();
+  // RTL
+  const primary=lang.split("-")[0];
+  document.documentElement.dir=RTL.has(primary)?"rtl":"ltr";
+  document.documentElement.lang=primary;
+}
+
+function cycleLang(){lang=ORDER[(ORDER.indexOf(lang)+1)%ORDER.length];render();}
+document.getElementById("langBtn").addEventListener("click",cycleLang);
+document.getElementById("langLink").addEventListener("click",e=>{e.preventDefault();cycleLang();});
+
+/* ruch ostrości między polami kodu */
+const codeInputs=[...document.querySelectorAll(".code input")];
+codeInputs.forEach((inp,i)=>{
+  inp.addEventListener("input",()=>{if(inp.value && i<codeInputs.length-1)codeInputs[i+1].focus();});
+  inp.addEventListener("keydown",e=>{if(e.key==="Backspace"&&!inp.value&&i>0)codeInputs[i-1].focus();});
+});
+
+/* przełącznik stanu makiety */
+const bDef=document.getElementById("st-default"), bErr=document.getElementById("st-error");
+function setState(err){
+  bDef.setAttribute("aria-pressed",String(!err));
+  bErr.setAttribute("aria-pressed",String(err));
+  document.getElementById("note-default").hidden=err;
+  document.getElementById("note-error").hidden=!err;
+  document.getElementById("causes-box").hidden=err; // przy konkretnym błędzie nie dublujemy listy przyczyn
+}
+bDef.addEventListener("click",()=>setState(false));
+bErr.addEventListener("click",()=>setState(true));
+
+render();
+setState(false);
+</script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR-09 · Dokumenty dziecka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;--accent:#ef5a3c;
+  --color-success:#1f9d57;--color-warning:#c47d0a;--color-error:#d6402a;--color-info:#2f72d6;
+  --paper:#faf5ee;--surface-1:#ffffff;--surface-2:#fff9f2;--surface-3:#f3ebe0;--hairline:#e7ddcf;
+  --text-strong:#241c17;--text:#4a4039;--text-muted:#8a7d70;--on-accent:#fff7f3;
+  --kid-1:#ef5a3c;--kid-2:#1f9d8f;--kid-3:#7a5cd6;--kid-4:#c47d0a;
+  --font-display:"Fraunces", Georgia, serif;--font-body:"Hanken Grotesk", system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:20px;--shadow:0 14px 34px -16px rgba(60,40,30,.28);--tap:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);color:var(--text);
+  background:radial-gradient(120% 80% at 85% -8%,#fff 0%,transparent 52%),radial-gradient(90% 70% at -10% 108%,#fff4ea 0%,transparent 60%),var(--paper);
+  min-height:100%;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+.appbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s4) var(--s5) var(--s3);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline)}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.iconbtn{width:36px;height:36px;flex:none;border-radius:11px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);display:grid;place-items:center;font-size:17px;cursor:pointer}
+.title-h{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:18px}
+.lang{display:inline-flex;gap:var(--s1);flex:none}
+.lang button{font-weight:600;font-size:12px;min-height:32px;padding:0 var(--s3);border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-muted);border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.lang button:focus-visible,.kid:focus-visible,.seg button:focus-visible,.btn:focus-visible,.link:focus-visible,.miniBtn:focus-visible,.consent:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.kidbar{position:sticky;top:57px;z-index:29;display:flex;gap:var(--s3);align-items:center;overflow-x:auto;padding:var(--s3) var(--s5);background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--hairline);scrollbar-width:none}
+.kidbar::-webkit-scrollbar{display:none}
+.kid{display:inline-flex;align-items:center;gap:var(--s2);flex:none;cursor:pointer;min-height:38px;padding:0 var(--s3) 0 5px;border-radius:999px;background:var(--surface-1);border:1.5px solid var(--hairline);font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text)}
+.kid .tok{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:none}
+.kid[aria-pressed="true"]{border-color:var(--brand-ink);background:var(--surface-2)}
+.kid[data-kid="zofia"] .tok{background:var(--kid-2)} .kid[data-kid="jan"] .tok{background:var(--kid-1)}
+
+.modmark{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s5);font-size:11px;color:var(--text-muted)}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-3);border:1px solid var(--hairline);border-radius:999px;padding:3px 10px;font-weight:600;font-size:11px;color:var(--text)}
+.chip i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.chip.z i{background:var(--color-info)} .chip.c i{background:var(--accent)}
+
+.statebar{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);background:var(--surface-3);border-bottom:1px dashed var(--hairline);font-size:12px;color:var(--text-muted)}
+.statebar .lbl{font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:10.5px}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;cursor:pointer;border-radius:999px;font-weight:600;font-size:12px;color:var(--text-muted);min-height:30px;padding:0 var(--s3);font-family:var(--font-body)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+
+main{flex:1;padding:var(--s4) var(--s5) calc(var(--s10) + 120px)}
+h2.sec{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--text-muted);font-weight:700;margin:var(--s4) 0 var(--s3)}
+
+.doc{background:var(--surface-1);border:1px solid var(--hairline);border-radius:16px;padding:var(--s4);margin-bottom:var(--s3);box-shadow:var(--shadow)}
+.doc .top{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s3)}
+.doc .nm{font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--text-strong);display:flex;align-items:center;gap:var(--s2)}
+.lock{font-size:11px;color:var(--text-muted)}
+.doc .req{font-size:12px;color:var(--text-muted);margin-top:2px}
+.badge{font-size:11px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.badge.ok{background:#e6f6ec;color:var(--color-success)}
+.badge.warn{background:#fbf0d8;color:#7a5410}
+.badge.err{background:#fdeee9;color:var(--color-error)}
+.badge.neutral{background:var(--surface-3);color:var(--text)}
+.doc .acts{display:flex;gap:var(--s2);margin-top:var(--s3);flex-wrap:wrap}
+.miniBtn{min-height:40px;padding:0 var(--s4);border-radius:11px;border:1.5px solid transparent;font-family:var(--font-body);font-weight:700;font-size:14px;cursor:pointer}
+.miniBtn.solid{background:var(--accent);color:var(--on-accent)}
+.miniBtn.line{background:var(--surface-2);color:var(--text-strong);border-color:var(--hairline);font-weight:600}
+.miniBtn.danger{background:none;border-color:transparent;color:var(--color-error);font-weight:600}
+.doc .vmsg{display:flex;gap:var(--s2);align-items:flex-start;font-size:12.5px;margin-top:var(--s3);color:var(--text-muted)}
+.doc .vmsg.block{color:var(--color-error);font-weight:600}
+
+/* rejected (alt) */
+.doc.rejected{border:1.5px solid var(--color-error);border-left-width:4px}
+.rejectBox{display:none;margin-top:var(--s3);background:#fdeee9;border:1px solid #f3c9bd;border-radius:12px;padding:var(--s3) var(--s4);color:#8f2c1c;font-size:13px}
+body[data-state="alt"] .rejectBox{display:block}
+
+.consentSec{margin-top:var(--s5)}
+.consent{display:flex;gap:var(--s3);align-items:flex-start;background:var(--surface-1);border:1px solid var(--hairline);border-radius:14px;padding:var(--s4);margin-bottom:var(--s3);font-size:14px;cursor:pointer}
+.consent input{width:22px;height:22px;accent-color:var(--accent);flex:none;margin-top:1px}
+.consent .new{font-size:11px;font-weight:700;color:var(--accent)}
+.consent a{color:var(--accent)}
+
+.offlineNote{display:flex;gap:var(--s2);align-items:center;background:#fff4e4;border:1px solid #f0d49a;color:#7a5410;border-radius:12px;padding:var(--s3) var(--s4);font-size:12.5px;font-weight:600;margin-top:var(--s4)}
+
+.actionbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:30;background:color-mix(in srgb,var(--surface-1) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--hairline);padding:var(--s3) var(--s5) calc(var(--s4)+env(safe-area-inset-bottom))}
+.status{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s2)}
+.status .dot{width:8px;height:8px;border-radius:50%}
+.second{display:flex;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s3)}
+.link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body)}
+.btn{width:100%;min-height:var(--tap);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:16px;border-radius:14px;border:1.5px solid transparent}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 22px -12px rgba(239,90,60,.9)}
+
+[data-when]{display:none}
+body[data-state="default"] [data-when="default"]{display:revert}
+body[data-state="alt"] [data-when="alt"]{display:revert}
+.reveal{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}}
+[dir="rtl"] .doc .top,[dir="rtl"] .consent,[dir="rtl"] .offlineNote,[dir="rtl"] .status,[dir="rtl"] .doc .vmsg{flex-direction:row-reverse}
+</style>
+</head>
+<body data-state="default">
+<div class="app">
+  <header class="appbar">
+    <div class="brand"><button class="iconbtn" aria-label="Menu">☰</button><span class="title-h" data-i18n="par09.h1">Dokumenty</span></div>
+    <div class="lang" role="group" aria-label="Język"><button data-lang="pl-PL" aria-pressed="true">PL</button><button data-lang="en-GB" aria-pressed="false">EN</button></div>
+  </header>
+
+  <div class="kidbar" role="group" aria-label="Wybór dziecka">
+    <button class="kid" data-kid="jan" aria-pressed="true"><span class="tok">J</span>Jan</button>
+    <button class="kid" data-kid="zofia" aria-pressed="false"><span class="tok">Z</span>Zofia</button>
+  </div>
+
+  <div class="modmark"><span data-i18n="par09.cover">Dokumenty obejmują:</span><span class="chip z"><i></i><span data-i18n="mod.classes">zajęcia</span></span><span class="chip c"><i></i><span data-i18n="mod.comp">zawody</span></span></div>
+
+  <div class="statebar">
+    <span class="lbl" data-i18n="state.label">Stan makiety</span>
+    <div class="seg" role="group" aria-label="Stan ekranu">
+      <button data-state-btn="default" aria-pressed="true" data-i18n="state.default">lista ze statusami</button>
+      <button data-state-btn="alt" aria-pressed="false" data-i18n="state.alt09">dokument odrzucony</button>
+    </div>
+  </div>
+
+  <main>
+    <h2 class="sec" data-i18n="par09.secDocs">Dokumenty Jana</h2>
+
+    <!-- Karta pływacka: BRAK (blocks) -->
+    <div class="doc reveal">
+      <div class="top">
+        <div><div class="nm" data-i18n="par09.d.card">Karta pływacka</div><div class="req" data-i18n="par09.d.cardReq">wymagana: zapis na grupę Żabki</div></div>
+        <span class="badge err" data-i18n="par09.st.missing">BRAK</span>
+      </div>
+      <div class="vmsg block"><span aria-hidden="true">⚠</span><span data-i18n="par09.cardBlock">Brak dokumentu blokuje zapis na grupę.</span></div>
+      <div class="acts">
+        <button class="miniBtn solid" data-i18n="par09.upload">Wgraj plik</button>
+        <button class="miniBtn line"><span aria-hidden="true">📷</span> <span data-i18n="par09.photo">Zrób zdjęcie</span></button>
+      </div>
+      <div class="vmsg"><span aria-hidden="true">ⓘ</span><span data-i18n="par09.formats">Dozwolone: PDF, JPG, PNG · do 10 MB.</span></div>
+    </div>
+
+    <!-- Zgoda medyczna: WYGASA -->
+    <div class="doc reveal">
+      <div class="top">
+        <div><div class="nm" data-i18n="par09.d.med">Zgoda medyczna <span class="lock" title="dane wrażliwe" aria-label="dane wrażliwe">🔒</span></div><div class="req" data-i18n="par09.d.medReq">wymagana: obóz letni · szczególna kategoria danych</div></div>
+        <span class="badge warn" id="medExpBadge"></span>
+      </div>
+      <div class="acts">
+        <button class="miniBtn line" data-i18n="par09.preview">Podgląd</button>
+        <button class="miniBtn line" data-i18n="par09.replace">Zastąp</button>
+      </div>
+    </div>
+
+    <!-- Orzeczenie: ZAAKCEPTOWANY / (ALT) ODRZUCONY -->
+    <div class="doc reveal" id="docCert">
+      <div class="top">
+        <div><div class="nm" data-i18n="par09.d.cert">Orzeczenie lekarskie <span class="lock" aria-label="dane wrażliwe">🔒</span></div><div class="req" data-i18n="par09.d.certReq">wymagane: starty w zawodach</div></div>
+        <span class="badge ok" data-when="default" data-i18n="par09.st.accepted">ZAAKCEPTOWANY</span>
+        <span class="badge err" data-when="alt" data-i18n="par09.st.rejected">ODRZUCONY</span>
+      </div>
+      <!-- ALT reject reason -->
+      <div class="rejectBox" role="alert">
+        <strong data-i18n="par09.reject.title">Organizator odrzucił dokument.</strong>
+        <div style="margin-top:3px" data-i18n="par09.reject.body">Powód: data badania nieczytelna na skanie. Wgraj wyraźną kopię z widoczną datą ważności, najlepiej PDF zamiast zdjęcia.</div>
+      </div>
+      <div class="acts" data-when="default">
+        <button class="miniBtn line" data-i18n="par09.preview">Podgląd</button>
+        <button class="miniBtn line" data-i18n="par09.download">Pobierz kopię</button>
+        <button class="miniBtn danger" data-i18n="par09.delete">Usuń</button>
+      </div>
+      <div class="acts" data-when="alt">
+        <button class="miniBtn solid" data-i18n="par09.uploadFix">Wgraj poprawioną wersję</button>
+        <button class="miniBtn line"><span aria-hidden="true">📷</span> <span data-i18n="par09.photo">Zrób zdjęcie</span></button>
+      </div>
+    </div>
+
+    <div class="consentSec">
+      <h2 class="sec" data-i18n="par09.secConsents">Zgody</h2>
+      <label class="consent">
+        <input type="checkbox">
+        <span><span data-i18n="par09.c.terms">Regulamin</span> <span class="new" data-i18n="par09.c.termsNew">(nowa wersja 4 — przejrzyj przed akceptacją)</span></span>
+      </label>
+      <label class="consent">
+        <input type="checkbox" checked>
+        <span data-i18n="par09.c.image">Zgoda na wizerunek dziecka</span>
+      </label>
+    </div>
+
+    <div class="offlineNote"><span aria-hidden="true">⚠</span><span data-i18n="par09.offline">Offline: plik możesz przygotować, wgranie i akceptacja zgód ruszą po powrocie sieci.</span></div>
+  </main>
+
+  <div class="actionbar">
+    <div class="status">
+      <span class="dot" id="barDot" style="background:var(--color-error)" aria-hidden="true"></span>
+      <span data-when="default" data-i18n="par09.barDefault">1 dokument blokuje zapis · 1 wygasa</span>
+      <span data-when="alt" data-i18n="par09.barAlt">1 dokument odrzucony — wymaga poprawy</span>
+    </div>
+    <div class="second">
+      <button class="link" data-i18n="par09.downloadAll">Pobierz komplet</button>
+    </div>
+    <button class="btn btn-primary" data-when="default" data-i18n="par09.cta">Wgraj brakujący dokument</button>
+    <button class="btn btn-primary" data-when="alt" data-i18n="par09.ctaFix">Wgraj poprawioną wersję</button>
+  </div>
+</div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "state.label":"Stan makiety","state.default":"lista ze statusami","state.alt09":"dokument odrzucony",
+  "mod.classes":"zajęcia","mod.comp":"zawody",
+  "par09.h1":"Dokumenty","par09.cover":"Dokumenty obejmują:","par09.secDocs":"Dokumenty Jana",
+  "par09.d.card":"Karta pływacka","par09.d.cardReq":"wymagana: zapis na grupę Żabki",
+  "par09.d.med":"Zgoda medyczna","par09.d.medReq":"wymagana: obóz letni · szczególna kategoria danych",
+  "par09.d.cert":"Orzeczenie lekarskie","par09.d.certReq":"wymagane: starty w zawodach",
+  "par09.st.missing":"BRAK","par09.st.expiring.tpl":"WYGASA ZA {n,plural,one{# DZIEŃ}few{# DNI}many{# DNI}other{# DNI}}","par09.st.accepted":"ZAAKCEPTOWANY","par09.st.rejected":"ODRZUCONY",
+  "par09.cardBlock":"Brak dokumentu blokuje zapis na grupę.","par09.formats":"Dozwolone: PDF, JPG, PNG · do 10 MB.",
+  "par09.upload":"Wgraj plik","par09.photo":"Zrób zdjęcie","par09.preview":"Podgląd","par09.replace":"Zastąp","par09.download":"Pobierz kopię","par09.delete":"Usuń","par09.uploadFix":"Wgraj poprawioną wersję",
+  "par09.reject.title":"Organizator odrzucił dokument.","par09.reject.body":"Powód: data badania nieczytelna na skanie. Wgraj wyraźną kopię z widoczną datą ważności, najlepiej PDF zamiast zdjęcia.",
+  "par09.secConsents":"Zgody","par09.c.terms":"Regulamin","par09.c.termsNew":"(nowa wersja 4 — przejrzyj przed akceptacją)","par09.c.image":"Zgoda na wizerunek dziecka",
+  "par09.offline":"Offline: plik możesz przygotować, wgranie i akceptacja zgód ruszą po powrocie sieci.",
+  "par09.barDefault":"1 dokument blokuje zapis · 1 wygasa","par09.barAlt":"1 dokument odrzucony — wymaga poprawy",
+  "par09.downloadAll":"Pobierz komplet","par09.cta":"Wgraj brakujący dokument","par09.ctaFix":"Wgraj poprawioną wersję"
+ },
+ "en-GB":{
+  "state.label":"Mockup state","state.default":"list with statuses","state.alt09":"document rejected",
+  "mod.classes":"classes","mod.comp":"competitions",
+  "par09.h1":"Documents","par09.cover":"Documents cover:","par09.secDocs":"Jan's documents",
+  "par09.d.card":"Swimming card","par09.d.cardReq":"required: sign-up to the Żabki group",
+  "par09.d.med":"Medical consent","par09.d.medReq":"required: summer camp · special category of data",
+  "par09.d.cert":"Medical certificate","par09.d.certReq":"required: competition starts",
+  "par09.st.missing":"MISSING","par09.st.expiring.tpl":"EXPIRES IN {n,plural,one{# DAY}other{# DAYS}}","par09.st.accepted":"ACCEPTED","par09.st.rejected":"REJECTED",
+  "par09.cardBlock":"A missing document blocks the group sign-up.","par09.formats":"Allowed: PDF, JPG, PNG · up to 10 MB.",
+  "par09.upload":"Upload file","par09.photo":"Take a photo","par09.preview":"Preview","par09.replace":"Replace","par09.download":"Download copy","par09.delete":"Delete","par09.uploadFix":"Upload corrected version",
+  "par09.reject.title":"The organiser rejected the document.","par09.reject.body":"Reason: the exam date is unreadable on the scan. Upload a clear copy with a visible validity date, ideally a PDF rather than a photo.",
+  "par09.secConsents":"Consents","par09.c.terms":"Terms","par09.c.termsNew":"(new version 4 — review before accepting)","par09.c.image":"Consent for the child's image",
+  "par09.offline":"Offline: you can prepare a file; upload and consent acceptance start once you're back online.",
+  "par09.barDefault":"1 document blocks sign-up · 1 expiring","par09.barAlt":"1 document rejected — needs a fix",
+  "par09.downloadAll":"Download all","par09.cta":"Upload the missing document","par09.ctaFix":"Upload corrected version"
+ }
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+let lang="pl-PL";
+const t=k=>(I18N[lang]&&I18N[lang][k])??(I18N["en-GB"]&&I18N["en-GB"][k])??k;
+function tPlural(key,vars){
+  let s=t(key);
+  for(const [n,v] of Object.entries(vars)){
+    s=s.replace(new RegExp(`\\{${n}\\}`,"g"),v);
+    /* parsowanie {name,plural,...} z balansowaniem klamr */
+    const start=`{${n},plural,`;
+    let i;
+    while((i=s.indexOf(start))>=0){
+      let depth=1,j=i+start.length;
+      while(j<s.length&&depth>0){
+        if(s[j]==="{")depth++;
+        else if(s[j]==="}"){depth--;if(depth===0)break;}
+        j++;
+      }
+      const inner=s.slice(i+start.length,j);
+      const cat=new Intl.PluralRules(lang).select(v);
+      const m={};inner.replace(/(zero|one|two|few|many|other)\{([^{}]*)\}/g,(_,k,vv)=>{m[k]=vv;});
+      const out=(m[cat]??m.other??"").replace(/#/g,v);
+      s=s.slice(0,i)+out+s.slice(j+1);
+    }
+  }
+  return s;
+}
+/* dane dokumentów - liczone z dat ważności, nie wpisywane do kluczy */
+const DOCS={medExpiresInDays:7};
+function render(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"));});
+  /* badge "wygasa za N dni" z plurałami */
+  const b=document.getElementById("medExpBadge");
+  if(b)b.textContent=tPlural("par09.st.expiring.tpl",{n:DOCS.medExpiresInDays});
+}
+function applyState(){
+  document.getElementById("docCert").classList.toggle("rejected",document.body.dataset.state==="alt");
+}
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();}));
+document.querySelectorAll(".kid").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".kid").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+document.querySelectorAll("[data-state-btn]").forEach(b=>b.addEventListener("click",()=>{document.body.dataset.state=b.dataset.stateBtn;document.querySelectorAll("[data-state-btn]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));applyState();}));
+render();applyState();
+</script>
+</body>
+</html>

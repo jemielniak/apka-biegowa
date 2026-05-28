@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KID-02 - Mój paszport</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600..800&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;1,6..12,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#23303a;
+  --accent:#2a9d8f;
+
+  --color-success:#1f9d57;
+  --color-warning:#c47d0a;
+  --color-error:#d6402a;
+  --color-info:#2f72d6;
+
+  --sensitive:#7a5cd6;
+
+  --paper:#f4f8f6;
+  --surface-1:#ffffff;
+  --surface-2:#eef4f1;
+  --surface-3:#e1ebe7;
+  --hairline:#d3e0da;
+  --text-strong:#23303a;
+  --text:#46555c;
+  --text-muted:#7a8a8f;
+  --on-accent:#ffffff;
+
+  --font-display:"Nunito", system-ui, sans-serif;
+  --font-body:"Nunito Sans", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:22px;
+  --shadow:0 14px 34px -16px rgba(35,48,58,.26);
+  --tap:48px;
+
+  --accent-tint:rgba(42,157,143,.12);
+  --info-tint:rgba(47,114,214,.10);
+  --warning-tint:rgba(196,125,10,.12);
+  --gold:#e3a72f;
+  --gold-tint:rgba(227,167,47,.14);
+
+  /* derived stops + readable inks */
+  --accent-2:#34b3a3;
+  --accent-deep:#2f6f66;
+  --gold-ink:#9a6a06;
+  --info-ink:#244a7a;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  color:var(--text);
+  background:
+    radial-gradient(120% 55% at 0% -6%, #eaf4f0 0%, transparent 58%),
+    radial-gradient(120% 65% at 108% 4%, #eef3f9 0%, transparent 52%),
+    var(--paper);
+  min-height:100dvh;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+}
+
+.app{max-width:480px; margin:0 auto; min-height:100dvh; display:flex; flex-direction:column; position:relative}
+
+/* demo control */
+.demo-bar{
+  position:sticky; top:0; z-index:40;
+  display:flex; gap:var(--s2); align-items:center;
+  padding:var(--s2) var(--s4); background:var(--brand-ink); color:#dfeae6; font-size:12.5px;
+}
+.demo-bar b{font-family:var(--font-display); font-weight:700; color:#fff}
+.demo-seg{display:inline-flex; background:rgba(255,255,255,.12); border-radius:999px; padding:3px; margin-left:auto}
+.demo-seg button{
+  font-family:var(--font-body); font-weight:600; font-size:12px; border:0; background:transparent;
+  color:#cfe0db; cursor:pointer; padding:7px 12px; border-radius:999px; min-height:34px;
+}
+.demo-seg button[aria-pressed="true"]{background:#fff; color:var(--brand-ink)}
+.demo-seg button:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+/* header */
+.appbar{
+  position:sticky; top:42px; z-index:30;
+  display:flex; align-items:center; gap:var(--s2);
+  padding:var(--s3) var(--s4);
+  background:rgba(244,248,246,.86); backdrop-filter:saturate(1.2) blur(10px);
+  border-bottom:1px solid var(--hairline);
+}
+.iconbtn{
+  width:var(--tap); height:var(--tap); display:grid; place-items:center;
+  border:1px solid var(--hairline); background:var(--surface-1); border-radius:14px;
+  cursor:pointer; color:var(--text-strong);
+}
+.iconbtn:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.appbar h1{font-family:var(--font-display); font-weight:800; font-size:18px; color:var(--text-strong); margin:0; flex:1; line-height:1.15}
+.readonly-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--font-display); font-weight:800; font-size:11px; letter-spacing:.5px; text-transform:uppercase;
+  color:var(--accent); background:var(--accent-tint); border:1px solid rgba(42,157,143,.3);
+  padding:6px 10px; border-radius:999px;
+}
+.lang{
+  display:inline-flex; align-items:center; gap:6px; min-height:var(--tap); padding:0 12px;
+  border:1px solid var(--hairline); background:var(--surface-1); border-radius:999px; cursor:pointer;
+  color:var(--text-strong); font-family:var(--font-display); font-weight:700; font-size:13px;
+}
+.lang:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+/* persistent read-only + sync ribbon */
+.ribbon{
+  display:flex; align-items:center; gap:var(--s2);
+  padding:var(--s2) var(--s4); background:var(--surface-2);
+  border-bottom:1px solid var(--hairline); font-size:12.5px; color:var(--text-muted);
+}
+.ribbon .sync{display:inline-flex; align-items:center; gap:6px}
+.ribbon .sync svg{flex:none}
+.ribbon .who{margin-left:auto; font-weight:600; color:var(--text)}
+
+.scroll{flex:1; padding:var(--s4) var(--s4) 130px; display:flex; flex-direction:column; gap:var(--s4); position:relative}
+
+/* greeting */
+.greeting{font-family:var(--font-display); font-weight:800; color:var(--text-strong); font-size:21px; line-height:1.15; margin:2px 0 -6px}
+.greeting span{color:var(--accent)}
+
+/* passport hero */
+.passport{
+  position:relative; overflow:hidden;
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  background:linear-gradient(150deg,var(--accent-deep) 0%, var(--accent) 60%, var(--accent-2) 100%);
+  color:#fff; padding:var(--s5) var(--s4);
+}
+.passport::after{
+  content:""; position:absolute; right:-30px; top:-30px; width:150px; height:150px; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.28), transparent 70%);
+}
+.passport .kicker{font-size:11px; letter-spacing:1px; text-transform:uppercase; font-weight:800; opacity:.85}
+.passport h2{font-family:var(--font-display); font-weight:800; font-size:24px; margin:6px 0 2px}
+.passport .disc{font-size:14px; opacity:.95}
+.passport .level{
+  display:inline-flex; align-items:center; gap:8px; margin-top:var(--s3);
+  background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
+  padding:7px 13px; border-radius:999px; font-family:var(--font-display); font-weight:800; font-size:14px;
+}
+.passport .open{
+  position:absolute; right:var(--s4); bottom:var(--s4);
+  display:inline-flex; align-items:center; gap:6px; min-height:42px; padding:0 16px;
+  background:#fff; color:var(--brand-ink); border:0; border-radius:13px; cursor:pointer;
+  font-family:var(--font-display); font-weight:800; font-size:13.5px;
+}
+.passport .open:focus-visible{outline:3px solid #fff; outline-offset:3px}
+
+/* section block */
+.block{background:var(--surface-1); border:1px solid var(--hairline); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden}
+.block > .bhead{display:flex; align-items:center; gap:var(--s2); padding:var(--s4) var(--s4) var(--s2)}
+.block > .bhead .ic{
+  width:32px; height:32px; flex:none; border-radius:10px; display:grid; place-items:center;
+  background:var(--accent-tint); color:var(--accent);
+}
+.block > .bhead h3{font-family:var(--font-display); font-weight:800; font-size:15px; color:var(--text-strong); margin:0; flex:1}
+.block > .bhead .count{font-size:12px; color:var(--text-muted); font-weight:700}
+
+/* skill tree */
+.skills{padding:var(--s2) var(--s4) var(--s4); display:flex; flex-direction:column; gap:var(--s2)}
+.skill{display:flex; align-items:center; gap:var(--s3); padding:var(--s3); border-radius:14px; background:var(--surface-2)}
+.skill .mk{width:26px; height:26px; flex:none; border-radius:50%; display:grid; place-items:center}
+.skill.done .mk{background:var(--color-success); color:#fff}
+.skill.todo .mk{background:transparent; border:2px dashed var(--hairline); color:var(--text-muted)}
+.skill .nm{flex:1; font-weight:600; color:var(--text-strong); font-size:14px}
+.skill.done .nm{color:var(--text)}
+.skill .film{
+  display:inline-flex; align-items:center; gap:6px; min-height:38px; padding:0 12px;
+  border:1px solid var(--accent); color:var(--accent); background:transparent; border-radius:11px;
+  font-family:var(--font-display); font-weight:700; font-size:12.5px; cursor:pointer;
+}
+.skill .film:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+/* gallery */
+.gallery{padding:var(--s2) var(--s4) var(--s4)}
+.thumbs{display:grid; grid-template-columns:repeat(3,1fr); gap:var(--s2)}
+.thumb{
+  aspect-ratio:1; border-radius:14px; overflow:hidden; position:relative; cursor:pointer;
+  border:1px solid var(--hairline);
+  background-size:cover; background-position:center;
+}
+.thumb:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.thumb .bib{position:absolute; left:6px; bottom:6px; background:rgba(35,48,58,.78); color:#fff; font-size:10.5px; font-weight:700; padding:3px 7px; border-radius:999px}
+.thumb.more{display:grid; place-items:center; background:var(--surface-2); color:var(--accent); font-family:var(--font-display); font-weight:800; font-size:15px}
+
+/* achievement */
+.achieve{padding:var(--s2) var(--s4) var(--s4)}
+.result{
+  display:flex; align-items:center; gap:var(--s3); padding:var(--s3) var(--s4);
+  border-radius:16px; background:var(--gold-tint); border:1px solid rgba(227,167,47,.3);
+}
+.result .trophy{width:38px; height:38px; flex:none; border-radius:11px; background:var(--gold); color:#fff; display:grid; place-items:center}
+.result .ri{flex:1}
+.result .dist{font-family:var(--font-display); font-weight:800; color:var(--text-strong); font-size:15px}
+.result .time{font-size:13px; color:var(--text)}
+.result .pb{font-size:11px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:var(--gold-ink)}
+
+/* empty hint inside a section (for the in-progress / future data) */
+.empty-hint{font-size:12.5px; color:var(--text-muted); padding:0 var(--s4) var(--s4)}
+
+/* simple-language info: enrolment handled by guardian (not an action surface) */
+.guardian-note{
+  display:flex; gap:var(--s3); align-items:flex-start;
+  background:var(--info-tint); border:1px solid rgba(47,114,214,.22);
+  border-radius:16px; padding:var(--s3) var(--s4); font-size:13px; color:var(--info-ink);
+}
+.guardian-note .gi{flex:none; width:22px; height:22px; border-radius:50%; background:var(--color-info); color:#fff; display:grid; place-items:center; font-family:var(--font-display); font-weight:800; font-size:13px}
+
+/* offline-ish footer note about sync handled in ribbon */
+
+/* bottom bar: passive browse action dominates */
+.actionbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:35; max-width:480px; margin:0 auto;
+  padding:var(--s3) var(--s4) max(var(--s4), env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.92); backdrop-filter:blur(10px);
+  border-top:1px solid var(--hairline); display:flex; flex-direction:column; gap:var(--s2);
+}
+.btn-primary{
+  width:100%; min-height:54px; border-radius:16px; cursor:pointer; border:0;
+  background:linear-gradient(180deg,var(--accent-2),var(--accent)); color:var(--on-accent);
+  font-family:var(--font-display); font-weight:800; font-size:16.5px;
+  box-shadow:0 12px 26px -12px rgba(42,157,143,.7);
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-primary:focus-visible{outline:3px solid var(--brand-ink); outline-offset:3px}
+.btn-primary:disabled{background:var(--surface-3); color:var(--text-muted); box-shadow:none; cursor:not-allowed}
+.secondary-row{display:flex; gap:var(--s2)}
+.btn-ghost{
+  flex:1; min-height:46px; border-radius:12px; cursor:pointer; background:var(--surface-2);
+  border:1px solid var(--hairline); color:var(--text-strong);
+  font-family:var(--font-display); font-weight:700; font-size:13.5px;
+}
+.btn-ghost:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+/* revoked-access lock screen (alternative state) */
+.lock{
+  position:fixed; inset:0; z-index:60; max-width:480px; margin:0 auto;
+  background:rgba(244,248,246,.97); backdrop-filter:blur(4px);
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:var(--s8) var(--s6);
+}
+.lock.show{display:flex}
+.lock .lk-ic{width:74px; height:74px; border-radius:24px; background:var(--surface-1); border:1px solid var(--hairline); box-shadow:var(--shadow); display:grid; place-items:center; color:var(--text-muted); margin-bottom:var(--s5)}
+.lock h2{font-family:var(--font-display); font-weight:800; font-size:22px; color:var(--text-strong); margin:0 0 var(--s3)}
+.lock p{font-size:14.5px; color:var(--text); max-width:300px; margin:0 0 var(--s2)}
+.lock .who-off{font-size:13px; color:var(--text-muted); margin-bottom:var(--s5)}
+.lock .who-off b{color:var(--text-strong); font-family:var(--font-display)}
+.lock .lk-btn{
+  min-height:50px; padding:0 22px; border-radius:14px; border:1px solid var(--hairline);
+  background:var(--surface-1); color:var(--text-strong); cursor:pointer;
+  font-family:var(--font-display); font-weight:700; font-size:14px;
+}
+.lock .lk-btn:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+/* toast */
+.toast{
+  position:fixed; left:50%; bottom:140px; transform:translateX(-50%) translateY(20px);
+  max-width:440px; width:calc(100% - 32px); background:var(--brand-ink); color:#eaf3f0;
+  border-radius:14px; padding:var(--s3) var(--s4); font-size:13.5px; box-shadow:var(--shadow);
+  opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:50;
+  display:flex; align-items:center; gap:10px;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+.toast .pl{width:20px; height:20px; border-radius:50%; background:var(--accent); color:#fff; display:grid; place-items:center; font-size:12px; flex:none}
+
+/* offline chip in ribbon */
+.offline-chip{
+  display:none; align-items:center; gap:5px;
+  font-size:11px; font-weight:800; letter-spacing:.4px; text-transform:uppercase;
+  color:var(--color-warning); background:var(--warning-tint);
+  border:1px solid rgba(196,125,10,.3); padding:3px 9px; border-radius:999px;
+}
+.offline-chip.show{display:inline-flex}
+
+/* alternative-state overlays (loading / empty / error) */
+.state-overlay{
+  position:absolute; left:0; right:0; top:138px; bottom:0; z-index:25;
+  display:none; flex-direction:column; gap:var(--s4);
+  padding:var(--s5) var(--s4) 130px; background:var(--paper); overflow:auto;
+}
+.state-overlay.show{display:flex}
+.state-overlay.panel{align-items:center; justify-content:center; text-align:center}
+.panel-ic{width:64px; height:64px; border-radius:20px; display:grid; place-items:center; color:var(--accent); background:var(--accent-tint); box-shadow:var(--shadow)}
+.panel-ic.warn{color:#fff; background:var(--color-warning)}
+.state-overlay.panel h2{font-family:var(--font-display); font-weight:800; font-size:20px; color:var(--text-strong); margin:var(--s3) 0 var(--s2)}
+.state-overlay.panel p{font-size:14.5px; color:var(--text); max-width:300px; margin:0 0 var(--s4)}
+.sr-status{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+
+/* skeleton */
+.sk{border-radius:var(--radius); background:var(--surface-3); position:relative; overflow:hidden}
+.sk::after{content:""; position:absolute; inset:0; transform:translateX(-100%); background:linear-gradient(90deg, transparent, rgba(255,255,255,.6), transparent); animation:shimmer 1.3s infinite}
+.sk-hero{height:150px}
+.sk-block{height:130px}
+@keyframes shimmer{to{transform:translateX(100%)}}
+
+/* demo control wraps when many states are present */
+.demo-bar{flex-wrap:wrap}
+.demo-seg{flex-wrap:wrap; gap:2px}
+
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
+@keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+.scroll > *{animation:rise .45s ease both}
+.scroll > *:nth-child(2){animation-delay:.05s}
+.scroll > *:nth-child(3){animation-delay:.1s}
+.scroll > *:nth-child(4){animation-delay:.15s}
+.scroll > *:nth-child(5){animation-delay:.2s}
+.scroll > *:nth-child(6){animation-delay:.25s}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- demo control -->
+  <div class="demo-bar">
+    <b>KID-02</b>&nbsp;<span data-i18n="demo.hint">makieta hi-fi</span>
+    <span class="demo-seg" role="group" aria-label="Stan ekranu" data-i18n-aria="demo.group">
+      <button data-mode="default" aria-pressed="true" data-i18n="demo.default">Domyślny</button>
+      <button data-mode="loading" aria-pressed="false" data-i18n="demo.loading">Ładowanie</button>
+      <button data-mode="empty" aria-pressed="false" data-i18n="demo.empty">Pusty</button>
+      <button data-mode="error" aria-pressed="false" data-i18n="demo.error">Błąd</button>
+      <button data-mode="offline" aria-pressed="false" data-i18n="demo.offline">Offline</button>
+      <button data-mode="revoked" aria-pressed="false" data-i18n="demo.revoked">Dostęp wyłączony</button>
+    </span>
+  </div>
+
+  <!-- header -->
+  <header class="appbar">
+    <button class="iconbtn" aria-label="Wstecz" data-i18n-aria="header.back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <h1 data-i18n="header.title">Mój paszport</h1>
+    <button class="lang" id="langBtn" aria-label="Zmień język">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span id="langLabel">PL</span>
+    </button>
+  </header>
+
+  <!-- persistent read-only + sync ribbon -->
+  <div class="ribbon">
+    <span class="readonly-pill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+      <span data-i18n="readonly">tylko odczyt</span>
+    </span>
+    <span class="offline-chip" id="offlineChip" data-i18n="offline.chip">bez sieci</span>
+    <span class="who" id="syncText"></span>
+  </div>
+
+  <main class="scroll" id="content">
+
+    <p class="greeting" data-i18n-html="greeting">Cześć, <span>Zofia</span>!</p>
+
+    <!-- passport hero -->
+    <section class="passport" aria-labelledby="pp-title">
+      <span class="kicker" data-i18n="passport.kicker">Paszport sportowy</span>
+      <h2 id="pp-title">Zofia Kowalska</h2>
+      <div class="disc" data-i18n="passport.disc">Pływanie + biegi</div>
+      <span class="level">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 3h14v4a7 7 0 01-14 0V3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 21h6M12 14v7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span data-i18n="passport.level">Poziom: Delfin 3</span>
+      </span>
+      <button class="open" id="openPassport"><span data-i18n="passport.open">Otwórz</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </section>
+
+    <!-- skill tree -->
+    <section class="block" aria-labelledby="sk-title">
+      <div class="bhead">
+        <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v6m0 0L7 6m5 3l5-3M12 9v12M7 21v-4m10 4v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3 id="sk-title" data-i18n="skills.title">Postęp umiejętności</h3>
+        <span class="count" id="skCount">2 / 3</span>
+      </div>
+      <div class="skills">
+        <div class="skill done">
+          <span class="mk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="nm" data-i18n="skill.glide">Ślizg na piersi</span>
+        </div>
+        <div class="skill done">
+          <span class="mk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="nm" data-i18n="skill.breath">Oddychanie bokiem</span>
+        </div>
+        <div class="skill todo">
+          <span class="mk">•</span>
+          <span class="nm" data-i18n="skill.turn">Nawrót koziołkowy</span>
+          <button class="film" id="playFilm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg><span data-i18n="skill.film">Film</span></button>
+        </div>
+      </div>
+      <p class="empty-hint" data-i18n="skills.hint">Kolejne umiejętności pojawią się po następnych zajęciach.</p>
+    </section>
+
+    <!-- gallery -->
+    <section class="block" aria-labelledby="gl-title">
+      <div class="bhead">
+        <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="M5 17l4-4 3 3 3-3 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3 id="gl-title" data-i18n="gallery.title">Zdjęcia ze startu</h3>
+        <span class="count" data-i18n="gallery.src">RunPixie</span>
+      </div>
+      <div class="gallery">
+        <div class="thumbs">
+          <button class="thumb" data-i18n-aria="thumb.aria" aria-label="Zdjęcie ze startu" style="background-image:linear-gradient(135deg,#1f6f74,#2a9d8f)"><span class="bib" data-bib="142"></span></button>
+          <button class="thumb" data-i18n-aria="thumb.aria" aria-label="Zdjęcie ze startu" style="background-image:linear-gradient(135deg,#2f72d6,#5b6fd6)"><span class="bib" data-bib="142"></span></button>
+          <button class="thumb" data-i18n-aria="thumb.aria" aria-label="Zdjęcie ze startu" style="background-image:linear-gradient(135deg,#e3a72f,#d6772a)"><span class="bib" data-bib="142"></span></button>
+          <button class="thumb" data-i18n-aria="thumb.aria" aria-label="Zdjęcie ze startu" style="background-image:linear-gradient(135deg,#34b3a3,#1f9d57)"><span class="bib" data-bib="142"></span></button>
+          <button class="thumb" data-i18n-aria="thumb.aria" aria-label="Zdjęcie ze startu" style="background-image:linear-gradient(135deg,#7f93f0,#7a5cd6)"><span class="bib" data-bib="142"></span></button>
+          <button class="thumb more" id="moreThumb"><span>+8</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- achievements / results (competition module) -->
+    <section class="block" aria-labelledby="ac-title">
+      <div class="bhead">
+        <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v3a5 5 0 01-10 0V4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M5 5H3v1a4 4 0 004 4M19 5h2v1a4 4 0 01-4 4M9 20h6M12 14v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <h3 id="ac-title" data-i18n="achieve.title">Osiągnięcia i wyniki</h3>
+      </div>
+      <div class="achieve">
+        <div class="result">
+          <span class="trophy"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v3a5 5 0 01-10 0V4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 20h6M12 14v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <div class="ri">
+            <div class="dist" data-i18n="achieve.dist">Bieg 5 km</div>
+            <div class="time"><span id="acTime">28:14</span> · <span class="pb" data-i18n="achieve.pb">rekord życiowy</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- simple-language note: enrolments handled by guardian (information, not an action) -->
+    <div class="guardian-note">
+      <span class="gi">i</span>
+      <span data-i18n="guardian.note">Zapisy, płatności i zgody prowadzi Twój opiekun. Tutaj oglądasz swoje postępy.</span>
+    </div>
+
+  </main>
+
+  <!-- bottom: passive browse action -->
+  <div class="actionbar">
+    <button class="btn-primary" id="browseBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+      <span data-i18n="action.browse">Przeglądaj paszport</span>
+    </button>
+    <div class="secondary-row">
+      <button class="btn-ghost" id="langBtn2" data-i18n="action.lang">Zmień język</button>
+      <button class="btn-ghost" id="galleryBtn" data-i18n="action.gallery">Galeria</button>
+    </div>
+  </div>
+
+  <!-- revoked-access lock (alternative state) -->
+  <div class="lock" id="lock" role="alertdialog" aria-labelledby="lk-title" aria-describedby="lk-desc">
+    <span class="lk-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="2"/></svg></span>
+    <h2 id="lk-title" data-i18n="lock.title">Dostęp został wyłączony</h2>
+    <p id="lk-desc" data-i18n="lock.desc">Twój widok paszportu jest teraz zamknięty. Włącza go i wyłącza opiekun konta.</p>
+    <p class="who-off" data-i18n-html="lock.who">Wyłączył: <b>Anna Kowalska</b> (opiekun)</p>
+    <button class="lk-btn" id="lockInfo" data-i18n="lock.btn">Co to znaczy?</button>
+  </div>
+
+  <div class="toast" id="toast"><span class="pl">✓</span><span id="toastText"></span></div>
+
+  <!-- loading skeleton (alternative state) -->
+  <div class="state-overlay" id="loadingState" aria-hidden="true">
+    <div class="sk sk-hero"></div>
+    <div class="sk sk-block"></div>
+    <div class="sk sk-block"></div>
+    <span class="sr-status" role="status" data-i18n="state.loading">Wczytywanie paszportu…</span>
+  </div>
+
+  <!-- empty: no data yet (alternative state) -->
+  <div class="state-overlay panel" id="emptyState" role="status">
+    <span class="panel-ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 3v6m0 0L7 6m5 3l5-3M12 9v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <h2 data-i18n="empty.title">Twój paszport jest jeszcze pusty</h2>
+    <p data-i18n="empty.desc">Postępy, zdjęcia i wyniki pojawią się po pierwszych zajęciach lub starcie.</p>
+  </div>
+
+  <!-- error: load failed, with retry (alternative state) -->
+  <div class="state-overlay panel" id="errorState" role="alert">
+    <span class="panel-ic warn"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16.5v.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/></svg></span>
+    <h2 data-i18n="error.title">Nie udało się wczytać paszportu</h2>
+    <p data-i18n="error.desc">Sprawdź połączenie i spróbuj ponownie.</p>
+    <button class="lk-btn" id="retryBtn" data-i18n="action.retry">Spróbuj ponownie</button>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+const I18N = {
+  "pl-PL":{
+    "demo.hint":"makieta hi-fi",
+    "demo.default":"Domyślny",
+    "demo.revoked":"Dostęp wyłączony",
+    "demo.loading":"Ładowanie",
+    "demo.empty":"Pusty",
+    "demo.error":"Błąd",
+    "demo.offline":"Offline",
+    "demo.group":"Stan ekranu",
+    "thumb.aria":"Zdjęcie ze startu",
+    "bib.prefix":"nr",
+    "offline.chip":"bez sieci",
+    "state.loading":"Wczytywanie paszportu…",
+    "empty.title":"Twój paszport jest jeszcze pusty",
+    "empty.desc":"Postępy, zdjęcia i wyniki pojawią się po pierwszych zajęciach lub starcie.",
+    "error.title":"Nie udało się wczytać paszportu",
+    "error.desc":"Sprawdź połączenie i spróbuj ponownie.",
+    "action.retry":"Spróbuj ponownie",
+    "toast.retry":"Ponawiam wczytywanie paszportu.",
+    "header.title":"Mój paszport",
+    "header.back":"Wstecz",
+    "readonly":"tylko odczyt",
+    "sync.label":"dane z",
+    "sync.synced":"zsynchronizowano",
+    "greeting":"Cześć, <span>Zofia</span>!",
+    "passport.kicker":"Paszport sportowy",
+    "passport.disc":"Pływanie + biegi",
+    "passport.level":"Poziom: Delfin 3",
+    "passport.open":"Otwórz",
+    "skills.title":"Postęp umiejętności",
+    "skill.glide":"Ślizg na piersi",
+    "skill.breath":"Oddychanie bokiem",
+    "skill.turn":"Nawrót koziołkowy",
+    "skill.film":"Film",
+    "skills.hint":"Kolejne umiejętności pojawią się po następnych zajęciach.",
+    "gallery.title":"Zdjęcia ze startu",
+    "gallery.src":"RunPixie",
+    "achieve.title":"Osiągnięcia i wyniki",
+    "achieve.dist":"Bieg 5 km",
+    "achieve.pb":"rekord życiowy",
+    "guardian.note":"Zapisy, płatności i zgody prowadzi Twój opiekun. Tutaj oglądasz swoje postępy.",
+    "action.browse":"Przeglądaj paszport",
+    "action.lang":"Zmień język",
+    "action.gallery":"Galeria",
+    "lock.title":"Dostęp został wyłączony",
+    "lock.desc":"Twój widok paszportu jest teraz zamknięty. Włącza go i wyłącza opiekun konta.",
+    "lock.who":"Wyłączył: <b>Anna Kowalska</b> (opiekun)",
+    "lock.btn":"Co to znaczy?",
+    "toast.passport":"Otwieram paszport w trybie odczytu.",
+    "toast.film":"Odtwarzam film instruktażowy.",
+    "toast.gallery":"Otwieram galerię zdjęć.",
+    "toast.photo":"Podgląd zdjęcia (nr 142).",
+    "toast.lockInfo":"Poproś opiekuna, aby ponownie włączył Twój widok w ustawieniach konta.",
+    "toast.browse":"Przewiń, aby obejrzeć swoje postępy."
+  },
+  "en-GB":{
+    "demo.hint":"hi-fi mockup",
+    "demo.default":"Default",
+    "demo.revoked":"Access off",
+    "demo.loading":"Loading",
+    "demo.empty":"Empty",
+    "demo.error":"Error",
+    "demo.offline":"Offline",
+    "demo.group":"Screen state",
+    "thumb.aria":"Event photo",
+    "bib.prefix":"bib",
+    "offline.chip":"offline",
+    "state.loading":"Loading the passport…",
+    "empty.title":"Your passport is still empty",
+    "empty.desc":"Progress, photos and results will appear after your first classes or race.",
+    "error.title":"We could not load the passport",
+    "error.desc":"Check your connection and try again.",
+    "action.retry":"Try again",
+    "toast.retry":"Retrying the passport load.",
+    "header.title":"My passport",
+    "header.back":"Back",
+    "readonly":"read only",
+    "sync.label":"data from",
+    "sync.synced":"synced",
+    "greeting":"Hi, <span>Zofia</span>!",
+    "passport.kicker":"Sports passport",
+    "passport.disc":"Swimming + running",
+    "passport.level":"Level: Dolphin 3",
+    "passport.open":"Open",
+    "skills.title":"Skill progress",
+    "skill.glide":"Front glide",
+    "skill.breath":"Side breathing",
+    "skill.turn":"Tumble turn",
+    "skill.film":"Video",
+    "skills.hint":"More skills will appear after your next classes.",
+    "gallery.title":"Event photos",
+    "gallery.src":"RunPixie",
+    "achieve.title":"Achievements & results",
+    "achieve.dist":"5 km run",
+    "achieve.pb":"personal best",
+    "guardian.note":"Sign-ups, payments and consents are handled by your guardian. Here you view your progress.",
+    "action.browse":"Browse passport",
+    "action.lang":"Change language",
+    "action.gallery":"Gallery",
+    "lock.title":"Access has been turned off",
+    "lock.desc":"Your passport view is now closed. Your account guardian turns it on and off.",
+    "lock.who":"Turned off by: <b>Anna Kowalska</b> (guardian)",
+    "lock.btn":"What does this mean?",
+    "toast.passport":"Opening the passport in read-only mode.",
+    "toast.film":"Playing the instructional video.",
+    "toast.gallery":"Opening the photo gallery.",
+    "toast.photo":"Photo preview (bib 142).",
+    "toast.lockInfo":"Ask your guardian to switch your view back on in account settings.",
+    "toast.browse":"Scroll to view your progress."
+  }
+};
+
+const RTL = new Set(["ar","he","fa","ur"]);
+const FALLBACK = "en-GB";
+const SYNC_ISO = "2026-05-25T14:02:00";
+
+const state = { lang:"pl-PL", mode:"default" };
+
+function t(key){
+  const d = I18N[state.lang] || {};
+  if(key in d) return d[key];
+  const f = I18N[FALLBACK] || {};
+  return (key in f) ? f[key] : key;
+}
+
+function fmtDateTime(iso){
+  try{
+    return new Intl.DateTimeFormat(state.lang,{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}).format(new Date(iso));
+  }catch(e){ return iso; }
+}
+
+function applyI18n(){
+  document.documentElement.lang = state.lang;
+  const base = state.lang.split("-")[0];
+  document.documentElement.dir = RTL.has(base) ? "rtl" : "ltr";
+
+  document.querySelectorAll("[data-i18n]").forEach(el=> el.textContent = t(el.getAttribute("data-i18n")));
+  document.querySelectorAll("[data-i18n-html]").forEach(el=> el.innerHTML = t(el.getAttribute("data-i18n-html")));
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=> el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria"))));
+
+  document.getElementById("langLabel").textContent = state.lang === "pl-PL" ? "PL" : "EN";
+  document.getElementById("syncText").textContent = t("sync.synced") + " · " + fmtDateTime(SYNC_ISO);
+
+  // localized start-number labels on thumbnails
+  document.querySelectorAll(".bib[data-bib]").forEach(el=>{
+    el.textContent = t("bib.prefix") + " " + el.getAttribute("data-bib");
+  });
+
+  refresh();
+}
+
+function refresh(){
+  const m = state.mode;
+  const revoked = m === "revoked";
+  const offline = m === "offline";
+
+  document.getElementById("lock").classList.toggle("show", revoked);
+  document.getElementById("loadingState").classList.toggle("show", m === "loading");
+  document.getElementById("emptyState").classList.toggle("show", m === "empty");
+  document.getElementById("errorState").classList.toggle("show", m === "error");
+
+  // offline shows last synced data with a clear no-network marker
+  document.getElementById("offlineChip").classList.toggle("show", offline);
+
+  // the passive browse action is unavailable when content is not reachable
+  const blocked = revoked || m === "loading" || m === "empty" || m === "error";
+  document.getElementById("browseBtn").disabled = blocked;
+}
+
+let toastTimer = null;
+function toast(key){
+  const el = document.getElementById("toast");
+  document.getElementById("toastText").textContent = t(key);
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> el.classList.remove("show"), 3000);
+}
+
+/* wiring */
+function toggleLang(){ state.lang = state.lang === "pl-PL" ? "en-GB" : "pl-PL"; applyI18n(); }
+document.getElementById("langBtn").addEventListener("click", toggleLang);
+document.getElementById("langBtn2").addEventListener("click", toggleLang);
+
+const demoButtons = document.querySelectorAll(".demo-seg button[data-mode]");
+demoButtons.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    state.mode = btn.getAttribute("data-mode");
+    demoButtons.forEach(b=> b.setAttribute("aria-pressed", b === btn ? "true" : "false"));
+    refresh();
+  });
+});
+document.getElementById("retryBtn").addEventListener("click", ()=>{
+  state.mode = "default";
+  demoButtons.forEach(b=> b.setAttribute("aria-pressed", b.getAttribute("data-mode") === "default" ? "true" : "false"));
+  refresh();
+  toast("toast.retry");
+});
+
+document.getElementById("openPassport").addEventListener("click", ()=> toast("toast.passport"));
+document.getElementById("browseBtn").addEventListener("click", ()=> toast("toast.browse"));
+document.getElementById("playFilm").addEventListener("click", ()=> toast("toast.film"));
+document.getElementById("galleryBtn").addEventListener("click", ()=> toast("toast.gallery"));
+document.getElementById("moreThumb").addEventListener("click", ()=> toast("toast.gallery"));
+document.querySelectorAll(".thumb:not(.more)").forEach(b=> b.addEventListener("click", ()=> toast("toast.photo")));
+document.getElementById("lockInfo").addEventListener("click", ()=> toast("toast.lockInfo"));
+
+applyI18n();
+</script>
+</body>
+</html>

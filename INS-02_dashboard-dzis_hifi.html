@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INS-02 · Dziś</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#0d1a1e; --accent:#21d8c4;
+  --color-success:#4ade80; --color-warning:#f6b73c; --color-error:#ff6b5e; --color-info:#5aa8ff;
+  --surface-1:#13242a; --surface-2:#1a313a; --surface-3:#234049; --hairline:#2c4b55;
+  --text-strong:#f0f6f5; --text:#c7d6d8; --text-muted:#83a0a5; --on-accent:#062420; --paper:#eef4f1;
+  --font-display:"Bricolage Grotesque", system-ui; --font-body:"IBM Plex Sans", system-ui;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:16px; --shadow:0 12px 32px -14px rgba(0,0,0,.7); --tap:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06100f;color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+.num{font-variant-numeric:tabular-nums}
+.shell{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--brand-ink)}
+header.app{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border-bottom:1px solid var(--hairline)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);min-height:var(--tap)}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.logo{width:38px;height:38px;border-radius:11px;flex:none;background:radial-gradient(circle at 30% 30%,#2ff0da,var(--accent) 60%,#0fae9e);display:grid;place-items:center;color:var(--on-accent);font-family:var(--font-display);font-weight:800}
+.brand .day{min-width:0}
+.brand .day b{display:block;font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:16px;line-height:1.1}
+.brand .day small{color:var(--text-muted);font-size:12px}
+.lang{display:flex;align-items:center;gap:var(--s1);background:var(--surface-3);border:1px solid var(--hairline);color:var(--text-strong);border-radius:999px;padding:0 var(--s3);height:40px;font:600 14px/1 var(--font-body);cursor:pointer}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s4);font-size:12.5px;color:var(--text-muted);border-top:1px solid var(--hairline);background:var(--surface-1)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.on{background:var(--color-success);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-success) 25%,transparent)}
+.dot.warn{background:var(--color-warning);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-warning) 25%,transparent)}
+body.is-offline .sys .online{display:none}
+body.is-offline .dot.on{background:var(--color-warning);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-warning) 25%,transparent)}
+.sys .offline-txt{display:none;color:var(--color-warning);font-weight:600}
+body.is-offline .sys .offline-txt{display:inline}
+.offline-banner{display:none;align-items:flex-start;gap:var(--s3);margin:var(--s4) var(--s4) 0;padding:var(--s3) var(--s4);
+  border:1px solid color-mix(in srgb,var(--color-warning) 50%,var(--hairline));border-left:4px solid var(--color-warning);
+  border-radius:var(--radius);background:color-mix(in srgb,var(--color-warning) 12%,var(--surface-1));color:var(--text-strong);font-size:13.5px;line-height:1.4}
+body.is-offline .offline-banner{display:flex}
+.offline-banner b{font-weight:600}
+.seg{display:flex;gap:var(--s1);margin:var(--s4) var(--s4) 0;padding:var(--s1);background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px}
+.seg button{flex:1;border:0;background:transparent;color:var(--text-muted);font:600 13.5px/1 var(--font-body);height:40px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected=true]{background:var(--surface-3);color:var(--text-strong)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{flex:1;padding:var(--s5) var(--s4) var(--s10)}
+.sect{display:flex;align-items:center;gap:var(--s3);margin:var(--s6) 0 var(--s3);color:var(--text-muted);font:700 12px/1 var(--font-display);letter-spacing:1.5px;text-transform:uppercase}
+.sect::after{content:"";flex:1;height:1px;background:var(--hairline)}
+.sect.lead-accent{color:var(--accent)} .sect.lead-accent::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 22%,transparent)}
+.card{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);padding:var(--s4);margin-bottom:var(--s3);animation:rise .5s both}
+.card.next{background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border-color:color-mix(in srgb,var(--accent) 40%,var(--hairline));box-shadow:var(--shadow)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card:nth-of-type(2){animation-delay:.05s}.card:nth-of-type(3){animation-delay:.1s}
+.when{display:flex;align-items:baseline;gap:var(--s3)}
+.when .time{font-family:var(--font-display);font-weight:800;color:var(--text-strong);font-size:28px;letter-spacing:-.5px}
+.when .where{color:var(--text-muted);font-size:14px}
+.grp{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:18px;margin-top:var(--s2)}
+.meta{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);margin-top:var(--s2);font-size:13.5px;color:var(--text-muted)}
+.meta .cnt{color:var(--text);font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--hairline)}
+.pill.sub{color:var(--color-info);border-color:color-mix(in srgb,var(--color-info) 45%,transparent);background:color-mix(in srgb,var(--color-info) 12%,transparent)}
+.pill.done{color:var(--text-muted)}
+.pill.notstarted{color:var(--color-warning);border-color:color-mix(in srgb,var(--color-warning) 45%,transparent);background:color-mix(in srgb,var(--color-warning) 10%,transparent)}
+.start{margin-top:var(--s4);width:100%;min-height:var(--tap);border:0;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.2px;cursor:pointer;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;gap:var(--s3)}
+.start:focus-visible{outline:3px solid var(--text-strong);outline-offset:3px}
+.start .badge{background:var(--on-accent);color:var(--accent);border-radius:999px;font-size:13px;padding:2px 9px}
+.later{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s2) 0}
+.later + .later{border-top:1px solid var(--hairline)}
+.later .lt{display:flex;align-items:baseline;gap:var(--s3)}
+.later .lt .time{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:18px}
+.later .lt .lw{color:var(--text-muted);font-size:13px}
+.alert{display:flex;gap:var(--s3);margin-top:var(--s4);padding:var(--s3) var(--s4);border-radius:12px;font-size:13.5px;line-height:1.4;
+  background:color-mix(in srgb,var(--color-info) 12%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-info) 40%,transparent);color:#d6ecff}
+.alert b{color:#fff;font-weight:600}
+.empty{text-align:center;padding:var(--s8) var(--s4);color:var(--text-muted)}
+.hide{display:none!important}
+footer.app{position:sticky;bottom:0;z-index:20;background:linear-gradient(0deg,var(--surface-2),var(--surface-1));border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom))}
+.saveline{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s3)}
+.links{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);justify-content:center}
+.links a{color:var(--text-muted);font-size:14px;text-decoration:none;min-height:40px;display:inline-flex;align-items:center}
+.links a:hover{color:var(--text-strong)} .links a:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+@media(prefers-reduced-motion:reduce){.card{animation:none}}
+</style>
+</head>
+<body class="pl-PL">
+<div class="shell">
+  <header class="app">
+    <div class="bar">
+      <div class="brand">
+        <span class="logo">D</span>
+        <span class="day"><b id="dayTitle">Dziś, wtorek</b><small id="dayDate" class="num">27 maja 2026</small></span>
+      </div>
+      <button class="lang" id="langBtn" aria-label="Zmień język"><span id="langLabel">PL</span> ▾</button>
+    </div>
+    <div class="sys">
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="online"><span data-i="syncOk">Sync 2 min temu</span> · <span class="num">0</span> <span data-i="inQueue">w kolejce</span></span>
+      <span class="offline-txt" data-i="offShort">Offline · plan z ostatniej sync</span>
+    </div>
+  </header>
+
+  <div class="offline-banner" role="status">
+    <span aria-hidden="true">⚠</span>
+    <span><b data-i="offTitle">Tryb offline.</b> <span data-i="offBody">Plan dnia pochodzi z ostatniej synchronizacji. Obecność i tak działa lokalnie - dane pójdą do kolejki i wyślą się po sieci.</span></span>
+  </div>
+
+  <div class="seg" role="tablist" aria-label="Podgląd stanu ekranu">
+    <button role="tab" aria-selected="true" data-state="default" data-i="stDefault">Online</button>
+    <button role="tab" aria-selected="false" data-state="offline" data-i="stOffline">Offline</button>
+  </div>
+
+  <main>
+    <div class="sect lead-accent" data-i="secNext">Najbliższe</div>
+    <article class="card next">
+      <div class="when"><span class="time num">16:00</span><span class="where" data-i="t2">Tor 2</span></div>
+      <div class="grp" data-i="gDelfinki">Delfinki · poziom 3</div>
+      <div class="meta">
+        <span><span data-i="enrolled">Zapisanych</span> <b class="cnt num">11</b></span>
+        <span class="pill notstarted" data-i="notStarted">Obecność nierozpoczęta</span>
+      </div>
+      <button class="start" id="startBtn">
+        <span data-i="ctaStart">Rozpocznij obecność</span>
+        <span class="badge num">0/11</span>
+      </button>
+    </article>
+
+    <div class="sect" data-i="secLater">Później dziś</div>
+    <article class="card">
+      <div class="later">
+        <div class="lt"><span class="time num">17:00</span><span class="lw" data-i="lwZabki">Sala A · Żabki</span></div>
+        <span class="pill sub" data-i="sub">Zastępstwo</span>
+      </div>
+      <div class="later">
+        <div class="lt"><span class="time num">18:00</span><span class="lw" data-i="lwRekiny">Tor 1 · Rekiny</span></div>
+        <span class="pill done" data-i="closed">Zamknięta</span>
+      </div>
+    </article>
+
+    <div class="alert" role="status">
+      <span aria-hidden="true">ⓘ</span>
+      <span><b data-i="alertB">Zmiana sali:</b> <span data-i="alertBody">zajęcia o 17:00 przeniesione z Sali A do Sali B.</span></span>
+    </div>
+  </main>
+
+  <footer class="app">
+    <div class="saveline">
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="online" data-i="upToDate">Plan aktualny</span>
+      <span class="offline-txt" data-i="localPlan">Plan lokalny · obecność działa offline</span>
+    </div>
+    <div class="links">
+      <a href="#" data-i="aSchedule">Mój grafik</a>
+      <a href="#" data-i="aGroup">Lista grupy</a>
+      <a href="#" data-i="aAvail">Dostępność</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL", date:new Date(2026,4,27,15,30)};
+
+const I18N={
+ "pl-PL":{
+   syncOk:"Sync 2 min temu", inQueue:"w kolejce", offShort:"Offline · plan z ostatniej sync",
+   offTitle:"Tryb offline.", offBody:"Plan dnia pochodzi z ostatniej synchronizacji. Obecność i tak działa lokalnie - dane pójdą do kolejki i wyślą się po sieci.",
+   stDefault:"Online", stOffline:"Offline",
+   secNext:"Najbliższe", t2:"Tor 2", gDelfinki:"Delfinki · poziom 3",
+   enrolled:"Zapisanych", notStarted:"Obecność nierozpoczęta", ctaStart:"Rozpocznij obecność",
+   secLater:"Później dziś", lwZabki:"Sala A · Żabki", sub:"Zastępstwo", lwRekiny:"Tor 1 · Rekiny", closed:"Zamknięta",
+   alertB:"Zmiana sali:", alertBody:"zajęcia o 17:00 przeniesione z Sali A do Sali B.",
+   upToDate:"Plan aktualny", localPlan:"Plan lokalny · obecność działa offline",
+   aSchedule:"Mój grafik", aGroup:"Lista grupy", aAvail:"Dostępność",
+   dayTitle:"Dziś, "
+ },
+ "en-GB":{
+   syncOk:"Synced 2 min ago", inQueue:"queued", offShort:"Offline · plan from last sync",
+   offTitle:"Offline mode.", offBody:"Today's plan is from the last sync. Attendance still works locally - changes queue and send once you're back online.",
+   stDefault:"Online", stOffline:"Offline",
+   secNext:"Up next", t2:"Lane 2", gDelfinki:"Dolphins · level 3",
+   enrolled:"Enrolled", notStarted:"Attendance not started", ctaStart:"Start attendance",
+   secLater:"Later today", lwZabki:"Hall A · Frogs", sub:"Cover", lwRekiny:"Lane 1 · Sharks", closed:"Closed",
+   alertB:"Room change:", alertBody:"the 17:00 class moved from Hall A to Hall B.",
+   upToDate:"Plan up to date", localPlan:"Local plan · attendance works offline",
+   aSchedule:"My schedule", aGroup:"Group list", aAvail:"Availability",
+   dayTitle:"Today, "
+ }
+};
+const FALLBACK="en-GB";
+function t(k){const l=I18N[DATA.locale]||{};return (k in l)?l[k]:(I18N[FALLBACK][k]??k);}
+
+function fmt(){
+  const wd=new Intl.DateTimeFormat(DATA.locale,{weekday:"long"}).format(DATA.date);
+  const d=new Intl.DateTimeFormat(DATA.locale,{day:"numeric",month:"long",year:"numeric"}).format(DATA.date);
+  document.getElementById("dayTitle").textContent=t("dayTitle")+wd;
+  document.getElementById("dayDate").textContent=d;
+}
+function applyLang(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i);});
+  document.getElementById("langLabel").textContent=DATA.locale.split("-")[0].toUpperCase();
+  document.documentElement.lang=DATA.locale;
+  document.documentElement.dir=RTL.has(DATA.locale.split("-")[0])?"rtl":"ltr";
+  fmt();
+}
+function toggleLang(){DATA.locale=DATA.locale==="pl-PL"?"en-GB":"pl-PL";applyLang();}
+document.getElementById("langBtn").addEventListener("click",toggleLang);
+
+const tabs=document.querySelectorAll('[role=tab]');
+tabs.forEach(tb=>tb.addEventListener("click",()=>{
+  tabs.forEach(x=>x.setAttribute("aria-selected",x===tb));
+  document.body.classList.toggle("is-offline", tb.dataset.state==="offline");
+}));
+
+applyLang();
+</script>
+</body>
+</html>

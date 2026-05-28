@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<!--
+  ATH-08 - samoobsługa zgłoszenia (panel zawodnika, moduł zawodów)
+  Makieta hi-fi, mobile-first, jeden ekran / jeden plik.
+  Stan domyślny: lista operacji. Stan alternatywny: oferta z listy rezerwowej z odliczaniem.
+  Wszystkie napisy to klucze tłumaczeń ze znacznikami BCP 47 (pl-PL domyślny, en-GB zapasowy).
+  Motywowanie wyłącznie przez zmienne CSS w :root (sekcja TOKENY MARKI).
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moje zgłoszenie · ATH-08</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   TOKENY MARKI - jedyne miejsce do przemotywowania (zmienne CSS)
+   Panel jest brandowany barwami organizatora kontekstu startu.
+   ========================================================================= */
+:root{
+  /* kolory marki */
+  --brand-ink:#10141b;          /* podstawowe tło panelu */
+  --accent:#d6f622;             /* akcent organizatora (electric lime) */
+
+  /* kolory semantyczne */
+  --color-success:#3ddc84;
+  --color-warning:#ffb84d;
+  --color-error:#ff6b5e;
+  --color-info:#6aa9ff;
+
+  /* powierzchnie pochodne (wyliczone z brand-ink, nie do przemotywowania ręcznie) */
+  --surface-1:#181e28;
+  --surface-2:#1f2733;
+  --surface-3:#283241;
+  --hairline:#313c4c;
+  --text-strong:#f2f5f7;
+  --text:#cdd5df;
+  --text-muted:#8c97a6;
+  --on-accent:#10141b;          /* tekst na akcencie - wysoki kontrast */
+  --paper:#f4f5ef;              /* płótno numeru startowego */
+
+  /* para krojów: nagłówkowy wyróżniający + tekstowy czytelny (z dala od Inter/Arial) */
+  --font-display:"Saira Condensed", system-ui;
+  --font-body:"Barlow", system-ui;
+
+  /* skala odstępów na jednej jednostce bazowej */
+  --u:4px;
+  --s1:calc(var(--u)*1);   /* 4 */
+  --s2:calc(var(--u)*2);   /* 8 */
+  --s3:calc(var(--u)*3);   /* 12 */
+  --s4:calc(var(--u)*4);   /* 16 */
+  --s5:calc(var(--u)*5);   /* 20 */
+  --s6:calc(var(--u)*6);   /* 24 */
+  --s8:calc(var(--u)*8);   /* 32 */
+  --s10:calc(var(--u)*10); /* 40 */
+
+  /* jeden promień, jeden poziom cienia */
+  --radius:14px;
+  --shadow:0 10px 30px -12px rgba(0,0,0,.65);
+
+  /* minimalny cel dotykowy zgodny z WCAG 2.1 AA */
+  --tap:48px;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(120% 60% at 80% -10%, rgba(214,246,34,.10), transparent 60%),
+    var(--brand-ink);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+[dir="rtl"] body{direction:rtl}
+
+/* atmosfera: subtelna siatka linii startu */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 64px);
+  mask-image:linear-gradient(180deg, transparent, #000 30%, #000 80%, transparent);
+}
+
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:168px}
+
+/* ---------- nagłówek (przyklejony) ---------- */
+header.bar{
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg, rgba(16,20,27,.96), rgba(16,20,27,.86));
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--hairline);
+  box-shadow:0 1px 0 rgba(214,246,34,.18);
+}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{
+  flex:0 0 auto;width:34px;height:34px;border-radius:9px;
+  background:var(--accent);position:relative;overflow:hidden;
+}
+.mark::before{ /* chevron biegacza */
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(120deg, transparent 38%, var(--on-accent) 38% 50%, transparent 50% 60%, var(--on-accent) 60% 72%, transparent 72%);
+}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;letter-spacing:.3px;color:var(--text-strong);font-size:15px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+
+.lang{margin-inline-start:auto;position:relative}
+.lang select{
+  appearance:none;-webkit-appearance:none;
+  font-family:var(--font-body);font-weight:600;font-size:13px;
+  color:var(--text-strong);background:var(--surface-2);
+  border:1px solid var(--hairline);border-radius:10px;
+  min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer;
+}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* pasek stanu systemu - zawsze widoczny */
+.sys{
+  display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);
+  padding:var(--s2) var(--s4) var(--s3);
+  font-size:12.5px;color:var(--text-muted);
+}
+.sys .bib{
+  font-family:var(--font-display);font-weight:800;color:var(--accent);
+  letter-spacing:.5px;font-variant-numeric:tabular-nums;
+}
+.dot{display:inline-flex;align-items:center;gap:6px}
+.dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--color-success);box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+.dot.off::before{background:var(--color-warning);box-shadow:0 0 0 3px rgba(255,184,77,.18)}
+.pill-paid{
+  color:var(--on-accent);background:var(--color-success);
+  font-weight:700;font-size:11px;letter-spacing:.4px;text-transform:uppercase;
+  padding:2px 8px;border-radius:999px;
+}
+
+/* ---------- przełącznik stanu (segmented) ---------- */
+.seg{display:flex;gap:var(--s2);padding:var(--s4) var(--s4) var(--s2)}
+.seg button{
+  flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;
+  font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.3px;
+  background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);
+  transition:all .18s ease;
+}
+.seg button[aria-pressed="true"]{
+  background:var(--accent);color:var(--on-accent);border-color:var(--accent);
+  box-shadow:0 6px 18px -8px rgba(214,246,34,.6);
+}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+main{padding:var(--s2) var(--s4) 0}
+.h-section{
+  font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--text-muted);margin:var(--s5) 0 var(--s3);
+}
+.h-section .rule{display:block;font-family:var(--font-body);font-weight:500;font-size:12px;letter-spacing:.2px;text-transform:none;color:var(--text-muted);opacity:.85;margin-top:2px}
+
+/* ---------- karta podsumowania zgłoszenia ---------- */
+.entry{
+  background:linear-gradient(135deg,var(--surface-2),var(--surface-1));
+  border:1px solid var(--hairline);border-radius:var(--radius);
+  padding:var(--s4);display:flex;gap:var(--s4);align-items:center;box-shadow:var(--shadow);
+}
+.bib-tag{
+  flex:0 0 auto;background:var(--paper);color:#000;border-radius:10px;
+  padding:var(--s2) var(--s3);text-align:center;position:relative;
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.08);
+}
+.bib-tag::before,.bib-tag::after{content:"";position:absolute;width:8px;height:8px;border:2px solid rgba(0,0,0,.35);border-radius:50%}
+.bib-tag::before{top:6px;left:6px;border-right:none;border-bottom:none}
+.bib-tag::after{bottom:6px;right:6px;border-left:none;border-top:none}
+.bib-tag small{display:block;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:#5a5a52;font-weight:700}
+.bib-tag b{font-family:var(--font-display);font-weight:800;font-size:30px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.entry-meta{min-width:0}
+.entry-meta .ev{font-family:var(--font-display);font-weight:700;font-size:19px;color:var(--text-strong);line-height:1.1}
+.entry-meta .sub{font-size:13px;color:var(--text-muted);margin-top:3px}
+
+/* ---------- lista operacji ---------- */
+.ops{list-style:none;margin:var(--s3) 0 0;padding:0;display:flex;flex-direction:column;gap:var(--s3)}
+.op{
+  position:relative;border:1px solid var(--hairline);border-radius:var(--radius);
+  background:var(--surface-1);overflow:hidden;
+  transition:border-color .16s ease, background .16s ease, transform .12s ease;
+}
+.op>.row{display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s4);width:100%;text-align:start;background:none;border:none;color:inherit;cursor:pointer;font:inherit;min-height:var(--tap)}
+.op .stripe{position:absolute;inset-inline-start:0;top:0;bottom:0;width:4px;background:var(--hairline)}
+.op[data-paid="true"] .stripe{background:var(--accent)}
+.op.selected{border-color:var(--accent);background:linear-gradient(180deg,rgba(214,246,34,.08),transparent)}
+.op.selected{box-shadow:0 0 0 1px var(--accent), 0 10px 24px -14px rgba(214,246,34,.7)}
+.op.disabled{opacity:.62}
+.op.disabled>.row{cursor:not-allowed}
+.op .row:focus-visible{outline:3px solid var(--accent);outline-offset:-3px;border-radius:var(--radius)}
+
+.check{
+  flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--text-muted);
+  margin-top:1px;display:grid;place-items:center;transition:.16s;
+}
+.op.selected .check{border-color:var(--accent);background:var(--accent)}
+.op.selected .check::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--on-accent)}
+.op-body{flex:1;min-width:0}
+.op-name{font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--text-strong);line-height:1.12}
+.op-effect{font-size:13px;color:var(--text-muted);margin-top:3px}
+.op-deadline{font-size:12px;color:var(--text-muted);margin-top:var(--s2);display:flex;align-items:center;gap:6px}
+.op-deadline b{color:var(--text);font-variant-numeric:tabular-nums;font-weight:600}
+.badge{
+  flex:0 0 auto;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px;align-self:flex-start;margin-top:1px;
+}
+.badge.free{color:var(--color-success);background:rgba(61,220,132,.12);border:1px solid rgba(61,220,132,.4)}
+.badge.paid{color:var(--accent);background:rgba(214,246,34,.12);border:1px solid rgba(214,246,34,.45)}
+.badge.closed{color:var(--color-warning);background:rgba(255,184,77,.12);border:1px solid rgba(255,184,77,.4)}
+.badge.lock{color:var(--text-muted);background:var(--surface-3);border:1px solid var(--hairline)}
+
+/* komunikat walidacji wewnątrz operacji po terminie */
+.op-validation{
+  display:none;gap:var(--s3);align-items:flex-start;
+  margin:0 var(--s4) var(--s4);padding:var(--s3);border-radius:10px;
+  background:rgba(255,184,77,.10);border:1px solid rgba(255,184,77,.45);
+  color:#ffd79a;font-size:13px;
+}
+.op.show-val .op-validation{display:flex}
+.op-validation svg{flex:0 0 auto;margin-top:1px}
+.op-validation a{color:var(--color-warning);font-weight:700;text-decoration:underline;text-underline-offset:2px;min-height:auto;display:inline}
+.op-reason{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text-muted);margin:0 var(--s4) var(--s4)}
+
+/* ---------- strefa niszcząca ---------- */
+.danger{
+  margin-top:var(--s6);border-radius:var(--radius);overflow:hidden;
+  border:1px solid rgba(255,107,94,.4);background:var(--surface-1);
+}
+.danger-head{
+  padding:var(--s2) var(--s4);
+  background:repeating-linear-gradient(45deg, rgba(255,107,94,.16) 0 12px, rgba(255,107,94,.05) 12px 24px);
+  border-bottom:1px solid rgba(255,107,94,.35);
+  font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--color-error);
+}
+.danger-row{display:flex;align-items:center;gap:var(--s3);padding:var(--s4)}
+.danger-row .op-body .op-name{color:var(--text-strong)}
+.refund{margin-inline-start:auto;text-align:end;flex:0 0 auto}
+.refund b{font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--color-success);font-variant-numeric:tabular-nums;display:block}
+.refund small{font-size:11px;color:var(--text-muted)}
+.btn-danger-toggle{
+  min-height:var(--tap);border:1px solid rgba(255,107,94,.5);background:transparent;color:var(--color-error);
+  border-radius:10px;padding:0 var(--s4);font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:.4px;cursor:pointer;width:100%;
+  margin:0 var(--s4) var(--s4);width:calc(100% - var(--s8));
+}
+.btn-danger-toggle:focus-visible{outline:3px solid var(--color-error);outline-offset:2px}
+.confirm-panel{display:none;padding:0 var(--s4) var(--s4)}
+.confirm-panel.open{display:block}
+.confirm-card{background:var(--surface-2);border:1px solid rgba(255,107,94,.4);border-radius:12px;padding:var(--s4)}
+.confirm-card p{margin:0 0 var(--s3);font-size:13.5px;color:var(--text)}
+.confirm-check{display:flex;gap:var(--s3);align-items:flex-start;cursor:pointer;min-height:var(--tap);font-size:14px;color:var(--text-strong)}
+.confirm-check input{width:22px;height:22px;accent-color:var(--color-error);margin-top:1px;flex:0 0 auto}
+.confirm-actions{display:flex;gap:var(--s3);margin-top:var(--s4)}
+.btn-resign{
+  flex:1;min-height:var(--tap);border:none;border-radius:12px;cursor:pointer;
+  background:var(--color-error);color:#1a0805;font-family:var(--font-display);font-weight:800;font-size:15px;letter-spacing:.4px;
+}
+.btn-resign:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{
+  min-height:var(--tap);border:1px solid var(--hairline);border-radius:12px;background:transparent;color:var(--text);
+  padding:0 var(--s5);font-family:var(--font-body);font-weight:600;font-size:14px;cursor:pointer;
+}
+.btn-resign:focus-visible,.btn-ghost:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* ---------- stan alternatywny: oferta z listy rezerwowej ---------- */
+.offer{padding-top:var(--s4);animation:rise .4s ease both}
+.offer-card{
+  border-radius:var(--radius);border:1px solid var(--hairline);overflow:hidden;
+  background:linear-gradient(160deg,var(--surface-2),var(--surface-1));box-shadow:var(--shadow);
+}
+.offer-top{padding:var(--s5) var(--s4) var(--s4)}
+.offer-kicker{font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent)}
+.offer-h{font-family:var(--font-display);font-weight:800;font-size:26px;color:var(--text-strong);line-height:1.05;margin:var(--s2) 0 var(--s2)}
+.offer-body{font-size:14px;color:var(--text);margin:0}
+.timer-wrap{
+  margin:var(--s4) 0 0;padding:var(--s4);border-radius:12px;
+  background:var(--brand-ink);border:1px solid var(--hairline);text-align:center;
+}
+.timer-label{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted)}
+.timer{
+  font-family:var(--font-display);font-weight:800;font-size:54px;line-height:1;letter-spacing:2px;
+  color:var(--accent);font-variant-numeric:tabular-nums;margin-top:var(--s1);
+  text-shadow:0 0 24px rgba(214,246,34,.25);
+}
+.timer.warn{color:var(--color-error);text-shadow:0 0 24px rgba(255,107,94,.3);animation:pulse 1s ease-in-out infinite}
+.offer-price{display:flex;justify-content:space-between;align-items:baseline;padding:var(--s4);border-top:1px solid var(--hairline)}
+.offer-price span{font-size:13px;color:var(--text-muted)}
+.offer-price b{font-family:var(--font-display);font-weight:800;font-size:24px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.offer-expired{display:none;margin:var(--s4) var(--s4) 0;padding:var(--s4);border-radius:12px;background:rgba(255,107,94,.1);border:1px solid rgba(255,107,94,.45);color:#ffc4bd;font-size:14px}
+.offer.expired .offer-expired{display:block}
+.offer.expired .timer-wrap{opacity:.5}
+
+/* ---------- dolny pasek akcji (przyklejony) ---------- */
+.actionbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:linear-gradient(180deg, rgba(16,20,27,.4), var(--brand-ink) 40%);
+  border-top:1px solid var(--hairline);
+  padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px));
+}
+.actionbar .inner{max-width:480px;margin:0 auto}
+.sec-actions{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-bottom:var(--s3)}
+.sec-actions button{
+  background:none;border:none;color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;
+  cursor:pointer;min-height:36px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hairline);
+}
+.sec-actions button:hover{color:var(--text)}
+.sec-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.status-line{display:none;align-items:center;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600}
+.status-line.show{display:flex}
+.cta{
+  width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;
+  background:var(--accent);color:var(--on-accent);
+  font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.5px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s ease, opacity .15s ease;
+}
+.cta:active{transform:translateY(1px) scale(.995)}
+.cta:disabled{background:var(--surface-3);color:var(--text-muted);box-shadow:none;cursor:not-allowed}
+.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.cta .amt{font-variant-numeric:tabular-nums}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}
+
+.hidden{display:none !important}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.ops .op{animation:rise .4s ease both}
+.ops .op:nth-child(1){animation-delay:.03s}
+.ops .op:nth-child(2){animation-delay:.08s}
+.ops .op:nth-child(3){animation-delay:.13s}
+.ops .op:nth-child(4){animation-delay:.18s}
+.ops .op:nth-child(5){animation-delay:.23s}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== NAGŁÓWEK ===================== -->
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo">
+        <div class="mark" aria-hidden="true"></div>
+        <div class="org">
+          <b id="orgName">Stołeczny Klub Biegacza</b>
+          <span data-i18n="brandContext">panel zawodnika</span>
+        </div>
+      </div>
+      <div class="lang">
+        <label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language">
+          <option value="pl-PL">PL</option>
+          <option value="en-GB">EN</option>
+        </select>
+      </div>
+    </div>
+    <div class="sys" id="sysBar">
+      <span class="dot" id="netDot"><span data-i18n="online">online</span></span>
+      <span><span data-i18n="bibLabel">numer startowy</span> <b class="bib" id="bibVal">1287</b></span>
+      <span class="pill-paid" data-i18n="statusPaid">opłacone</span>
+      <span id="syncVal"></span>
+    </div>
+  </header>
+
+  <!-- ===================== PRZEŁĄCZNIK STANU ===================== -->
+  <div class="seg" role="group" aria-label="Stan ekranu">
+    <button id="segOps" aria-pressed="true" data-i18n="segOperations">Operacje</button>
+    <button id="segOffer" aria-pressed="false" data-i18n="segOffer">Oferta z rezerwy</button>
+  </div>
+
+  <!-- ===================== STAN DOMYŚLNY: OPERACJE ===================== -->
+  <main id="viewOps">
+
+    <section class="entry" aria-label="Zgłoszenie">
+      <div class="bib-tag">
+        <small data-i18n="bibShort">numer</small>
+        <b>1287</b>
+      </div>
+      <div class="entry-meta">
+        <div class="ev"><span id="evName">Bieg Stołeczny 2026</span> · <span id="evDist">10 km</span></div>
+        <div class="sub"><span data-i18n="eventDateLabel">data startu</span>: <b id="evDate"></b></div>
+      </div>
+    </section>
+
+    <h2 class="h-section">
+      <span data-i18n="opsHeading">Dostępne operacje</span>
+      <span class="rule" data-i18n="opsRule">w granicach reguł organizatora</span>
+    </h2>
+
+    <ul class="ops" id="opsList" role="listbox" aria-label="Dostępne operacje"></ul>
+
+    <!-- strefa niszcząca -->
+    <section class="danger" aria-label="Operacje nieodwracalne">
+      <div class="danger-head" data-i18n="destructiveHeading">Operacje nieodwracalne</div>
+      <div class="danger-row">
+        <div class="op-body">
+          <div class="op-name" data-i18n="resignName">Rezygnacja ze startu</div>
+          <div class="op-effect" data-i18n="resignEffect">Tracisz numer 1287. Zwrot trafi do portfela jako kredyt u organizatora.</div>
+        </div>
+        <div class="refund">
+          <b id="refundVal"></b>
+          <small data-i18n="toWallet">do portfela</small>
+        </div>
+      </div>
+      <button class="btn-danger-toggle" id="resignToggle" aria-expanded="false" data-i18n="resignStart">Rozpocznij rezygnację</button>
+      <div class="confirm-panel" id="resignPanel">
+        <div class="confirm-card">
+          <p data-i18n="resignWarn">Po potwierdzeniu zgłoszenie zostanie anulowane, a numer 1287 wróci do puli organizatora. Operacja jest nieodwracalna.</p>
+          <label class="confirm-check">
+            <input type="checkbox" id="resignAck">
+            <span data-i18n="confirmCheckbox">Rozumiem, że tracę prawo do startu i numer 1287</span>
+          </label>
+          <div class="confirm-actions">
+            <button class="btn-ghost" id="resignCancel" data-i18n="cancelAction">Anuluj</button>
+            <button class="btn-resign" id="resignConfirm" disabled data-i18n="confirmResign">Potwierdź rezygnację</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== STAN ALTERNATYWNY: OFERTA Z LISTY REZERWOWEJ ===================== -->
+  <main id="viewOffer" class="hidden">
+    <div class="offer" id="offerWrap">
+      <div class="offer-card">
+        <div class="offer-top">
+          <div class="offer-kicker" data-i18n="offerKicker">Lista rezerwowa</div>
+          <h2 class="offer-h" data-i18n="offerHeading">Zwolniło się miejsce</h2>
+          <p class="offer-body" data-i18n="offerBody">Z listy rezerwowej dostałeś ofertę startu na 10 km. Potwierdź, zanim odliczanie dobiegnie zera, inaczej miejsce trafi do kolejnej osoby.</p>
+          <div class="timer-wrap">
+            <div class="timer-label" data-i18n="offerTimeLeft">Pozostały czas</div>
+            <div class="timer" id="timer" aria-live="polite">09:58</div>
+          </div>
+        </div>
+        <div class="offer-price">
+          <span data-i18n="offerPriceLabel">Wpisowe (próg III)</span>
+          <b id="offerPrice"></b>
+        </div>
+        <div class="offer-expired" id="offerExpired" data-i18n="offerExpired">Oferta wygasła — miejsce trafiło do kolejnej osoby z listy.</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== DOLNY PASEK AKCJI ===================== -->
+  <div class="actionbar">
+    <div class="inner">
+      <div class="sec-actions" id="secActions">
+        <button data-i18n="secCompare">Porównaj operacje</button>
+        <button data-i18n="secRules">Reguły wydarzenia</button>
+        <button id="secCancelBtn" data-i18n="secCancel">Anuluj operację</button>
+      </div>
+      <div class="status-line" id="statusLine">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="statusText"></span>
+      </div>
+      <button class="cta" id="mainCta" disabled>
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="ctaLabel" data-i18n="ctaIdle">Wybierz operację powyżej</span>
+        <span class="amt" id="ctaAmt"></span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================================
+   i18n - klucze tłumaczeń ze znacznikami BCP 47. Domyślny pl-PL, zapasowy en-GB.
+   Treści organizatora (nazwa biegu, nazwa klubu) celowo poza kluczami UI.
+   ========================================================================= */
+const I18N = {
+  "pl-PL":{
+    brandContext:"panel zawodnika", langLabel:"Język",
+    online:"online", offline:"offline — zmiany w kolejce",
+    bibLabel:"numer startowy", bibShort:"numer", statusPaid:"opłacone",
+    syncTpl:"synchronizacja {date}",
+    eventDateLabel:"data startu",
+    segOperations:"Operacje", segOffer:"Oferta z rezerwy",
+    opsHeading:"Dostępne operacje", opsRule:"w granicach reguł organizatora",
+    deadlinePrefix:"termin do", windowClosed:"okno zamknięte", unavailable:"niedostępne",
+    badgeFree:"darmowe", badgePaid:"płatne",
+    opTransferName:"Transfer do innej osoby",
+    opTransferEffect:"Tracisz prawo do startu, zyskuje je osoba docelowa.",
+    opDeferralName:"Odroczenie na edycję 2027",
+    opDeferralEffect:"Miejsce wraca do puli, a start przechodzi na rok 2027.",
+    opSwapName:"Wymiana numeru lub pakietu",
+    opSwapEffect:"Zmiana rozmiaru pakietu zależy od stanu magazynu.",
+    opDistanceName:"Zmiana dystansu na 5 km",
+    opDistanceEffect:"Przeniesienie zgłoszenia na krótszy dystans tej samej edycji.",
+    opLeaveName:"Zejście z listy rezerwowej",
+    reasonNotOnWaitlist:"Nie jesteś na liście rezerwowej tego biegu.",
+    valExpiredTpl:"Termin tej operacji minął {date}. Skontaktuj się z organizatorem.",
+    contactOrganiser:"Skontaktuj się z organizatorem",
+    destructiveHeading:"Operacje nieodwracalne",
+    resignName:"Rezygnacja ze startu",
+    resignEffect:"Tracisz numer 1287. Zwrot trafi do portfela jako kredyt u organizatora.",
+    toWallet:"do portfela",
+    resignStart:"Rozpocznij rezygnację",
+    resignWarn:"Po potwierdzeniu zgłoszenie zostanie anulowane, a numer 1287 wróci do puli organizatora. Operacja jest nieodwracalna.",
+    confirmCheckbox:"Rozumiem, że tracę prawo do startu i numer 1287.",
+    cancelAction:"Anuluj", confirmResign:"Potwierdź rezygnację",
+    offerKicker:"Lista rezerwowa", offerHeading:"Zwolniło się miejsce",
+    offerBody:"Z listy rezerwowej dostałeś ofertę startu na 10 km. Potwierdź, zanim odliczanie dobiegnie zera, inaczej miejsce trafi do kolejnej osoby.",
+    offerTimeLeft:"Pozostały czas", offerPriceLabel:"Wpisowe (próg III)",
+    offerExpired:"Oferta wygasła — miejsce trafiło do kolejnej osoby z listy.",
+    secCompare:"Porównaj operacje", secRules:"Reguły wydarzenia", secCancel:"Anuluj operację",
+    ctaIdle:"Wybierz operację powyżej", ctaRun:"Wykonaj", processing:"Przetwarzanie…",
+    savedTpl:"Zaktualizowano status zgłoszenia: {op}",
+    offerCta:"Potwierdź miejsce", offerSaved:"Miejsce potwierdzone. Przejdź do płatności po numer startowy.",
+    offerCtaExpired:"Oferta wygasła"
+  },
+  "en-GB":{
+    brandContext:"athlete panel", langLabel:"Language",
+    online:"online", offline:"offline — changes queued",
+    bibLabel:"bib number", bibShort:"bib", statusPaid:"paid",
+    syncTpl:"synced {date}",
+    eventDateLabel:"race date",
+    segOperations:"Operations", segOffer:"Waitlist offer",
+    opsHeading:"Available operations", opsRule:"within the organiser's rules",
+    deadlinePrefix:"open until", windowClosed:"window closed", unavailable:"unavailable",
+    badgeFree:"free", badgePaid:"paid",
+    opTransferName:"Transfer to another person",
+    opTransferEffect:"You give up your spot; the recipient takes it.",
+    opDeferralName:"Defer to the 2027 edition",
+    opDeferralEffect:"Your spot returns to the pool and the entry moves to 2027.",
+    opSwapName:"Swap bib or pack",
+    opSwapEffect:"Changing the pack size depends on current stock.",
+    opDistanceName:"Change distance to 5 km",
+    opDistanceEffect:"Move the entry to the shorter distance of the same edition.",
+    opLeaveName:"Leave the waitlist",
+    reasonNotOnWaitlist:"You are not on this race's waitlist.",
+    valExpiredTpl:"This operation closed on {date}. Please contact the organiser.",
+    contactOrganiser:"Contact the organiser",
+    destructiveHeading:"Irreversible operations",
+    resignName:"Cancel my entry",
+    resignEffect:"You lose bib 1287. The refund goes to your wallet as organiser credit.",
+    toWallet:"to wallet",
+    resignStart:"Start cancellation",
+    resignWarn:"Once confirmed, the entry is cancelled and bib 1287 returns to the organiser's pool. This cannot be undone.",
+    confirmCheckbox:"I understand I give up my spot and bib 1287.",
+    cancelAction:"Cancel", confirmResign:"Confirm cancellation",
+    offerKicker:"Waitlist", offerHeading:"A spot has opened",
+    offerBody:"From the waitlist you've been offered a 10 km spot. Confirm before the countdown reaches zero, or the spot passes to the next person.",
+    offerTimeLeft:"Time left", offerPriceLabel:"Entry fee (tier III)",
+    offerExpired:"The offer expired — the spot went to the next person on the list.",
+    secCompare:"Compare operations", secRules:"Event rules", secCancel:"Cancel operation",
+    ctaIdle:"Select an operation above", ctaRun:"Run", processing:"Processing…",
+    savedTpl:"Entry status updated: {op}",
+    offerCta:"Confirm my spot", offerSaved:"Spot confirmed. Go to payment to receive your bib.",
+    offerCtaExpired:"Offer expired"
+  }
+};
+const RTL = new Set(["ar","he","fa","ur"]); // automatyczny RTL, gdy język na liście będzie pisany od prawej
+
+/* ----- model danych (liczby i kwoty przykładowe) ----- */
+const DATA = {
+  locale:"pl-PL",
+  syncedAt:new Date("2026-04-14T21:14:00"),
+  online:true,
+  event:{ name:"Bieg Stołeczny 2026", distance:"10 km", date:new Date("2026-05-18T10:00:00") },
+  refund:90,
+  offerFee:135,
+  organiserPhone:"+48221234567",
+  ops:[
+    {id:"transfer", key:"opTransfer", paid:true,  fee:20, deadline:new Date("2026-05-10"), state:"open"},
+    {id:"deferral", key:"opDeferral", paid:false, fee:0,  deadline:new Date("2026-04-30"), state:"open"},
+    {id:"swap",     key:"opSwap",     paid:false, fee:0,  deadline:new Date("2026-05-05"), state:"open"},
+    {id:"distance", key:"opDistance", paid:false, fee:0,  deadline:new Date("2026-04-01"), state:"expired"},
+    {id:"leave",    key:"opLeave",    paid:false, fee:0,  deadline:null,                   state:"unavailable", reason:"reasonNotOnWaitlist"}
+  ]
+};
+
+/* ----- stan UI ----- */
+const UI = { view:"ops", selected:null };
+
+/* ----- formatery zależne od regionu ----- */
+const fmtMoney = (v)=> new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN"}).format(v);
+const fmtDate  = (d)=> new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit",year:"numeric"}).format(d);
+function fmtPhone(e164){
+  // grupowanie krajowe: +48 22 123 45 67
+  const m = e164.match(/^(\+48)(\d{2})(\d{3})(\d{2})(\d{2})$/);
+  return m ? `${m[1]} ${m[2]} ${m[3]} ${m[4]} ${m[5]}` : e164;
+}
+function t(key){
+  const L = I18N[DATA.locale] || {};
+  const F = I18N["en-GB"];
+  return (key in L) ? L[key] : (F[key] ?? key); // język zapasowy en-GB na brak tłumaczenia
+}
+
+/* ----- render ----- */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+
+function applyStaticI18n(){
+  $$("[data-i18n]").forEach(el=>{ el.textContent = t(el.getAttribute("data-i18n")); });
+}
+
+function renderSys(){
+  $("#bibVal").textContent = "1287";
+  $("#syncVal").textContent = t("syncTpl").replace("{date}",
+    new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}).format(DATA.syncedAt));
+  const dot = $("#netDot");
+  dot.classList.toggle("off", !DATA.online);
+  dot.querySelector("span").textContent = DATA.online ? t("online") : t("offline");
+}
+
+function renderEntry(){
+  $("#orgName").textContent = "Stołeczny Klub Biegacza";
+  $("#evName").textContent = DATA.event.name;
+  $("#evDist").textContent = DATA.event.distance;
+  $("#evDate").textContent = fmtDate(DATA.event.date);
+  $("#refundVal").textContent = fmtMoney(DATA.refund);
+}
+
+function opName(op){ return t(op.key+"Name"); }
+function opEffect(op){ return t(op.key+"Effect"); }
+
+function renderOps(){
+  const list = $("#opsList");
+  list.innerHTML = "";
+  DATA.ops.forEach(op=>{
+    const li = document.createElement("li");
+    li.className = "op";
+    li.dataset.id = op.id;
+    li.dataset.paid = op.paid ? "true" : "false";
+    li.setAttribute("role","option");
+
+    const selectable = op.state==="open";
+    if(op.state==="unavailable") li.classList.add("disabled");
+
+    // badge
+    let badge="";
+    if(op.state==="open") badge = op.paid
+      ? `<span class="badge paid">${t("badgePaid")} · ${fmtMoney(op.fee)}</span>`
+      : `<span class="badge free">${t("badgeFree")}</span>`;
+    else if(op.state==="expired") badge = `<span class="badge closed">${t("windowClosed")}</span>`;
+    else badge = `<span class="badge lock">${t("unavailable")}</span>`;
+
+    // deadline / reason line
+    let meta="";
+    if(op.deadline && op.state!=="unavailable"){
+      meta = `<div class="op-deadline">⏱ ${t("deadlinePrefix")} <b>${fmtDate(op.deadline)}</b></div>`;
+    }
+
+    li.innerHTML = `
+      <span class="stripe" aria-hidden="true"></span>
+      <button class="row" type="button" aria-selected="false" ${op.state==="unavailable"?'aria-disabled="true"':''}>
+        <span class="check" aria-hidden="true"></span>
+        <span class="op-body">
+          <span class="op-name">${opName(op)}</span>
+          <span class="op-effect">${opEffect(op)}</span>
+          ${meta}
+        </span>
+        ${badge}
+      </button>
+      ${op.state==="expired" ? `
+        <div class="op-validation" role="alert">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <span>${t("valExpiredTpl").replace("{date}",fmtDate(op.deadline))}
+            <a href="tel:${DATA.organiserPhone}">${t("contactOrganiser")} · ${fmtPhone(DATA.organiserPhone)}</a></span>
+        </div>` : ""}
+      ${op.state==="unavailable" ? `<div class="op-reason">🔒 ${t(op.reason)}</div>` : ""}
+    `;
+
+    const rowBtn = li.querySelector(".row");
+    rowBtn.addEventListener("click", ()=>{
+      if(op.state==="unavailable") return;
+      if(op.state==="expired"){
+        // pokaż walidację, nie pozwól wykonać
+        $$(".op").forEach(x=>x.classList.remove("show-val"));
+        li.classList.add("show-val");
+        selectOp(null);
+        return;
+      }
+      $$(".op").forEach(x=>x.classList.remove("show-val"));
+      selectOp(op.id);
+    });
+
+    list.appendChild(li);
+  });
+  selectOp(UI.selected); // odśwież zaznaczenie po zmianie języka
+}
+
+function selectOp(id){
+  UI.selected = id;
+  $$(".op").forEach(li=>{
+    const on = li.dataset.id===id;
+    li.classList.toggle("selected", on);
+    const rb = li.querySelector(".row");
+    if(rb){ rb.setAttribute("aria-selected", on?"true":"false"); }
+  });
+  renderCta();
+}
+
+function renderCta(){
+  const cta = $("#mainCta"), label = $("#ctaLabel"), amt = $("#ctaAmt");
+  cta.classList.remove("processing");
+  $(".spinner").style.display="";
+  if(UI.view==="offer"){
+    cta.disabled = offerState==="expired";
+    label.textContent = offerState==="expired" ? t("offerCtaExpired") : t("offerCta");
+    amt.textContent = "";
+    return;
+  }
+  const op = DATA.ops.find(o=>o.id===UI.selected);
+  if(!op){ cta.disabled=true; label.textContent=t("ctaIdle"); amt.textContent=""; return; }
+  cta.disabled=false;
+  label.textContent = `${t("ctaRun")}: ${opName(op)}`;
+  amt.textContent = op.paid ? ` · ${fmtMoney(op.fee)}` : "";
+}
+
+/* ----- przełączanie widoku ----- */
+function setView(v){
+  UI.view=v;
+  $("#segOps").setAttribute("aria-pressed", v==="ops");
+  $("#segOffer").setAttribute("aria-pressed", v==="offer");
+  $("#viewOps").classList.toggle("hidden", v!=="ops");
+  $("#viewOffer").classList.toggle("hidden", v!=="offer");
+  $("#secActions").classList.toggle("hidden", v==="offer");
+  hideStatus();
+  if(v==="offer"){ startTimer(); } else { stopTimer(); }
+  renderCta();
+}
+
+/* ----- status zapisu / przetwarzanie ----- */
+let statusTimer=null;
+function showStatus(text){
+  $("#statusText").textContent=text;
+  $("#statusLine").classList.add("show");
+}
+function hideStatus(){ $("#statusLine").classList.remove("show"); }
+
+function runProcessing(onDone){
+  const cta=$("#mainCta"), label=$("#ctaLabel"), amt=$("#ctaAmt");
+  cta.disabled=true; cta.classList.add("processing");
+  amt.textContent=""; label.textContent=t("processing");
+  $(".spinner").style.display="inline-block";
+  clearTimeout(statusTimer);
+  statusTimer=setTimeout(()=>{ cta.classList.remove("processing"); onDone(); }, 1100);
+}
+
+/* ----- odliczanie oferty ----- */
+let offerLeft=598, offerInt=null, offerState="active";
+function fmtTimer(s){ const m=Math.floor(s/60), r=s%60; return `${String(m).padStart(2,"0")}:${String(r).padStart(2,"0")}`; }
+function startTimer(){
+  stopTimer(); offerState="active"; $("#offerWrap").classList.remove("expired");
+  $("#offerPrice").textContent=fmtMoney(DATA.offerFee);
+  $("#timer").textContent=fmtTimer(offerLeft);
+  $("#timer").classList.toggle("warn", offerLeft<=60);
+  offerInt=setInterval(()=>{
+    offerLeft--;
+    $("#timer").textContent=fmtTimer(Math.max(offerLeft,0));
+    $("#timer").classList.toggle("warn", offerLeft<=60);
+    if(offerLeft<=0){ expireOffer(); }
+  },1000);
+  renderCta();
+}
+function stopTimer(){ if(offerInt) clearInterval(offerInt); offerInt=null; }
+function expireOffer(){
+  stopTimer(); offerState="expired";
+  $("#offerWrap").classList.add("expired");
+  $("#timer").textContent="00:00";
+  renderCta();
+}
+
+/* ----- zmiana języka ----- */
+function setLocale(loc){
+  DATA.locale=loc;
+  document.documentElement.lang=loc;
+  document.documentElement.dir = RTL.has(loc.split("-")[0]) ? "rtl" : "ltr";
+  applyStaticI18n();
+  renderSys(); renderEntry(); renderOps();
+  $("#offerPrice").textContent=fmtMoney(DATA.offerFee);
+  renderCta();
+}
+
+/* =========================================================================
+   INICJALIZACJA + zdarzenia
+   ========================================================================= */
+document.addEventListener("DOMContentLoaded", ()=>{
+  setLocale("pl-PL");
+  $("#langSel").value="pl-PL";
+
+  $("#langSel").addEventListener("change", e=> setLocale(e.target.value));
+  $("#segOps").addEventListener("click", ()=>setView("ops"));
+  $("#segOffer").addEventListener("click", ()=>setView("offer"));
+
+  // główna akcja
+  $("#mainCta").addEventListener("click", ()=>{
+    if(UI.view==="offer"){
+      if(offerState==="expired") return;
+      runProcessing(()=>{ stopTimer(); showStatus(t("offerSaved")); $("#mainCta").disabled=true; });
+      return;
+    }
+    const op=DATA.ops.find(o=>o.id===UI.selected); if(!op) return;
+    runProcessing(()=>{
+      showStatus(t("savedTpl").replace("{op}", opName(op)));
+      selectOp(null);
+    });
+  });
+
+  // rezygnacja (niszcząca, wyraźne potwierdzenie)
+  const toggle=$("#resignToggle"), panel=$("#resignPanel"),
+        ack=$("#resignAck"), confirm=$("#resignConfirm"), cancel=$("#resignCancel");
+  toggle.addEventListener("click", ()=>{
+    const open=panel.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", open);
+    if(!open){ ack.checked=false; confirm.disabled=true; }
+  });
+  ack.addEventListener("change", ()=>{ confirm.disabled=!ack.checked; });
+  cancel.addEventListener("click", ()=>{ panel.classList.remove("open"); toggle.setAttribute("aria-expanded",false); ack.checked=false; confirm.disabled=true; });
+  confirm.addEventListener("click", ()=>{
+    confirm.disabled=true;
+    showStatus(t("savedTpl").replace("{op}", t("resignName")) + " · " + fmtMoney(DATA.refund) + " " + t("toWallet"));
+    panel.classList.remove("open"); toggle.setAttribute("aria-expanded",false);
+  });
+});
+</script>
+</body>
+</html>

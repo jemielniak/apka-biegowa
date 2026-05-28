@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<!--
+  ATH-10 - portfel i kredyty (panel zawodnika, moduł zawodów; portfel wspólny z PAR-10)
+  Makieta hi-fi, mobile-first, jeden ekran / jeden plik.
+  Stan domyślny: saldo per organizator + historia + dokumenty.
+  Stan alternatywny: pusty portfel (kredyt pojawia się po nadpłacie lub zwrocie).
+  Napisy to klucze tłumaczeń ze znacznikami BCP 47 (pl-PL domyślny, en-GB zapasowy).
+  Motywowanie wyłącznie przez zmienne CSS w :root (TOKENY MARKI).
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Portfel · ATH-10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   TOKENY MARKI - jedyne miejsce do przemotywowania (zmienne CSS)
+   ========================================================================= */
+:root{
+  --brand-ink:#10141b;
+  --accent:#d6f622;
+
+  --color-success:#3ddc84;
+  --color-warning:#ffb84d;
+  --color-error:#ff6b5e;
+  --color-info:#6aa9ff;
+
+  --surface-1:#181e28;
+  --surface-2:#1f2733;
+  --surface-3:#283241;
+  --hairline:#313c4c;
+  --text-strong:#f2f5f7;
+  --text:#cdd5df;
+  --text-muted:#8c97a6;
+  --on-accent:#10141b;
+  --paper:#f4f5ef;
+
+  --font-display:"Saira Condensed", system-ui;
+  --font-body:"Barlow", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:14px;
+  --shadow:0 10px 30px -12px rgba(0,0,0,.65);
+  --tap:48px;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(120% 60% at 80% -10%, rgba(214,246,34,.10), transparent 60%), var(--brand-ink);
+  color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;min-height:100vh;
+}
+[dir="rtl"] body{direction:rtl}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 64px);
+  mask-image:linear-gradient(180deg, transparent, #000 30%, #000 80%, transparent);}
+
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:172px}
+
+/* ---------- nagłówek ---------- */
+header.bar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg, rgba(16,20,27,.96), rgba(16,20,27,.86));
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);box-shadow:0 1px 0 rgba(214,246,34,.18);}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--accent);position:relative;overflow:hidden}
+.mark::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg, transparent 38%, var(--on-accent) 38% 50%, transparent 50% 60%, var(--on-accent) 60% 72%, transparent 72%);}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;letter-spacing:.3px;color:var(--text-strong);font-size:15px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+.lang{margin-inline-start:auto;position:relative}
+.lang select{appearance:none;-webkit-appearance:none;font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer;}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s2) var(--s4) var(--s3);font-size:12.5px;color:var(--text-muted)}
+.dot{display:inline-flex;align-items:center;gap:6px}
+.dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--color-success);box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+.dot.off::before{background:var(--color-warning);box-shadow:0 0 0 3px rgba(255,184,77,.18)}
+
+/* ---------- przełącznik stanu ---------- */
+.seg{display:flex;gap:var(--s2);padding:var(--s4) var(--s4) var(--s2)}
+.seg button{flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.3px;background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);transition:all .18s ease}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 18px -8px rgba(214,246,34,.6)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+main{padding:var(--s2) var(--s4) 0}
+.h-section{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-muted);margin:var(--s5) 0 var(--s3);display:flex;align-items:baseline;gap:var(--s2);flex-wrap:wrap}
+.h-section .pill-info{font-family:var(--font-body);font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--color-info);background:rgba(106,169,255,.12);border:1px solid rgba(106,169,255,.4);padding:2px 8px;border-radius:999px}
+
+/* ---------- karty salda per organizator ---------- */
+.bal-cards{display:flex;flex-direction:column;gap:var(--s3)}
+.bal{display:flex;align-items:center;gap:var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);padding:var(--s4);animation:rise .4s ease both}
+.bal.has{border-color:rgba(214,246,34,.4);background:linear-gradient(180deg,rgba(214,246,34,.06),transparent)}
+.bal .av{flex:0 0 auto;width:40px;height:40px;border-radius:10px;background:var(--surface-3);display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--text-strong)}
+.bal.has .av{background:var(--accent);color:var(--on-accent)}
+.bal .b-body{flex:1;min-width:0}
+.bal .b-name{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--text-strong);line-height:1.1}
+.bal .b-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.bal .b-amt{font-family:var(--font-display);font-weight:800;font-size:24px;color:var(--text-strong);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bal.zero .b-amt{color:var(--text-muted)}
+
+/* ---------- najbliższe płatności ---------- */
+.pay-rows{display:flex;flex-direction:column;gap:var(--s3)}
+.pay{display:flex;align-items:center;gap:var(--s3);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);padding:var(--s3) var(--s4)}
+.pay .p-body{flex:1;min-width:0}
+.pay .p-ev{font-weight:700;color:var(--text-strong);font-size:15px}
+.pay .p-org{font-size:12px;color:var(--text-muted);margin-top:1px}
+.pay .p-amt{font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.use-btn{min-height:42px;padding:0 var(--s4);border-radius:10px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.3px;cursor:pointer;white-space:nowrap;flex:0 0 auto}
+.use-btn.cross{border-color:var(--hairline);color:var(--text-muted)}
+.use-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* ---------- historia ---------- */
+.filters{display:flex;gap:var(--s2);margin-bottom:var(--s3);flex-wrap:wrap}
+.chip{min-height:38px;padding:0 var(--s4);border-radius:999px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--surface-3);color:var(--text-strong);border-color:var(--text-muted)}
+.chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tx{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--s2)}
+.tx li{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:12px}
+.tx .t-date{font-variant-numeric:tabular-nums;color:var(--text-muted);font-size:12.5px;flex:0 0 auto;width:54px}
+.tx .t-body{flex:1;min-width:0}
+.tx .t-title{color:var(--text-strong);font-size:14.5px;font-weight:600}
+.tx .t-org{font-size:11.5px;color:var(--text-muted)}
+.tx .t-amt{font-family:var(--font-display);font-weight:800;font-size:16px;font-variant-numeric:tabular-nums;flex:0 0 auto}
+.tx .t-amt.pos{color:var(--color-success)}
+.tx .t-amt.neg{color:var(--text)}
+
+/* ---------- dokumenty ---------- */
+.docs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--s2)}
+.docs li{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:12px}
+.docs .d-ic{flex:0 0 auto;color:var(--text-muted)}
+.docs .d-name{flex:1;color:var(--text-strong);font-weight:600;font-size:14.5px}
+.dl{min-height:42px;padding:0 var(--s4);border-radius:10px;border:1px solid var(--hairline);background:var(--surface-2);color:var(--text-strong);font-family:var(--font-body);font-weight:600;font-size:13px;cursor:pointer;flex:0 0 auto;display:inline-flex;align-items:center;gap:7px}
+.dl:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.dl.prep{color:var(--color-warning);border-color:rgba(255,184,77,.4)}
+.d-spin{width:14px;height:14px;border:2px solid var(--hairline);border-top-color:var(--text-strong);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.dl.loading .d-spin{display:inline-block}
+
+/* zasady kredytu */
+.rules{margin-top:var(--s5);padding:var(--s4);border-radius:var(--radius);background:var(--surface-1);border:1px solid var(--hairline);font-size:13px;color:var(--text);display:flex;gap:var(--s3);align-items:flex-start}
+.rules svg{flex:0 0 auto;color:var(--color-info);margin-top:1px}
+
+/* walidacja */
+.val{display:none;gap:var(--s3);align-items:flex-start;margin:var(--s3) 0 0;padding:var(--s3);border-radius:11px;font-size:13px}
+.val.show{display:flex}
+.val.warn{background:rgba(255,184,77,.10);border:1px solid rgba(255,184,77,.45);color:#ffd79a}
+.val.info{background:rgba(106,169,255,.10);border:1px solid rgba(106,169,255,.4);color:#cfe2ff}
+.val svg{flex:0 0 auto;margin-top:1px}
+
+/* ---------- stan pusty ---------- */
+.empty{padding-top:var(--s8);text-align:center;animation:rise .4s ease both}
+.empty .ic{width:76px;height:76px;border-radius:50%;margin:0 auto var(--s4);display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--hairline);color:var(--text-muted)}
+.empty h2{font-family:var(--font-display);font-weight:800;font-size:24px;color:var(--text-strong);margin:0 0 var(--s2)}
+.empty p{font-size:14px;color:var(--text);margin:0 auto;max-width:36ch}
+.empty .how{margin-top:var(--s5);display:flex;flex-direction:column;gap:var(--s2);text-align:start}
+.empty .how div{display:flex;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:12px;font-size:13.5px;color:var(--text)}
+.empty .how span{color:var(--accent);font-family:var(--font-display);font-weight:800;font-size:18px}
+
+/* ---------- dolny pasek ---------- */
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:linear-gradient(180deg, rgba(16,20,27,.4), var(--brand-ink) 40%);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+.actionbar .inner{max-width:480px;margin:0 auto}
+.status-line{display:none;align-items:center;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600;text-align:center}
+.status-line.show{display:flex}
+.status-line.warn{color:var(--color-warning)}
+.sec-actions{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-bottom:var(--s3)}
+.sec-actions button{background:none;border:none;color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hairline)}
+.sec-actions button:hover{color:var(--text)}
+.sec-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.cta{width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.4px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s ease, opacity .15s ease}
+.cta:active{transform:translateY(1px) scale(.995)}
+.cta:disabled{background:var(--surface-3);color:var(--text-muted);box-shadow:none;cursor:not-allowed}
+.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.cta.ghost{background:var(--surface-2);color:var(--text-strong);box-shadow:none;border:1px solid var(--hairline)}
+.cta .amt{font-variant-numeric:tabular-nums}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}
+
+.hidden{display:none !important}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.bal-cards .bal:nth-child(1){animation-delay:.03s}
+.bal-cards .bal:nth-child(2){animation-delay:.08s}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== NAGŁÓWEK ===================== -->
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo">
+        <div class="mark" aria-hidden="true"></div>
+        <div class="org">
+          <b data-i18n="walletTitle">Portfel</b>
+          <span data-i18n="sharedWith">wspólny z kontem rodzica</span>
+        </div>
+      </div>
+      <div class="lang">
+        <label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language">
+          <option value="pl-PL">PL</option>
+          <option value="en-GB">EN</option>
+        </select>
+      </div>
+    </div>
+    <div class="sys">
+      <span class="dot" id="netDot"><span data-i18n="online">online</span></span>
+      <span id="syncVal"></span>
+    </div>
+  </header>
+
+  <!-- ===================== PRZEŁĄCZNIK STANU ===================== -->
+  <div class="seg" role="group" aria-label="Stan ekranu">
+    <button id="segFull" aria-pressed="true" data-i18n="segBalance">Saldo</button>
+    <button id="segEmpty" aria-pressed="false" data-i18n="segEmpty">Pusty portfel</button>
+  </div>
+
+  <!-- ===================== STAN DOMYŚLNY ===================== -->
+  <main id="viewFull">
+
+    <h2 class="h-section">
+      <span data-i18n="balHeading">Saldo wg organizatora</span>
+      <span class="pill-info" data-i18n="nonTransfer">nieprzenoszalne</span>
+    </h2>
+    <div class="bal-cards" id="balCards"></div>
+
+    <h2 class="h-section"><span data-i18n="upcomingHeading">Najbliższe płatności</span></h2>
+    <div class="pay-rows" id="payRows"></div>
+    <div class="val warn" id="payVal" role="alert">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span id="payValText"></span>
+    </div>
+
+    <h2 class="h-section"><span data-i18n="historyHeading">Historia</span></h2>
+    <div class="filters" id="filters" role="group" aria-label="Filtr historii"></div>
+    <ul class="tx" id="txList"></ul>
+
+    <h2 class="h-section"><span data-i18n="docsHeading">Dokumenty płatności</span></h2>
+    <ul class="docs" id="docsList"></ul>
+    <div class="val info" id="docVal" role="status">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span id="docValText"></span>
+    </div>
+
+    <div class="rules">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span data-i18n="creditRules">Kredyt jest przypisany do danego organizatora i nie przenosi się między nimi. Wypłatę środków na zewnątrz prowadzi organizator w osobnej procedurze.</span>
+    </div>
+
+  </main>
+
+  <!-- ===================== STAN ALTERNATYWNY: PUSTY PORTFEL ===================== -->
+  <main id="viewEmpty" class="hidden">
+    <div class="empty">
+      <div class="ic" aria-hidden="true">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M3 7h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="2"/><path d="M3 7l2-3h11l2 3M16 13h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2 data-i18n="emptyHeading">Twój portfel jest jeszcze pusty</h2>
+      <p data-i18n="emptyBody">Nie masz tu żadnych operacji. Kredyt pojawia się, gdy powstanie nadpłata albo gdy zwrot z rezygnacji trafi do portfela.</p>
+      <div class="how">
+        <div><span>+</span> <span data-i18n="emptyHow1">Nadpłata przy zapisie wraca jako kredyt u tego organizatora.</span></div>
+        <div><span>+</span> <span data-i18n="emptyHow2">Zwrot po rezygnacji może trafić do portfela zamiast na kartę.</span></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== DOLNY PASEK ===================== -->
+  <div class="actionbar">
+    <div class="inner" id="fullBar">
+      <div class="status-line" id="statusLine">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="statusText"></span>
+      </div>
+      <div class="sec-actions">
+        <button id="secDoc" data-i18n="secDownload">Pobierz dokument</button>
+        <button id="secPayout" data-i18n="secPayout">Wniosek o wypłatę</button>
+      </div>
+      <button class="cta" id="mainCta">
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="ctaLabel" data-i18n="ctaUse">Wykorzystaj kredyt przy najbliższej płatności</span>
+        <span class="amt" id="ctaAmt"></span>
+      </button>
+    </div>
+    <div class="inner hidden" id="emptyBar">
+      <button class="cta ghost" id="backCta" data-i18n="backToEvents">Przeglądaj otwarte zapisy</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================================
+   i18n - klucze tłumaczeń, BCP 47. Domyślny pl-PL, zapasowy en-GB.
+   ========================================================================= */
+const I18N = {
+  "pl-PL":{
+    walletTitle:"Portfel", sharedWith:"wspólny z kontem rodzica", langLabel:"Język",
+    online:"online", offline:"offline — saldo z ostatniej synchronizacji, zmiany wstrzymane",
+    syncTpl:"synchronizacja {date}",
+    segBalance:"Saldo", segEmpty:"Pusty portfel",
+    balHeading:"Saldo wg organizatora", nonTransfer:"nieprzenoszalne",
+    orgABalanceSub:"kredyt do wykorzystania u tego organizatora",
+    orgBBalanceSub:"brak kredytu u tego organizatora",
+    upcomingHeading:"Najbliższe płatności",
+    useCredit:"Wykorzystaj kredyt",
+    payValSameTpl:"Kredyt {credit} pokryje część kwoty {amount}. Do dopłaty: {rest}.",
+    payValCrossTpl:"Kredyt u {orgA} nie przenosi się na start u {orgB}. Tę płatność rozliczysz pełną kwotą {amount} inną metodą lub kredytem u {orgB}.",
+    historyHeading:"Historia",
+    fAll:"Wszystkie", 
+    hRefund:"Zwrot za rezygnację", hOverpay:"Nadpłata przy zapisie",
+    docsHeading:"Dokumenty płatności",
+    download:"Pobierz", preparing:"w przygotowaniu",
+    docPreparingTpl:"Dokument „{name}” jest w przygotowaniu. Powiadomimy, gdy będzie gotowy do pobrania.",
+    docReadyTpl:"Dokument „{name}” przygotowany. Wysłaliśmy też kopię na e-mail.",
+    creditRules:"Kredyt jest przypisany do danego organizatora i nie przenosi się między nimi. Wypłatę środków na zewnątrz prowadzi organizator w osobnej procedurze.",
+    emptyHeading:"Twój portfel jest jeszcze pusty",
+    emptyBody:"Nie masz tu żadnych operacji. Kredyt pojawia się, gdy powstanie nadpłata albo gdy zwrot z rezygnacji trafi do portfela.",
+    emptyHow1:"Nadpłata przy zapisie wraca jako kredyt u tego organizatora.",
+    emptyHow2:"Zwrot po rezygnacji może trafić do portfela zamiast na kartę.",
+    secDownload:"Pobierz dokument", secPayout:"Wniosek o wypłatę",
+    ctaUse:"Wykorzystaj kredyt przy najbliższej płatności", ctaDownload:"Pobierz dokument płatności",
+    processing:"Przetwarzanie…",
+    usedCreditTpl:"Kredyt {used} przypisany do płatności „{event}”. Do dopłaty: {rest}.",
+    payoutInfo:"Wniosek przyjęty. Decyzję i termin wypłaty ustala organizator, zgodnie ze swoją polityką.",
+    backToEvents:"Przeglądaj otwarte zapisy"
+  },
+  "en-GB":{
+    walletTitle:"Wallet", sharedWith:"shared with the parent account", langLabel:"Language",
+    online:"online", offline:"offline — balance from last sync, changes paused",
+    syncTpl:"synced {date}",
+    segBalance:"Balance", segEmpty:"Empty wallet",
+    balHeading:"Balance by organiser", nonTransfer:"non-transferable",
+    orgABalanceSub:"credit to spend with this organiser",
+    orgBBalanceSub:"no credit with this organiser",
+    upcomingHeading:"Upcoming payments",
+    useCredit:"Use credit",
+    payValSameTpl:"Credit {credit} covers part of {amount}. Still to pay: {rest}.",
+    payValCrossTpl:"Credit with {orgA} does not transfer to a race run by {orgB}. Pay the full {amount} by another method, or use credit held with {orgB}.",
+    historyHeading:"History",
+    fAll:"All",
+    hRefund:"Cancellation refund", hOverpay:"Overpayment at sign-up",
+    docsHeading:"Payment documents",
+    download:"Download", preparing:"being prepared",
+    docPreparingTpl:"The document “{name}” is being prepared. We'll notify you once it's ready to download.",
+    docReadyTpl:"The document “{name}” is ready. We've also emailed you a copy.",
+    creditRules:"Credit belongs to a specific organiser and does not transfer between them. External payouts are handled by the organiser in a separate procedure.",
+    emptyHeading:"Your wallet is still empty",
+    emptyBody:"There are no operations here yet. Credit appears when an overpayment occurs, or when a cancellation refund goes to the wallet.",
+    emptyHow1:"An overpayment at sign-up returns as credit with that organiser.",
+    emptyHow2:"A refund after cancelling can go to the wallet instead of your card.",
+    secDownload:"Download document", secPayout:"Request payout",
+    ctaUse:"Use credit on the next payment", ctaDownload:"Download payment document",
+    processing:"Processing…",
+    usedCreditTpl:"Credit {used} applied to “{event}”. Still to pay: {rest}.",
+    payoutInfo:"Request received. The organiser decides on the payout and its timing under their own policy.",
+    backToEvents:"Browse open sign-ups"
+  }
+};
+const RTL = new Set(["ar","he","fa","ur"]);
+
+/* ----- model danych (kwoty i daty przykładowe) ----- */
+const DATA = {
+  locale:"pl-PL",
+  online:true,
+  syncedAt:new Date("2026-05-12T21:14:00"),
+  organisers:[
+    {id:"A", name:"Stołeczny Klub Biegacza", balance:120},
+    {id:"B", name:"Górski Klub Trailowy",     balance:0}
+  ],
+  upcoming:[
+    {id:"u1", eventKey:"Bieg Letni 2026", org:"A", amount:150},
+    {id:"u2", eventKey:"Trening zimowy",  org:"B", amount:80}
+  ],
+  history:[
+    {date:new Date("2026-05-10"), key:"hRefund",  org:"A", amount:90},
+    {date:new Date("2026-05-02"), key:"hOverpay", org:"A", amount:30}
+  ],
+  documents:[
+    {id:"d1", label:"Faktura 04/2026", ready:true},
+    {id:"d2", label:"Faktura 03/2026", ready:false}
+  ]
+};
+const UI = { view:"full", filter:"ALL" };
+
+/* ----- formatery regionalne ----- */
+const fmtMoney =(v)=>new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN"}).format(v);
+const fmtSigned=(v)=>new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN",signDisplay:"exceptZero"}).format(v);
+const fmtDate  =(d)=>new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit"}).format(d);
+function t(key){const L=I18N[DATA.locale]||{};const F=I18N["en-GB"];return (key in L)?L[key]:(F[key]??key);}
+function tpl(key,map){let s=t(key);for(const k in map)s=s.replace("{"+k+"}",map[k]);return s;}
+function orgName(id){return (DATA.organisers.find(o=>o.id===id)||{}).name||id;}
+
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+function applyStaticI18n(){$$("[data-i18n]").forEach(el=>el.textContent=t(el.getAttribute("data-i18n")));}
+
+function renderSys(){
+  $("#syncVal").textContent=tpl("syncTpl",{date:new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}).format(DATA.syncedAt)});
+  const dot=$("#netDot");dot.classList.toggle("off",!DATA.online);
+  dot.querySelector("span").textContent=DATA.online?t("online"):t("offline");
+}
+
+function renderBalances(){
+  const wrap=$("#balCards");wrap.innerHTML="";
+  DATA.organisers.forEach(o=>{
+    const has=o.balance>0;
+    const card=document.createElement("div");
+    card.className="bal "+(has?"has":"zero");
+    card.innerHTML=`
+      <div class="av" aria-hidden="true">${o.name.charAt(0)}</div>
+      <div class="b-body">
+        <div class="b-name">${o.name}</div>
+        <div class="b-sub">${has?t("orgABalanceSub"):t("orgBBalanceSub")}</div>
+      </div>
+      <div class="b-amt">${fmtMoney(o.balance)}</div>`;
+    wrap.appendChild(card);
+  });
+}
+
+function renderUpcoming(){
+  const wrap=$("#payRows");wrap.innerHTML="";
+  DATA.upcoming.forEach(u=>{
+    const credit=(DATA.organisers.find(o=>o.id===u.org)||{}).balance||0;
+    const cross=credit<=0; // brak kredytu u organizatora tej płatności
+    const row=document.createElement("div");
+    row.className="pay";
+    row.innerHTML=`
+      <div class="p-body">
+        <div class="p-ev">${u.eventKey}</div>
+        <div class="p-org">${orgName(u.org)}</div>
+      </div>
+      <div class="p-amt">${fmtMoney(u.amount)}</div>
+      <button class="use-btn ${cross?"cross":""}" data-id="${u.id}">${t("useCredit")}</button>`;
+    row.querySelector(".use-btn").addEventListener("click",()=>tryUse(u.id));
+    wrap.appendChild(row);
+  });
+}
+
+function tryUse(id){
+  const u=DATA.upcoming.find(x=>x.id===id);if(!u)return;
+  const creditAtPayOrg=(DATA.organisers.find(o=>o.id===u.org)||{}).balance||0;
+  const valBox=$("#payVal");
+  hideStatus();
+  if(creditAtPayOrg<=0){
+    // nieprzenoszalność: kredyt mamy u A, płatność u B
+    const orgWithCredit=DATA.organisers.find(o=>o.balance>0);
+    $("#payValText").textContent=tpl("payValCrossTpl",{
+      orgA:orgWithCredit?orgWithCredit.name:orgName("A"),
+      orgB:orgName(u.org),
+      amount:fmtMoney(u.amount)
+    });
+    valBox.classList.add("show");
+  }else{
+    const used=Math.min(creditAtPayOrg,u.amount);
+    const rest=u.amount-used;
+    valBox.classList.remove("show");
+    showStatus(tpl("usedCreditTpl",{used:fmtMoney(used),event:u.eventKey,rest:fmtMoney(rest)}));
+  }
+}
+
+function renderFilters(){
+  const wrap=$("#filters");wrap.innerHTML="";
+  const opts=[{k:"ALL",label:t("fAll")},...DATA.organisers.map(o=>({k:o.id,label:o.name.split(" ")[0]}))];
+  opts.forEach(o=>{
+    const b=document.createElement("button");
+    b.className="chip";b.textContent=o.label;
+    b.setAttribute("aria-pressed",UI.filter===o.k?"true":"false");
+    b.addEventListener("click",()=>{UI.filter=o.k;renderFilters();renderHistory();});
+    wrap.appendChild(b);
+  });
+}
+
+function renderHistory(){
+  const list=$("#txList");list.innerHTML="";
+  DATA.history.filter(h=>UI.filter==="ALL"||h.org===UI.filter).forEach(h=>{
+    const li=document.createElement("li");
+    li.innerHTML=`
+      <span class="t-date">${fmtDate(h.date)}</span>
+      <span class="t-body"><span class="t-title">${t(h.key)}</span><br><span class="t-org">${orgName(h.org)}</span></span>
+      <span class="t-amt ${h.amount>=0?"pos":"neg"}">${fmtSigned(h.amount)}</span>`;
+    list.appendChild(li);
+  });
+}
+
+function renderDocs(){
+  const list=$("#docsList");list.innerHTML="";
+  DATA.documents.forEach(d=>{
+    const li=document.createElement("li");
+    li.innerHTML=`
+      <span class="d-ic" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 2h8l4 4v16H6V2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 2v4h4M9 13h6M9 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      <span class="d-name">${d.label}</span>
+      <button class="dl ${d.ready?"":"prep"}" data-id="${d.id}">
+        <span class="d-spin" aria-hidden="true"></span>
+        ${d.ready?t("download"):t("preparing")}
+      </button>`;
+    li.querySelector(".dl").addEventListener("click",e=>handleDoc(d,e.currentTarget));
+    list.appendChild(li);
+  });
+}
+
+function handleDoc(d,btn){
+  $("#docVal").classList.remove("show");
+  if(!d.ready){
+    $("#docValText").textContent=tpl("docPreparingTpl",{name:d.label});
+    $("#docVal").classList.add("show");
+    return;
+  }
+  btn.classList.add("loading");btn.disabled=true;
+  setTimeout(()=>{
+    btn.classList.remove("loading");btn.disabled=false;
+    showStatus(tpl("docReadyTpl",{name:d.label}));
+  },1000);
+}
+
+/* ----- status ----- */
+let statusTimer=null;
+function showStatus(text,warn){$("#statusText").textContent=text;const l=$("#statusLine");l.classList.add("show");l.classList.toggle("warn",!!warn);}
+function hideStatus(){$("#statusLine").classList.remove("show");}
+function runProcessing(onDone){
+  const cta=$("#mainCta"),label=$("#ctaLabel"),amt=$("#ctaAmt");
+  cta.disabled=true;cta.classList.add("processing");amt.textContent="";label.textContent=t("processing");
+  $(".spinner").style.display="inline-block";
+  clearTimeout(statusTimer);statusTimer=setTimeout(()=>{cta.classList.remove("processing");cta.disabled=false;$(".spinner").style.display="";renderMainCta();onDone();},1000);
+}
+
+function renderMainCta(){
+  const label=$("#ctaLabel"),amt=$("#ctaAmt");
+  // dominująca akcja: wykorzystaj kredyt; gdy nie ma czego opłacić -> pobierz dokument
+  const eligible=DATA.upcoming.find(u=>((DATA.organisers.find(o=>o.id===u.org)||{}).balance||0)>0);
+  if(eligible){label.textContent=t("ctaUse");amt.textContent="";$("#mainCta").dataset.mode="use";}
+  else{label.textContent=t("ctaDownload");amt.textContent="";$("#mainCta").dataset.mode="doc";}
+}
+
+/* ----- widok ----- */
+function setView(v){
+  UI.view=v;
+  $("#segFull").setAttribute("aria-pressed",v==="full");
+  $("#segEmpty").setAttribute("aria-pressed",v==="empty");
+  $("#viewFull").classList.toggle("hidden",v!=="full");
+  $("#viewEmpty").classList.toggle("hidden",v!=="empty");
+  $("#fullBar").classList.toggle("hidden",v==="empty");
+  $("#emptyBar").classList.toggle("hidden",v!=="empty");
+  hideStatus();
+}
+
+/* ----- język ----- */
+function setLocale(loc){
+  DATA.locale=loc;
+  document.documentElement.lang=loc;
+  document.documentElement.dir=RTL.has(loc.split("-")[0])?"rtl":"ltr";
+  applyStaticI18n();renderSys();renderBalances();renderUpcoming();renderFilters();renderHistory();renderDocs();renderMainCta();
+}
+
+/* =========================================================================
+   INICJALIZACJA
+   ========================================================================= */
+document.addEventListener("DOMContentLoaded",()=>{
+  setLocale("pl-PL");
+  $("#langSel").value="pl-PL";
+  $("#langSel").addEventListener("change",e=>setLocale(e.target.value));
+
+  $("#segFull").addEventListener("click",()=>setView("full"));
+  $("#segEmpty").addEventListener("click",()=>setView("empty"));
+
+  $("#mainCta").addEventListener("click",()=>{
+    const mode=$("#mainCta").dataset.mode;
+    if(mode==="use"){
+      const eligible=DATA.upcoming.find(u=>((DATA.organisers.find(o=>o.id===u.org)||{}).balance||0)>0);
+      if(!eligible)return;
+      runProcessing(()=>tryUse(eligible.id));
+    }else{
+      const ready=DATA.documents.find(d=>d.ready);
+      if(ready) runProcessing(()=>showStatus(tpl("docReadyTpl",{name:ready.label})));
+    }
+  });
+
+  $("#secDoc").addEventListener("click",()=>{const r=DATA.documents.find(d=>d.ready);if(r)showStatus(tpl("docReadyTpl",{name:r.label}));});
+  $("#secPayout").addEventListener("click",()=>showStatus(t("payoutInfo"),true));
+  $("#backCta").addEventListener("click",()=>setView("full"));
+});
+</script>
+</body>
+</html>

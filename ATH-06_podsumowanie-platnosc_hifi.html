@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<!--
+  ATH-06 - podsumowanie i płatność (panel zawodnika, moduł zawodów)
+  Stan domyślny: rozbicie kwoty, metody płatności, licznik rezerwacji, numer startowy PO zaksięgowaniu.
+  Stan alternatywny: odrzucenie płatności przez bramkę z powodem po ludzku i propozycją innej metody.
+  Napisy = klucze tłumaczeń BCP 47 (pl-PL domyślny, en-GB zapasowy). Motywowanie tylko przez zmienne CSS.
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Podsumowanie i płatność · ATH-06</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#10141b;--accent:#d6f622;
+  --color-success:#3ddc84;--color-warning:#ffb84d;--color-error:#ff6b5e;--color-info:#6aa9ff;
+  --surface-1:#181e28;--surface-2:#1f2733;--surface-3:#283241;--hairline:#313c4c;
+  --text-strong:#f2f5f7;--text:#cdd5df;--text-muted:#8c97a6;--on-accent:#10141b;--paper:#f4f5ef;
+  --font-display:"Saira Condensed",system-ui;--font-body:"Barlow",system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);
+  --radius:14px;--shadow:0 10px 30px -12px rgba(0,0,0,.65);--tap:48px;
+}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:radial-gradient(120% 60% at 80% -10%,rgba(214,246,34,.10),transparent 60%),var(--brand-ink);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+[dir="rtl"] body{direction:rtl}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 64px);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 80%,transparent)}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:150px}
+header.bar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(16,20,27,.96),rgba(16,20,27,.86));backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);box-shadow:0 1px 0 rgba(214,246,34,.18)}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--accent);position:relative;overflow:hidden}
+.mark::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 38%,var(--on-accent) 38% 50%,transparent 50% 60%,var(--on-accent) 60% 72%,transparent 72%)}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:15px;line-height:1.05}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+.lang{margin-inline-start:auto;position:relative}
+.lang select{appearance:none;-webkit-appearance:none;font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.steps{display:flex;align-items:center;gap:6px;padding:var(--s2) var(--s4) var(--s2)}
+.step{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-muted);white-space:nowrap}
+.step .n{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:12px;background:var(--surface-3);color:var(--text-muted)}
+.step.active .n{background:var(--accent);color:var(--on-accent)}.step.active{color:var(--text-strong)}
+.step .ln{flex:1;height:1px;background:var(--hairline);min-width:8px}
+.resv{display:flex;align-items:center;gap:8px;padding:0 var(--s4) var(--s3);font-size:12.5px;color:var(--text-muted)}
+.resv .clock{font-family:var(--font-display);font-weight:800;color:var(--color-warning);font-variant-numeric:tabular-nums;font-size:15px}
+.resv.expired .clock{color:var(--color-error)}
+.seg{display:flex;gap:var(--s2);padding:var(--s2) var(--s4) var(--s2)}
+.seg button{flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:.3px;background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);transition:all .18s;padding:0 var(--s2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 18px -8px rgba(214,246,34,.6)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding:var(--s2) var(--s4) 0;animation:rise .4s ease both}
+/* rozbicie kwoty */
+.bill{margin-top:var(--s2);border-radius:var(--radius);border:1px solid var(--hairline);background:linear-gradient(160deg,var(--surface-2),var(--surface-1));overflow:hidden}
+.bline{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--hairline)}
+.bline .bl-main{flex:1;min-width:0}
+.bline .bl-t{font-size:14px;color:var(--text);font-weight:600}
+.bline .bl-s{font-size:12px;color:var(--text-muted)}
+.bline .bl-edit{background:none;border:none;color:var(--color-info);font:inherit;font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:2px;cursor:pointer;padding:4px 0;min-height:32px}
+.bline .bl-p{font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--text-strong);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bline .bl-p.credit{color:var(--color-success)}
+.bline.total{border-bottom:none;background:rgba(214,246,34,.05)}
+.bline.total .bl-t{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--text-strong);text-transform:uppercase;letter-spacing:.3px}
+.bline.total .bl-p{font-size:24px;color:var(--accent)}
+.wallet{margin-top:var(--s4);display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--radius);border:1px solid var(--hairline);background:var(--surface-1)}
+.wallet .wt{flex:1;font-size:13.5px;color:var(--text)}.wallet .wt small{display:block;color:var(--text-muted);font-size:12px;font-variant-numeric:tabular-nums}
+.switch{flex:0 0 auto;width:50px;height:30px;border-radius:999px;background:var(--surface-3);border:1px solid var(--hairline);position:relative;cursor:pointer;padding:0}
+.switch::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:24px;height:24px;border-radius:50%;background:var(--text-muted);transition:all .18s}
+.switch[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+.switch[aria-checked="true"]::after{inset-inline-start:22px;background:var(--on-accent)}
+.switch:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.bibnote{margin-top:var(--s4);display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s4);border-radius:var(--radius);background:rgba(214,246,34,.06);border:1px solid rgba(214,246,34,.28)}
+.bibnote svg{flex:0 0 auto;color:var(--accent);margin-top:1px}
+.bibnote p{margin:0;font-size:13px;color:var(--text)}.bibnote p b{color:var(--text-strong)}
+.sec-h{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-muted);margin:var(--s5) 0 var(--s2)}
+.methods{display:flex;flex-direction:column;gap:var(--s2)}
+.method{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:12px;border:1px solid var(--hairline);background:var(--surface-1);cursor:pointer;width:100%;font:inherit;color:inherit;text-align:start}
+.method[aria-checked="true"]{border-color:var(--accent);background:rgba(214,246,34,.08)}
+.method:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.method .radio{flex:0 0 auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--hairline);position:relative}
+.method[aria-checked="true"] .radio{border-color:var(--accent)}
+.method[aria-checked="true"] .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--accent)}
+.method .mname{flex:1;font-weight:600;font-size:14.5px;color:var(--text-strong)}
+.method .mtag{font-size:11px;color:var(--text-muted)}
+.method.rejected{border-color:var(--color-error);background:rgba(255,107,94,.06)}
+/* alt: odrzucenie płatności */
+.reject{margin-top:var(--s4)}
+.reject .rb{display:flex;gap:var(--s3);padding:var(--s4);border-radius:var(--radius);border:1px solid rgba(255,107,94,.5);background:rgba(255,107,94,.09)}
+.reject .rb svg{flex:0 0 auto;color:var(--color-error);margin-top:1px}
+.reject .rb .rt b{color:var(--text-strong)}.reject .rb .rt{font-size:13.5px;color:var(--text)}
+.reject .rb .rt small{display:block;color:var(--text-muted);font-size:12px;margin-top:4px}
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:linear-gradient(180deg,rgba(16,20,27,.4),var(--brand-ink) 35%);border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+.inner{max-width:480px;margin:0 auto}
+.status-line{display:none;align-items:flex-start;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600;text-align:center}
+.status-line svg{flex:0 0 auto;margin-top:2px}.status-line.show{display:flex}.status-line.warn{color:var(--color-warning)}.status-line.err{color:var(--color-error)}
+.sec-actions{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-bottom:var(--s3)}
+.sec-actions button{background:none;border:none;color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hairline)}
+.sec-actions button:hover{color:var(--text)}.sec-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.cta{width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.4px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s}
+.cta:active{transform:translateY(1px) scale(.995)}.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}
+.hidden{display:none !important}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo"><div class="mark" aria-hidden="true"></div>
+        <div class="org"><b data-i18n="title">Podsumowanie</b><span id="orgName">Stołeczny Klub Biegacza</span></div></div>
+      <div class="lang"><label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language"><option value="pl-PL">PL</option><option value="en-GB">EN</option></select></div>
+    </div>
+    <div class="steps" aria-label="Postęp zapisu">
+      <span class="step"><span class="n">1</span><span data-i18n="step1">Dane</span></span><span class="ln"></span>
+      <span class="step"><span class="n">2</span><span data-i18n="step2">Zgody</span></span><span class="ln"></span>
+      <span class="step active"><span class="n">3</span><span data-i18n="step3">Płatność</span></span>
+    </div>
+    <div class="resv" id="resv"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="resvLabel">rezerwacja miejsca:</span><span class="clock" id="resvClock">04:59</span></div>
+  </header>
+
+  <div class="seg" role="group" aria-label="Stan ekranu">
+    <button id="segPay" aria-pressed="true" data-i18n="segPay">Do zapłaty</button>
+    <button id="segReject" aria-pressed="false" data-i18n="segReject">Płatność odrzucona</button>
+  </div>
+
+  <!-- STAN DOMYŚLNY -->
+  <main id="viewPay">
+    <div class="bill">
+      <div class="bline"><div class="bl-main"><div class="bl-t" data-i18n="liEntry">Wpisowe</div><div class="bl-s" data-i18n="liEntryS">Bieg Stołeczny · 10 km · próg II</div></div><div class="bl-p" id="pEntry"></div></div>
+      <div class="bline"><div class="bl-main"><div class="bl-t" data-i18n="liShirt">Koszulka techniczna (M)</div><button class="bl-edit" id="editShirt" data-i18n="edit">zmień</button></div><div class="bl-p" id="pShirt"></div></div>
+      <div class="bline" id="creditLine"><div class="bl-main"><div class="bl-t" data-i18n="liCredit">Kredyt z portfela</div><div class="bl-s" id="creditS"></div></div><div class="bl-p credit" id="pCredit"></div></div>
+      <div class="bline total"><div class="bl-main"><div class="bl-t" data-i18n="liTotal">Do zapłaty</div></div><div class="bl-p" id="pTotal"></div></div>
+    </div>
+
+    <div class="wallet">
+      <div class="wt"><span data-i18n="walletLabel">Pokryj część z portfela</span><small id="walletBal"></small></div>
+      <button class="switch" id="walletSw" role="switch" aria-checked="true" aria-label="Pokryj część z portfela"></button>
+    </div>
+
+    <div class="bibnote">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 7h14v10H5zM9 7V5h6v2M9 12h6M9 15h4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <p data-i18n="bibNote"><b>Numer startowy nadamy po zaksięgowaniu wpłaty.</b> Do tego czasu zgłoszenie ma status oczekuje na płatność.</p>
+    </div>
+
+    <div class="sec-h" data-i18n="methodHead">Metoda płatności</div>
+    <div class="methods" id="methods" role="radiogroup" aria-label="Metoda płatności">
+      <button class="method" data-m="p24" role="radio" aria-checked="true"><span class="radio" aria-hidden="true"></span><span class="mname">Przelewy24</span><span class="mtag" data-i18n="mFast">szybki przelew</span></button>
+      <button class="method" data-m="payu" role="radio" aria-checked="false"><span class="radio" aria-hidden="true"></span><span class="mname">PayU</span><span class="mtag" data-i18n="mFast">szybki przelew</span></button>
+      <button class="method" data-m="stripe" role="radio" aria-checked="false"><span class="radio" aria-hidden="true"></span><span class="mname">Stripe</span><span class="mtag" data-i18n="mCard">karta</span></button>
+      <button class="method" data-m="blik" role="radio" aria-checked="false"><span class="radio" aria-hidden="true"></span><span class="mname">BLIK</span><span class="mtag" data-i18n="mCode">kod z aplikacji</span></button>
+      <button class="method" data-m="card" role="radio" aria-checked="false"><span class="radio" aria-hidden="true"></span><span class="mname" data-i18n="mCardName">Karta płatnicza</span><span class="mtag" data-i18n="mCard">karta</span></button>
+    </div>
+  </main>
+
+  <!-- STAN ALTERNATYWNY: odrzucenie płatności -->
+  <main id="viewReject" class="hidden">
+    <div class="reject">
+      <div class="rb"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <div class="rt"><b data-i18n="rejTitle">Bank odrzucił płatność BLIK.</b> <span data-i18n="rejBody">Kod wygasł, zanim potwierdziłeś go w aplikacji banku. Nic nie pobraliśmy. Miejsce wciąż jest zarezerwowane.</span><small data-i18n="rejWhat">Spróbuj jeszcze raz z nowym kodem BLIK albo wybierz inną metodę poniżej.</small></div></div>
+
+      <div class="sec-h" data-i18n="tryOther">Spróbuj inną metodą</div>
+      <div class="methods" id="methodsR" role="radiogroup" aria-label="Inna metoda płatności">
+        <button class="method rejected" data-m="blik" role="radio" aria-checked="false"><span class="radio" aria-hidden="true"></span><span class="mname">BLIK</span><span class="mtag" data-i18n="mExpired">kod wygasł</span></button>
+        <button class="method" data-m="p24" role="radio" aria-checked="true"><span class="radio" aria-hidden="true"></span><span class="mname">Przelewy24</span><span class="mtag" data-i18n="mFast">szybki przelew</span></button>
+        <button class="method" data-m="card" role="radio" aria-checked="false"><span class="radio" aria-hidden="true"></span><span class="mname" data-i18n="mCardName">Karta płatnicza</span><span class="mtag" data-i18n="mCard">karta</span></button>
+      </div>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="inner">
+      <div class="status-line" id="statusLine"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="statusText"></span></div>
+      <div class="sec-actions" id="secPay">
+        <button id="secBackConsent" data-i18n="secBackConsent">Wróć do zgód</button>
+        <button id="secPreview" data-i18n="secPreview">Pobierz wstępne podsumowanie</button>
+      </div>
+      <div class="sec-actions hidden" id="secRej"><button id="secResv" data-i18n="secResv">Sprawdź, czy miejsce wciąż jest</button></div>
+      <button class="cta" id="mainCta"><span class="spinner" aria-hidden="true"></span><span id="ctaLabel"></span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const I18N={
+ "pl-PL":{title:"Podsumowanie",langLabel:"Język",step1:"Dane",step2:"Zgody",step3:"Płatność",
+  resvLabel:"rezerwacja miejsca:",segPay:"Do zapłaty",segReject:"Płatność odrzucona",
+  liEntry:"Wpisowe",liEntryS:"Bieg Stołeczny · 10 km · próg II",liShirt:"Koszulka techniczna (M)",edit:"zmień",
+  liCredit:"Kredyt z portfela",creditSTpl:"z salda {bal}",liTotal:"Do zapłaty",
+  walletLabel:"Pokryj część z portfela",walletBalTpl:"saldo: {bal}",
+  bibNote:"<b>Numer startowy nadamy po zaksięgowaniu wpłaty.</b> Do tego czasu zgłoszenie ma status oczekuje na płatność.",
+  methodHead:"Metoda płatności",mFast:"szybki przelew",mCard:"karta",mCode:"kod z aplikacji",mCardName:"Karta płatnicza",mExpired:"kod wygasł",
+  rejTitle:"Bank odrzucił płatność BLIK.",rejBody:"Kod wygasł, zanim potwierdziłeś go w aplikacji banku. Nic nie pobraliśmy. Miejsce wciąż jest zarezerwowane.",
+  rejWhat:"Spróbuj jeszcze raz z nowym kodem BLIK albo wybierz inną metodę poniżej.",tryOther:"Spróbuj inną metodą",
+  ctaPayTpl:"Zapłać i sfinalizuj · {amt}",ctaConfirm:"Potwierdź zgłoszenie (portfel pokrywa całość)",ctaRetryTpl:"Zapłać ponownie · {amt}",processingTxt:"Łączę z bramką…",
+  secBackConsent:"Wróć do zgód",secPreview:"Pobierz wstępne podsumowanie",secResv:"Sprawdź, czy miejsce wciąż jest",
+  goPaid:"Płatność przyjęta. Przechodzę do potwierdzenia, numer nadamy po zaksięgowaniu (ATH-07).",
+  goConfirm:"Portfel pokrył całość. Potwierdzam zgłoszenie bez bramki (ATH-07).",
+  walletOn:"Część kwoty pokryje portfel.",walletOff:"Płacisz całość bez portfela.",
+  methodSetTpl:"Wybrana metoda: {m}.",backConsent:"Wracam do zgód i regulaminów (ATH-05).",
+  previewReady:"Przygotowaliśmy wstępne podsumowanie do pobrania.",editShirt:"Wracam do dodatków, żeby zmienić koszulkę (ATH-04).",
+  resvExpired:"Czas rezerwacji minął. Zanim zapłacisz, sprawdzamy, czy miejsce nadal jest dostępne.",
+  resvOk:"Miejsce wciąż wolne. Rezerwację przedłużyliśmy - możesz zapłacić.",
+  rejStatus:"Płatność odrzucona: kod BLIK wygasł. Nic nie pobrano, miejsce zarezerwowane."},
+ "en-GB":{title:"Summary",langLabel:"Language",step1:"Details",step2:"Consents",step3:"Payment",
+  resvLabel:"place reserved for:",segPay:"To pay",segReject:"Payment declined",
+  liEntry:"Entry fee",liEntryS:"City Run · 10 km · tier II",liShirt:"Technical tee (M)",edit:"change",
+  liCredit:"Wallet credit",creditSTpl:"from balance {bal}",liTotal:"To pay",
+  walletLabel:"Cover part from the wallet",walletBalTpl:"balance: {bal}",
+  bibNote:"<b>We assign your race number once the payment settles.</b> Until then the registration is in awaiting-payment status.",
+  methodHead:"Payment method",mFast:"instant transfer",mCard:"card",mCode:"app code",mCardName:"Payment card",mExpired:"code expired",
+  rejTitle:"The bank declined the BLIK payment.",rejBody:"The code expired before you confirmed it in your banking app. Nothing was charged. Your place is still reserved.",
+  rejWhat:"Try again with a new BLIK code or pick another method below.",tryOther:"Try another method",
+  ctaPayTpl:"Pay and finalise · {amt}",ctaConfirm:"Confirm registration (wallet covers it all)",ctaRetryTpl:"Pay again · {amt}",processingTxt:"Connecting to the gateway…",
+  secBackConsent:"Back to consents",secPreview:"Download a draft summary",secResv:"Check the place is still there",
+  goPaid:"Payment accepted. Going to confirmation, the number is assigned after settlement (ATH-07).",
+  goConfirm:"The wallet covered it all. Confirming without the gateway (ATH-07).",
+  walletOn:"Part of the amount will be covered by the wallet.",walletOff:"Paying in full without the wallet.",
+  methodSetTpl:"Method selected: {m}.",backConsent:"Back to consents and terms (ATH-05).",
+  previewReady:"We've prepared a draft summary for download.",editShirt:"Back to add-ons to change the tee (ATH-04).",
+  resvExpired:"The reservation time ran out. Before you pay, we check the place is still available.",
+  resvOk:"The place is still free. We extended the reservation - you can pay.",
+  rejStatus:"Payment declined: the BLIK code expired. Nothing was charged, your place is reserved."}
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+const METHODS={p24:"Przelewy24",payu:"PayU",stripe:"Stripe",blik:"BLIK",card:null};
+const DATA={locale:"pl-PL",entry:120,shirt:79,wallet:120,resvLeft:299};
+const UI={view:"pay",useWallet:true,method:"p24"};
+const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function t(k){const L=I18N[DATA.locale]||{},F=I18N["en-GB"];return (k in L)?L[k]:(F[k]??k);}
+function tpl(k,m){let s=t(k);for(const x in m)s=s.replace(new RegExp("{"+x+"}","g"),m[x]);return s;}
+function applyStatic(){$$("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-i18n"),v=t(k);if(v.includes("<"))e.innerHTML=v;else e.textContent=v;});}
+const fmtMoney=(v)=>new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN"}).format(v);
+const fmtSigned=(v)=>new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN",signDisplay:"exceptZero"}).format(v);
+function gross(){return DATA.entry+DATA.shirt;}
+function credit(){return UI.useWallet?Math.min(DATA.wallet,gross()):0;}
+function net(){return gross()-credit();}
+function methodName(m){return METHODS[m]||t("mCardName");}
+function mmss(s){const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0");}
+function renderBill(){
+  $("#pEntry").textContent=fmtMoney(DATA.entry);$("#pShirt").textContent=fmtMoney(DATA.shirt);
+  const c=credit();$("#creditLine").style.display=c>0?"":"none";$("#pCredit").textContent=fmtSigned(-c);
+  $("#creditS").textContent=tpl("creditSTpl",{bal:fmtMoney(DATA.wallet)});
+  $("#pTotal").textContent=fmtMoney(net());$("#walletBal").textContent=tpl("walletBalTpl",{bal:fmtMoney(DATA.wallet)});
+}
+function renderCta(){const l=$("#ctaLabel");
+  if(UI.view==="reject"){l.textContent=tpl("ctaRetryTpl",{amt:fmtMoney(net())});return;}
+  if(net()<=0){l.textContent=t("ctaConfirm");return;}
+  l.textContent=tpl("ctaPayTpl",{amt:fmtMoney(net())});}
+let st=null;
+function showStatus(x,cls){const s=$("#statusLine");$("#statusText").textContent=x;s.classList.add("show");s.classList.remove("warn","err");if(cls)s.classList.add(cls);}
+function hideStatus(){$("#statusLine").classList.remove("show");}
+function runProcessing(done){const c=$("#mainCta"),l=$("#ctaLabel");c.disabled=true;c.classList.add("processing");l.textContent=t("processingTxt");$(".spinner").style.display="inline-block";clearTimeout(st);st=setTimeout(()=>{c.classList.remove("processing");c.disabled=false;renderCta();done();},1000);}
+function selectMethod(group,m){$$("#"+group+" .method").forEach(b=>b.setAttribute("aria-checked",b.dataset.m===m?"true":"false"));}
+function setView(v){UI.view=v;$("#segPay").setAttribute("aria-pressed",v==="pay");$("#segReject").setAttribute("aria-pressed",v==="reject");
+  $("#viewPay").classList.toggle("hidden",v!=="pay");$("#viewReject").classList.toggle("hidden",v!=="reject");
+  $("#secPay").classList.toggle("hidden",v!=="pay");$("#secRej").classList.toggle("hidden",v!=="reject");
+  if(v==="reject"){showStatus(t("rejStatus"),"err");}else hideStatus();renderCta();}
+function setLocale(loc){DATA.locale=loc;document.documentElement.lang=loc;document.documentElement.dir=RTL.has(loc.split("-")[0])?"rtl":"ltr";applyStatic();renderBill();renderCta();$("#resvClock").textContent=mmss(DATA.resvLeft);if(UI.view==="reject")showStatus(t("rejStatus"),"err");}
+let tick=null;
+function startTick(){clearInterval(tick);tick=setInterval(()=>{
+  if(DATA.resvLeft>0){DATA.resvLeft--;$("#resvClock").textContent=mmss(DATA.resvLeft);
+    if(DATA.resvLeft===0){$("#resv").classList.add("expired");}}
+},1000);}
+document.addEventListener("DOMContentLoaded",()=>{
+  setLocale("pl-PL");$("#langSel").value="pl-PL";
+  $("#langSel").addEventListener("change",e=>setLocale(e.target.value));
+  $("#segPay").addEventListener("click",()=>setView("pay"));
+  $("#segReject").addEventListener("click",()=>setView("reject"));
+  $$("#methods .method").forEach(b=>b.addEventListener("click",()=>{UI.method=b.dataset.m;selectMethod("methods",b.dataset.m);showStatus(tpl("methodSetTpl",{m:methodName(b.dataset.m)}));}));
+  $$("#methodsR .method").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.m==="blik")return;UI.method=b.dataset.m;selectMethod("methodsR",b.dataset.m);hideStatus();}));
+  $("#walletSw").addEventListener("click",e=>{const on=e.currentTarget.getAttribute("aria-checked")==="true";e.currentTarget.setAttribute("aria-checked",String(!on));UI.useWallet=!on;renderBill();renderCta();showStatus(t(!on?"walletOn":"walletOff"));});
+  $("#mainCta").addEventListener("click",()=>{
+    if(DATA.resvLeft<=0&&UI.view==="pay"){showStatus(t("resvExpired"),"warn");DATA.resvLeft=180;$("#resv").classList.remove("expired");$("#resvClock").textContent=mmss(DATA.resvLeft);return;}
+    if(net()<=0){runProcessing(()=>showStatus(t("goConfirm")));return;}
+    runProcessing(()=>showStatus(t("goPaid")));
+  });
+  $("#editShirt").addEventListener("click",()=>showStatus(t("editShirt")));
+  $("#secBackConsent").addEventListener("click",()=>showStatus(t("backConsent")));
+  $("#secPreview").addEventListener("click",()=>showStatus(t("previewReady")));
+  $("#secResv").addEventListener("click",()=>showStatus(t("resvOk")));
+  startTick();
+});
+</script>
+</body>
+</html>

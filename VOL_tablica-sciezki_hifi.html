@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOL · Tablica ścieżki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600..800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#11161c;
+  --accent:#0b69d4;
+
+  --color-success:#0a7d35;
+  --color-warning:#b45309;
+  --color-error:#c4181f;
+  --color-info:#0b69d4;
+
+  --paper:#f1f4f8;
+  --surface-1:#ffffff;
+  --surface-2:#e9eef4;
+  --surface-3:#dbe3ec;
+  --hairline:#c5cfdb;
+  --text-strong:#11161c;
+  --text:#33404e;
+  --text-muted:#5d6b7c;
+  --on-accent:#ffffff;
+
+  --hivis:#f3b50a;
+  --hivis-rgb:243,181,10;
+
+  --tint-success-bg:#ecfdf3;
+  --tint-success-border:#a6e0bd;
+  --tint-success-text:#075c28;
+  --tint-warning-bg:#fff7ed;
+  --tint-warning-border:#f2c79a;
+  --tint-warning-text:#7c3d05;
+  --tint-error-bg:#fdeaea;
+  --tint-error-border:#f0b4b4;
+  --tint-error-text:#8a1318;
+  --tint-info-bg:#eaf2fc;
+  --tint-info-border:#b8d3f3;
+  --tint-info-text:#0a4a96;
+
+  --verdict-ok:#0a7d35;
+  --verdict-no:#c4181f;
+  --status-paid:#0a7d35;
+  --status-unpaid:#b45309;
+  --status-check:#5d6b7c;
+
+  --font-display:"Archivo", system-ui, sans-serif;
+  --font-body:"IBM Plex Sans", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:14px;
+  --shadow:0 10px 26px -14px rgba(17,22,28,.34);
+  --tap:56px;
+  --tap-primary:64px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  font-family:var(--font-body);color:var(--text);
+  background:
+    radial-gradient(120% 80% at 0% 0%, var(--surface-2) 0, transparent 50%),
+    radial-gradient(120% 80% at 100% 100%, var(--surface-2) 0, transparent 50%),
+    var(--paper);
+  padding:var(--s8) var(--s5) calc(var(--s10) + env(safe-area-inset-bottom));
+  -webkit-font-smoothing:antialiased;
+}
+
+/* --- nagłówek strony --- */
+header.page{max-width:1080px;margin:0 auto var(--s6);display:flex;flex-direction:column;gap:var(--s3)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+  font:700 11px/1 var(--font-display);letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted)}
+.eyebrow::before{content:"";width:24px;height:6px;
+  background:repeating-linear-gradient(135deg,var(--hivis) 0 6px,var(--brand-ink) 6px 12px);
+  background-size:12px 12px;border-radius:2px}
+h1{font:800 32px/1.05 var(--font-display);color:var(--text-strong);letter-spacing:-.01em;max-width:34ch}
+.lede{font:400 15px/1.5 var(--font-body);color:var(--text);max-width:62ch}
+.lede b{color:var(--text-strong);font-weight:600}
+
+/* --- legenda --- */
+.legend{max-width:1080px;margin:0 auto var(--s6);background:var(--surface-1);
+  border:1px solid var(--hairline);border-radius:var(--radius);
+  padding:var(--s4) var(--s5);display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4);
+  box-shadow:var(--shadow)}
+.legend h2{grid-column:1/-1;font:700 11px/1 var(--font-display);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--s1)}
+.legend-item{display:flex;align-items:center;gap:10px;font:500 13px/1.3 var(--font-body);color:var(--text)}
+.legend-item b{font-weight:600;color:var(--text-strong)}
+.legend-swatch{flex:0 0 auto;width:48px;height:24px;border-radius:6px;display:grid;place-items:center}
+.swatch-primary{position:relative}
+.swatch-primary::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:2px;
+  background:var(--accent);transform:translateY(-50%)}
+.swatch-primary::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;
+  border-left:8px solid var(--accent);border-top:5px solid transparent;border-bottom:5px solid transparent;
+  transform:translateY(-50%)}
+.swatch-sec{position:relative}
+.swatch-sec::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:2px;
+  background:var(--text-muted);transform:translateY(-50%)}
+.swatch-sec::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;
+  border-left:8px solid var(--text-muted);border-top:5px solid transparent;border-bottom:5px solid transparent;
+  transform:translateY(-50%)}
+.swatch-branch{position:relative}
+.swatch-branch::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:0;
+  border-top:2px dashed var(--color-warning);transform:translateY(-1px)}
+.swatch-branch::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;
+  border-left:8px solid var(--color-warning);border-top:5px solid transparent;border-bottom:5px solid transparent;
+  transform:translateY(-50%)}
+.swatch-ext{background:var(--surface-2);border:1px dashed var(--hairline);color:var(--text-muted);
+  font:700 9px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase}
+
+/* --- plansza --- */
+.board-wrap{max-width:1080px;margin:0 auto;overflow:auto;
+  background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:var(--s5)}
+.board{position:relative;width:1000px;height:1080px;margin:0 auto}
+
+/* --- SVG arrows --- */
+.arrows{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.arrows .path-primary{fill:none;stroke:var(--accent);stroke-width:2.2;
+  marker-end:url(#arrowhead-primary)}
+.arrows .path-sec{fill:none;stroke:var(--text-muted);stroke-width:1.8;
+  marker-end:url(#arrowhead-sec)}
+.arrows .path-branch{fill:none;stroke:var(--color-warning);stroke-width:1.8;
+  stroke-dasharray:6 4;marker-end:url(#arrowhead-branch)}
+
+/* --- etykieta przy strzałce --- */
+.label{position:absolute;transform:translate(-50%,-50%);
+  background:var(--surface-1);border:1px solid var(--hairline);
+  border-radius:999px;padding:4px 10px;
+  font:600 11px/1.1 var(--font-body);color:var(--text-strong);
+  white-space:nowrap;z-index:2;letter-spacing:.01em;
+  box-shadow:0 1px 0 rgba(17,22,28,.04)}
+.label.primary{border-color:rgba(11,105,212,.35);color:var(--accent)}
+.label.branch{border-color:var(--tint-warning-border);background:var(--tint-warning-bg);color:var(--tint-warning-text)}
+
+/* --- węzeł (kontener miniatury + caption) --- */
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;z-index:1}
+.node .cap{margin-top:6px;text-align:center;font:600 12px/1.25 var(--font-body);color:var(--text-strong);width:130px}
+.node .cap small{display:block;font-weight:500;color:var(--text-muted);margin-top:1px}
+
+/* --- klikalny węzeł (miniatura → ekran) --- */
+a.node{text-decoration:none;color:inherit;cursor:pointer}
+a.node .phone{transition:transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .18s, border-color .18s}
+a.node:hover{z-index:5}
+a.node:hover .phone{transform:translateY(-3px);border-color:var(--accent);
+  box-shadow:0 16px 32px -12px rgba(11,105,212,.4), 0 0 0 2px rgba(11,105,212,.18)}
+a.node:hover .cap{color:var(--accent)}
+a.node:focus-visible{outline:none}
+a.node:focus-visible .phone{box-shadow:0 0 0 3px var(--hivis), 0 14px 30px -12px rgba(17,22,28,.34);border-color:var(--accent)}
+a.node:focus-visible .cap{color:var(--accent)}
+
+/* --- miniatura telefonu --- */
+.phone{width:120px;height:188px;background:var(--surface-1);
+  border:1px solid var(--hairline);border-radius:10px;
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.phone .band{height:3px;background:repeating-linear-gradient(135deg,var(--hivis) 0 6px,var(--brand-ink) 6px 12px)}
+.phone .hdr{display:flex;align-items:center;justify-content:space-between;gap:4px;
+  padding:5px 7px;border-bottom:1px solid var(--hairline);background:var(--surface-1)}
+.phone .id{font:800 10px/1 var(--font-display);color:var(--text-strong);letter-spacing:.04em}
+.phone .lang{font:700 8px/1 var(--font-display);color:var(--text-muted);letter-spacing:.06em}
+.phone .body{flex:1;padding:6px;display:flex;flex-direction:column;gap:4px;background:var(--surface-1)}
+.phone .foot{padding:5px 6px;border-top:1px solid var(--hairline);background:var(--surface-2)}
+.phone .cta{display:block;width:100%;background:var(--accent);color:var(--on-accent);
+  text-align:center;padding:4px 0;border-radius:5px;
+  font:700 9px/1 var(--font-display);letter-spacing:.02em}
+
+/* warianty body */
+.b-scanner{position:relative;background:var(--brand-ink);border-radius:5px;flex:1;min-height:60px}
+.b-scanner::before,.b-scanner::after{content:"";position:absolute;width:10px;height:10px;border:2px solid var(--hivis)}
+.b-scanner::before{top:5px;left:5px;border-right:0;border-bottom:0;border-radius:3px 0 0 0}
+.b-scanner::after{top:5px;right:5px;border-left:0;border-bottom:0;border-radius:0 3px 0 0}
+.b-scanner .laser{position:absolute;left:5px;right:5px;height:1.5px;background:var(--hivis);top:50%;
+  box-shadow:0 0 4px 1px rgba(var(--hivis-rgb),.6)}
+
+.b-meta{display:grid;grid-template-columns:auto 1fr;gap:3px 6px;align-items:baseline;
+  background:var(--surface-2);border:1px solid var(--hairline);border-radius:5px;padding:4px 6px}
+.b-meta dt{font:600 7px/1 var(--font-body);color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em}
+.b-meta dd{font:600 9px/1 var(--font-body);color:var(--text-strong);text-align:right;font-variant-numeric:tabular-nums}
+
+.b-code{display:flex;gap:2px;justify-content:space-between}
+.b-code span{flex:1;height:14px;border:1px solid var(--hairline);border-radius:3px;background:var(--surface-2)}
+
+.b-card{flex:1;background:var(--brand-ink);color:#fff;border-radius:5px;padding:5px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px}
+.b-card .clab{font:700 7px/1 var(--font-display);letter-spacing:.14em;text-transform:uppercase;color:var(--hivis)}
+.b-card .cval{font:800 16px/1 var(--font-display);color:#fff}
+.b-card .cwhere{font:500 8px/1.1 var(--font-body);color:#aebccd}
+
+.b-row{display:flex;align-items:center;gap:5px;padding:4px 5px;border-radius:4px;background:var(--surface-2)}
+.b-row .clk{font:700 9px/1 var(--font-display);color:var(--text-strong);width:34px;font-variant-numeric:tabular-nums}
+.b-row .what{flex:1;font:500 9px/1.1 var(--font-body);color:var(--text)}
+.b-row .what b{display:block;font-weight:600;color:var(--text-strong)}
+.b-row.now{background:var(--tint-info-bg);border:1px solid var(--tint-info-border)}
+.b-row.cancel .what{text-decoration:line-through;color:var(--text-muted)}
+.b-row.brk{background:transparent;border:1px dashed var(--hairline)}
+.b-row.brk .what{color:var(--text-muted)}
+
+.b-verdict{flex:1;background:var(--verdict-ok);color:#fff;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;gap:5px;padding:5px}
+.b-verdict .v-ico{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.22);
+  display:grid;place-items:center;font:800 11px/1 var(--font-display)}
+.b-verdict .v-word{font:800 13px/1 var(--font-display)}
+
+.b-size{flex:1;background:var(--brand-ink);color:#fff;border-radius:5px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative;overflow:hidden}
+.b-size::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(135deg,rgba(var(--hivis-rgb),.1) 0 6px,transparent 6px 12px)}
+.b-size .lab{position:relative;z-index:1;font:700 7px/1 var(--font-display);letter-spacing:.18em;text-transform:uppercase;color:var(--hivis)}
+.b-size .val{position:relative;z-index:1;font:800 38px/.85 var(--font-display);color:#fff}
+
+.b-search{display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:5px;
+  background:var(--surface-2);border:1px solid var(--hairline);font:500 8px/1 var(--font-body);color:var(--text-muted)}
+.b-listrow{display:flex;align-items:center;gap:4px;padding:3px 5px;border-radius:4px;background:var(--surface-1);border:1px solid var(--hairline)}
+.b-listrow .bib{font:800 11px/1 var(--font-display);color:var(--text-strong);font-variant-numeric:tabular-nums}
+.b-listrow .stat{margin-left:auto;font:700 7px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;
+  padding:2px 5px;border-radius:3px;border:1px solid}
+.b-listrow .stat.ok{background:var(--tint-success-bg);border-color:var(--tint-success-border);color:var(--tint-success-text)}
+.b-listrow .stat.no{background:var(--tint-error-bg);border-color:var(--tint-error-border);color:var(--tint-error-text)}
+.b-listrow .stat.wait{background:var(--tint-warning-bg);border-color:var(--tint-warning-border);color:var(--tint-warning-text)}
+
+.b-opt{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1px solid var(--hairline);border-radius:5px;
+  font:500 9px/1 var(--font-body);color:var(--text)}
+.b-opt .dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--hairline);flex:0 0 auto}
+.b-opt.on .dot{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 2px #fff}
+.b-opt b{color:var(--text-strong);font-weight:600}
+.b-opt small{margin-left:auto;font:600 7px/1 var(--font-display);color:var(--text-muted)}
+
+/* --- annotacja stanu alternatywnego (badge na miniaturze) --- */
+.altbadge{position:absolute;right:-6px;top:-6px;
+  background:var(--tint-warning-bg);border:1px solid var(--tint-warning-border);color:var(--tint-warning-text);
+  font:700 8px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;
+  padding:3px 6px;border-radius:999px;z-index:3;white-space:nowrap;
+  box-shadow:0 2px 6px -3px rgba(17,22,28,.4)}
+
+/* --- węzeł zewnętrzny (poza panelem) --- */
+.ext{display:flex;flex-direction:column;align-items:center}
+.ext .pill{background:var(--surface-2);border:1.5px dashed var(--hairline);border-radius:12px;
+  padding:8px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;
+  position:relative;box-sizing:border-box}
+.ext .pill .tag{font:700 9px/1 var(--font-display);letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
+.ext .pill .nm{font:700 13px/1.2 var(--font-display);color:var(--text-strong);text-align:center}
+.ext.invite{width:130px}
+.ext.invite .pill{width:130px}
+.ext.invite .pill .tag{color:var(--tint-info-text)}
+.ext.invite .pill{background:var(--tint-info-bg);border-color:var(--tint-info-border)}
+.ext.coord{width:280px}
+.ext.coord .pill{width:280px;background:var(--brand-ink);border:1.5px dashed rgba(255,255,255,.4)}
+.ext.coord .pill .tag{color:rgba(255,255,255,.6)}
+.ext.coord .pill .nm{color:#fff}
+
+/* --- nota --- */
+footer.page{max-width:1080px;margin:var(--s6) auto 0;padding:var(--s4) var(--s5);
+  background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);
+  display:flex;gap:var(--s4);align-items:flex-start}
+footer.page .pill-tag{flex:0 0 auto;background:var(--brand-ink);color:var(--hivis);
+  font:700 10px/1 var(--font-display);letter-spacing:.16em;text-transform:uppercase;
+  padding:6px 10px;border-radius:6px}
+footer.page p{font:400 13px/1.55 var(--font-body);color:var(--text);max-width:70ch}
+footer.page p b{color:var(--text-strong);font-weight:600}
+
+@media (max-width:1100px){
+  .board-wrap{padding:var(--s3)}
+  .board{transform-origin:top left}
+}
+</style>
+</head>
+<body>
+
+<header class="page">
+  <span class="eyebrow">Grupa VOL · panel wolontariusza · moduł zawodów</span>
+  <h1>Tablica ścieżki: od zaproszenia po wydanie pakietu</h1>
+  <p class="lede">
+    Każdy kafel to jeden ekran panelu wolontariusza - <b>kliknięcie miniatury otwiera
+    odpowiednią makietę w nowej karcie</b>. Strzałki pokazują przejście między
+    ekranami i akcję, która je wywołuje. <b>Niebieskie</b> to akcje główne,
+    <b>szare</b> to nawigacja drugorzędna, <b>bursztynowe przerywane</b> to rozgałęzienia
+    wyprowadzające z panelu (sprawa do koordynatora). Stany alternatywne, które
+    nie powodują przejścia, oznaczono jako badge przy miniaturze.
+  </p>
+</header>
+
+<section class="legend" aria-label="Legenda">
+  <h2>Legenda</h2>
+  <div class="legend-item"><span class="legend-swatch swatch-primary"></span><span><b>Akcja główna</b>: jedno dotknięcie, dominująca akcja ekranu.</span></div>
+  <div class="legend-item"><span class="legend-swatch swatch-sec"></span><span><b>Nawigacja drugorzędna</b>: skróty z pulpitu, podgląd planu lub listy.</span></div>
+  <div class="legend-item"><span class="legend-swatch swatch-branch"></span><span><b>Rozgałęzienie</b>: spór, brak rozmiaru, kod użyty - sprawa do koordynatora.</span></div>
+  <div class="legend-item"><span class="legend-swatch swatch-ext">poza</span><span><b>Poza panelem</b>: zaproszenie wydane przez organizatora lub koordynator po stronie wydarzenia.</span></div>
+</section>
+
+<div class="board-wrap">
+  <div class="board" role="img" aria-label="Tablica ścieżki przejść między ekranami VOL-01 do VOL-07">
+
+    <!-- ============================ SVG: STRZAŁKI ============================ -->
+    <svg class="arrows" viewBox="0 0 1000 1080" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <marker id="arrowhead-primary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:var(--accent)"/>
+        </marker>
+        <marker id="arrowhead-sec" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:var(--text-muted)"/>
+        </marker>
+        <marker id="arrowhead-branch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:var(--color-warning)"/>
+        </marker>
+      </defs>
+
+      <!-- 1: VOL-07 → VOL-01 (łuk nad Zaproszeniem) -->
+      <path class="path-primary" d="M 175 110 C 270 30, 410 30, 435 110"/>
+      <!-- 2: Zaproszenie → VOL-01 -->
+      <path class="path-primary" d="M 370 110 L 435 110"/>
+      <!-- 3: VOL-01 → VOL-02 -->
+      <path class="path-primary" d="M 495 204 L 495 300"/>
+      <!-- 4: VOL-02 → VOL-03 (sec, lewo) -->
+      <path class="path-sec" d="M 450 488 C 320 540, 200 570, 165 590"/>
+      <!-- 5: VOL-02 → VOL-06 (sec) -->
+      <path class="path-sec" d="M 475 488 C 475 540, 355 570, 355 590"/>
+      <!-- 6: VOL-02 → VOL-04 (primary) -->
+      <path class="path-primary" d="M 510 488 C 510 540, 550 570, 550 590"/>
+      <!-- 7: VOL-02 → VOL-05 (primary) -->
+      <path class="path-primary" d="M 535 488 C 700 540, 765 570, 765 590"/>
+      <!-- 8: VOL-03 → VOL-04 (otwórz zmianę, łuk pod VOL-06) -->
+      <path class="path-primary" d="M 225 760 C 290 830, 440 830, 490 760"/>
+      <!-- 9: VOL-06 → VOL-05 (wiersz uczestnika, łuk pod VOL-04) -->
+      <path class="path-primary" d="M 415 760 C 490 830, 660 830, 705 760"/>
+      <!-- 10: VOL-04 → VOL-05 (góra, "udana odprawa → wydanie") -->
+      <path class="path-primary" d="M 610 650 L 705 650"/>
+      <!-- 11: VOL-05 → VOL-04 (dół, "skanuj kolejnego") -->
+      <path class="path-sec" d="M 705 720 L 610 720"/>
+      <!-- 12: VOL-04 → Koordynator -->
+      <path class="path-branch" d="M 550 778 C 550 860, 480 920, 460 938"/>
+      <!-- 13: VOL-05 → Koordynator -->
+      <path class="path-branch" d="M 765 778 C 765 860, 600 920, 580 938"/>
+      <!-- 14: VOL-06 → Koordynator -->
+      <path class="path-branch" d="M 355 778 C 355 860, 420 920, 440 938"/>
+    </svg>
+
+    <!-- ============================ ETYKIETY STRZAŁEK ============================ -->
+    <div class="label primary" style="left:305px;top:30px">akceptacja organizatora</div>
+    <div class="label primary" style="left:397px;top:125px">skan QR / kod</div>
+    <div class="label primary" style="left:495px;top:250px">udane wejście</div>
+    <div class="label" style="left:280px;top:550px">harmonogram</div>
+    <div class="label" style="left:420px;top:545px">lista startowa</div>
+    <div class="label primary" style="left:580px;top:545px">rozpocznij: odprawa</div>
+    <div class="label primary" style="left:710px;top:545px">rozpocznij: wydawanie</div>
+    <div class="label primary" style="left:368px;top:835px">otwórz zmianę → VOL-04 / VOL-05</div>
+    <div class="label primary" style="left:608px;top:842px">wiersz uczestnika → VOL-04 / VOL-05</div>
+    <div class="label primary" style="left:690px;top:655px">odprawa → wydanie</div>
+    <div class="label" style="left:690px;top:725px">skanuj kolejnego</div>
+    <div class="label branch" style="left:498px;top:870px">do wyjaśnienia</div>
+    <div class="label branch" style="left:670px;top:890px">brak rozmiaru</div>
+    <div class="label branch" style="left:380px;top:890px">nieopłacone</div>
+
+    <!-- ============================ WĘZŁY ============================ -->
+
+    <!-- VOL-07 -->
+    <a class="node" style="left:55px;top:16px" href="VOL-07_zgloszenie-wolontariat-most-rodzica_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran VOL-07: zgłoszenie wolontariat (most rodzica)">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">VOL-07</span><span class="lang">PL</span></div>
+        <div class="body">
+          <div class="b-opt"><span class="dot" aria-hidden="true"></span><b>Brama</b><small>3 wolne</small></div>
+          <div class="b-opt on"><span class="dot" aria-hidden="true"></span><b>Depozyt</b><small>1 wolne</small></div>
+          <div class="b-opt"><span class="dot" aria-hidden="true"></span><b>Woda</b><small>PEŁNE</small></div>
+        </div>
+        <div class="foot"><span class="cta">Wyślij zgłoszenie</span></div>
+      </div>
+      <div class="cap">VOL-07<small>most rodzica (zgłoszenie)</small></div>
+    </a>
+
+    <!-- Zaproszenie (external) -->
+    <div class="node ext invite" style="left:240px;top:84px">
+      <div class="pill">
+        <span class="tag">poza panelem</span>
+        <span class="nm">Zaproszenie<br>QR / SMS</span>
+      </div>
+      <div class="cap" style="margin-top:8px">źródło: OEV-25<small>organizator wysyła link</small></div>
+    </div>
+
+    <!-- VOL-01 -->
+    <a class="node" style="left:435px;top:16px" href="VOL-01_logowanie-z-zaproszenia_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran VOL-01: logowanie z zaproszenia">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">VOL-01</span><span class="lang">PL</span></div>
+        <div class="body">
+          <div class="b-scanner" aria-hidden="true"><span class="laser"></span></div>
+          <div class="b-code"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="foot"><span class="cta">Skanuj zaproszenie</span></div>
+        <div class="altbadge" title="alt: kod użyty / wygasły → koordynator">× kod użyty</div>
+      </div>
+      <div class="cap">VOL-01<small>logowanie z zaproszenia</small></div>
+    </a>
+
+    <!-- VOL-02 -->
+    <a class="node" style="left:435px;top:300px" href="VOL-02_dashboard-zadania_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran VOL-02: dashboard zadań">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">VOL-02</span><span class="lang">sync 3</span></div>
+        <div class="body">
+          <div class="b-card">
+            <span class="clab">Teraz · 09:00–11:00</span>
+            <span class="cval" style="font-size:11px;line-height:1.1">Wydawanie pakietów</span>
+            <span class="cwhere">Sektor B · Brama 2</span>
+          </div>
+          <div class="b-row"><span class="clk">11:30</span><span class="what"><b>Odprawa</b>Brama 1</span></div>
+        </div>
+        <div class="foot"><span class="cta">Rozpocznij zadanie</span></div>
+      </div>
+      <div class="cap">VOL-02<small>dashboard zadań</small></div>
+    </a>
+
+    <!-- VOL-03 -->
+    <a class="node" style="left:105px;top:590px" href="VOL-03_harmonogram-zmian_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran VOL-03: harmonogram zmian">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">VOL-03</span><span class="lang">PL</span></div>
+        <div class="body">
+          <div class="b-row now"><span class="clk">09:00</span><span class="what"><b>Wydawanie</b>Sektor B</span></div>
+          <div class="b-row brk"><span class="clk">11:00</span><span class="what">Przerwa</span></div>
+          <div class="b-row"><span class="clk">11:30</span><span class="what"><b>Odprawa</b>Brama 1</span></div>
+          <div class="b-row cancel"><span class="clk">14:00</span><span class="what">Lista startowa</span></div>
+        </div>
+        <div class="foot"><span class="cta">Otwórz bieżącą zmianę</span></div>
+      </div>
+      <div class="cap">VOL-03<small>harmonogram zmian</small></div>
+    </a>
+
+    <!-- VOL-06 -->
+    <a class="node" style="left:295px;top:590px" href="VOL-06_lista-startowa_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran VOL-06: lista startowa">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">VOL-06</span><span class="lang">84/120</span></div>
+        <div class="body">
+          <div class="b-search">⌕ numer / nazwisko</div>
+          <div class="b-listrow"><span class="bib">142</span><span class="stat ok">OK</span></div>
+          <div class="b-listrow"><span class="bib">143</span><span class="stat no">NIE</span></div>
+          <div class="b-listrow"><span class="bib">144</span><span class="stat wait">?</span></div>
+        </div>
+        <div class="foot"><span class="cta">Dotknij wiersz</span></div>
+      </div>
+      <div class="cap">VOL-06<small>lista startowa</small></div>
+    </a>
+
+    <!-- VOL-04 -->
+    <a class="node" style="left:490px;top:590px" href="VOL-04_odprawa-skan-qr_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran VOL-04: odprawa (skan QR)">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">VOL-04</span><span class="lang">84/120</span></div>
+        <div class="body">
+          <div class="b-scanner" aria-hidden="true"><span class="laser"></span></div>
+          <div class="b-verdict"><span class="v-ico">✓</span><span class="v-word">OK · #142</span></div>
+        </div>
+        <div class="foot"><span class="cta">Potwierdź odprawę</span></div>
+        <div class="altbadge" title="alt: już odprawiony 09:12 → potwierdź ponowne">↻ już odprawiony</div>
+      </div>
+      <div class="cap">VOL-04<small>odprawa (skan QR)</small></div>
+    </a>
+
+    <!-- VOL-05 -->
+    <a class="node" style="left:705px;top:590px" href="VOL-05_wydawanie-pakietow_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran VOL-05: wydawanie pakietów">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">VOL-05</span><span class="lang">61/120</span></div>
+        <div class="body">
+          <div class="b-scanner" style="min-height:34px" aria-hidden="true"><span class="laser"></span></div>
+          <div class="b-size"><span class="lab">rozmiar</span><span class="val">M</span></div>
+        </div>
+        <div class="foot"><span class="cta">Potwierdź wydanie</span></div>
+        <div class="altbadge" title="alt: pakiet już wydany 09:20 / cofnij z powodem">↻ pakiet wydany</div>
+      </div>
+      <div class="cap">VOL-05<small>wydawanie pakietów</small></div>
+    </a>
+
+    <!-- Koordynator (external) -->
+    <div class="node ext coord" style="left:380px;top:940px">
+      <div class="pill">
+        <span class="tag">poza panelem</span>
+        <span class="nm">Koordynator wydarzenia</span>
+      </div>
+      <div class="cap" style="margin-top:8px;width:240px">źródło: OEV-25 / OEV-18<small>sprawy płatności i wyjątki proceduralne</small></div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="page">
+  <span class="pill-tag">jak czytać</span>
+  <p>
+    Wejście do panelu ma dwie ścieżki: <b>most rodzica</b> (VOL-07 → akceptacja
+    organizatora → VOL-01) i <b>zaproszenie</b> (QR lub SMS od organizatora → VOL-01).
+    Po wejściu VOL-02 jest centralnym pulpitem - prowadzi prosto do bieżącego zadania
+    (VOL-04 lub VOL-05) i daje skróty do planu (VOL-03) oraz weryfikacji (VOL-06).
+    Trzon operacyjny to para VOL-04 ↔ VOL-05: udana odprawa otwiera wydanie pakietu,
+    a po wydaniu wraca się do skanera kolejnego uczestnika. Każdy ekran operacyjny
+    ma swoje rozgałęzienie do koordynatora dla spraw, których wolontariusz nie
+    rozstrzyga: sporu o płatność, braku rozmiaru i statusu „do wyjaśnienia".
+    Stany alternatywne, które nie powodują przejścia („już odprawiony", „pakiet
+    wydany", „kod użyty"), oznaczono jako badge przy miniaturze - są to powtórki
+    na tym samym ekranie, nie nowe ekrany.
+    <br><br>
+    <b>Klikaj miniatury</b>, żeby otworzyć odpowiedni ekran w nowej karcie -
+    plików z makietami szukaj obok tego pliku w tej samej lokalizacji.
+    Pigułki „poza panelem" (Zaproszenie, Koordynator) są opisowe i nie
+    reprezentują ekranów panelu wolontariusza.
+  </p>
+</footer>
+
+</body>
+</html>

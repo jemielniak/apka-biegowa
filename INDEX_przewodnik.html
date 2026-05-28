@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Przewodnik · Platforma zapisów na zawody i zajęcia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Familjen+Grotesk:ital,wght@0,400..700;1,400..600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0c0f14;
+  --ink-2:#11151c;
+  --surface:#161b23;
+  --surface-2:#1c222c;
+  --hairline:rgba(255,255,255,.09);
+  --hairline-2:rgba(255,255,255,.05);
+  --paper:#f1ede3;
+  --text:#cfd6df;
+  --text-strong:#f4f1ea;
+  --text-muted:#828c9b;
+
+  /* akcenty modułów, te same co na tablicach ścieżek */
+  --ath:#d6f622;
+  --ins:#21d8c4;
+  --kid:#34b3a3;
+  --ocl:#7d78ff;
+  --par:#ff6f52;
+  --vol:#4a97f5;
+
+  --font-display:"Instrument Serif", Georgia, serif;
+  --font-body:"Familjen Grotesk", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, monospace;
+
+  --radius:16px;
+  --shadow:0 24px 60px -28px rgba(0,0,0,.8);
+  --maxw:1120px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+
+/* tło: siatka inżynierska plus miękkie poświaty w barwach modułów */
+.bg{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.bg::before{
+  content:"";position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--hairline-2) 1px,transparent 1px),
+    linear-gradient(90deg,var(--hairline-2) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(120% 90% at 50% 0%,#000 30%,transparent 78%);
+}
+.bg::after{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(60% 50% at 12% 4%, color-mix(in srgb,var(--ath) 12%,transparent) 0, transparent 60%),
+    radial-gradient(55% 45% at 88% 8%, color-mix(in srgb,var(--par) 13%,transparent) 0, transparent 60%),
+    radial-gradient(60% 55% at 70% 92%, color-mix(in srgb,var(--ocl) 14%,transparent) 0, transparent 62%),
+    radial-gradient(45% 40% at 6% 88%, color-mix(in srgb,var(--ins) 10%,transparent) 0, transparent 60%);
+}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* masthead */
+header.masthead{
+  border-bottom:1px solid var(--hairline);
+  padding:18px 0;
+  position:sticky;top:0;z-index:50;
+  background:color-mix(in srgb,var(--ink) 86%,transparent);
+  backdrop-filter:blur(14px);
+}
+.masthead .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.mark{display:flex;align-items:center;gap:12px}
+.mark .glyph{
+  width:34px;height:34px;border-radius:9px;flex:0 0 auto;
+  background:conic-gradient(from 220deg,var(--ath),var(--ins),var(--ocl),var(--par),var(--vol),var(--ath));
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.35);
+}
+.mark b{font-family:var(--font-mono);font-weight:700;font-size:12px;letter-spacing:.14em;color:var(--text-strong);text-transform:uppercase}
+.mast-nav{display:flex;gap:22px;font-family:var(--font-mono);font-size:12px;letter-spacing:.06em}
+.mast-nav a{color:var(--text-muted);text-decoration:none;text-transform:uppercase}
+.mast-nav a:hover{color:var(--text-strong)}
+@media(max-width:720px){.mast-nav{display:none}}
+
+/* hero */
+.hero{padding:84px 0 56px;position:relative}
+.eyebrow{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-muted);margin:0 0 22px
+}
+.hero h1{
+  font-family:var(--font-display);font-weight:400;
+  font-size:clamp(44px,7.4vw,92px);line-height:.98;letter-spacing:-.01em;
+  margin:0 0 26px;color:var(--text-strong);max-width:15ch;
+}
+.hero h1 em{font-style:italic;color:transparent;background:linear-gradient(96deg,var(--ath),var(--ins));-webkit-background-clip:text;background-clip:text}
+.lede{font-size:clamp(18px,2.1vw,21px);max-width:60ch;color:var(--text)}
+.lede strong{color:var(--text-strong);font-weight:600}
+
+/* sekcje */
+section{padding:54px 0;border-top:1px solid var(--hairline-2)}
+.sec-head{display:flex;align-items:baseline;gap:18px;margin:0 0 28px}
+.sec-num{font-family:var(--font-mono);font-size:13px;color:var(--text-muted);padding-top:6px}
+.sec-head h2{
+  font-family:var(--font-display);font-weight:400;font-size:clamp(28px,4vw,44px);
+  line-height:1.04;margin:0;color:var(--text-strong);letter-spacing:-.01em;
+}
+.sec-intro{max-width:64ch;margin:0 0 30px;color:var(--text)}
+
+/* karty wyjaśnień - jak działa platforma */
+.grid-explain{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+@media(max-width:760px){.grid-explain{grid-template-columns:1fr}}
+.note{
+  background:linear-gradient(180deg,var(--surface),var(--ink-2));
+  border:1px solid var(--hairline);border-radius:var(--radius);
+  padding:24px 24px 22px;
+}
+.note h3{font-family:var(--font-body);font-weight:600;font-size:17px;color:var(--text-strong);margin:0 0 8px;letter-spacing:.01em}
+.note p{margin:0;font-size:15.5px;color:var(--text)}
+.note .tag{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--text-muted);text-transform:uppercase;display:block;margin-bottom:12px}
+
+/* legenda ścieżek */
+.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:10px}
+@media(max-width:760px){.legend{grid-template-columns:1fr}}
+.leg{display:flex;gap:14px;align-items:flex-start;background:var(--ink-2);border:1px solid var(--hairline-2);border-radius:12px;padding:16px}
+.leg .swatch{flex:0 0 auto;width:40px;height:0;border-top-width:3px;margin-top:11px}
+.leg .swatch.solid{border-top-style:solid;border-top-color:var(--ath)}
+.leg .swatch.grey{border-top-style:solid;border-top-color:var(--text-muted)}
+.leg .swatch.branch{border-top-style:dashed;border-top-color:var(--par)}
+.leg b{display:block;color:var(--text-strong);font-weight:600;font-size:15px;margin-bottom:2px}
+.leg span{font-size:14px;color:var(--text-muted)}
+
+/* tablice - siatka kart */
+.boards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:980px){.boards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.boards{grid-template-columns:1fr}}
+
+.board{
+  --c:var(--text-muted);
+  position:relative;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,var(--surface),var(--ink-2));
+  border:1px solid var(--hairline);border-radius:var(--radius);
+  padding:24px 22px 20px;text-decoration:none;color:inherit;
+  overflow:hidden;transition:transform .25s cubic-bezier(.2,.7,.3,1),border-color .25s,box-shadow .25s;
+  opacity:0;transform:translateY(16px);
+}
+.board::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c);
+  box-shadow:0 0 22px color-mix(in srgb,var(--c) 70%,transparent);
+}
+.board::after{
+  content:"";position:absolute;right:-40%;top:-60%;width:80%;height:120%;
+  background:radial-gradient(closest-side, color-mix(in srgb,var(--c) 16%,transparent), transparent 70%);
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.board:hover{transform:translateY(-6px);border-color:color-mix(in srgb,var(--c) 55%,var(--hairline));box-shadow:var(--shadow)}
+.board:hover::after{opacity:1}
+.board:focus-visible{outline:2px solid var(--c);outline-offset:3px}
+
+.board .topline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}
+.board .code{font-family:var(--font-mono);font-weight:700;font-size:13px;letter-spacing:.16em;color:var(--c)}
+.board .module{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);border:1px solid var(--hairline);border-radius:999px;padding:4px 10px}
+.board h3{font-family:var(--font-display);font-weight:400;font-size:30px;line-height:1.02;margin:0 0 4px;color:var(--text-strong)}
+.board .persona{font-size:14px;color:var(--text-muted);margin:0 0 14px}
+.board .journey{font-size:15px;color:var(--text);margin:0 0 20px;flex:1}
+.board .foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--hairline-2);padding-top:14px}
+.board .count{font-family:var(--font-mono);font-size:12px;color:var(--text-muted)}
+.board .count b{color:var(--text);font-weight:700}
+.board .cta{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--c);display:inline-flex;align-items:center;gap:7px}
+.board .cta svg{transition:transform .25s}
+.board:hover .cta svg{transform:translateX(4px)}
+
+/* mapa ról */
+.roles{background:var(--ink-2);border:1px solid var(--hairline);border-radius:var(--radius);padding:28px}
+.role-row{display:grid;grid-template-columns:160px 1fr;gap:18px;padding:16px 0;border-top:1px solid var(--hairline-2);align-items:start}
+.role-row:first-of-type{border-top:0;padding-top:0}
+.role-row .who{display:flex;align-items:center;gap:10px}
+.role-row .dot{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.role-row .who b{color:var(--text-strong);font-weight:600;font-size:15px}
+.role-row p{margin:0;font-size:15px;color:var(--text)}
+@media(max-width:640px){.role-row{grid-template-columns:1fr;gap:6px}}
+
+/* tabela statusu grup */
+.statwrap{border:1px solid var(--hairline);border-radius:var(--radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+thead th{
+  text-align:left;font-family:var(--font-mono);font-weight:500;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-muted);padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--hairline)
+}
+tbody td{padding:14px 18px;border-bottom:1px solid var(--hairline-2);vertical-align:top;color:var(--text)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+td .gcode{font-family:var(--font-mono);font-weight:700;font-size:13px;color:var(--text-strong)}
+td .gname{color:var(--text-muted);font-size:13px}
+.pill{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;padding:3px 9px;border-radius:999px;white-space:nowrap;display:inline-block}
+.pill.live{color:#bff84a;background:rgba(120,200,40,.12);border:1px solid rgba(120,200,40,.3)}
+.pill.plan{color:#9fb0c4;background:rgba(120,150,190,.1);border:1px solid rgba(120,150,190,.25)}
+.pill.mod{color:var(--text-muted);background:transparent;border:1px solid var(--hairline)}
+.linkmini{color:var(--text-strong);text-decoration:none;border-bottom:1px solid var(--hairline);font-family:var(--font-mono);font-size:12px}
+.linkmini:hover{border-color:var(--text-strong)}
+@media(max-width:760px){
+  .statwrap{overflow-x:auto}
+  table{min-width:640px}
+}
+
+footer{padding:48px 0 64px;border-top:1px solid var(--hairline-2);color:var(--text-muted);font-size:13.5px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center}
+footer .mono{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em}
+
+/* wejście kart */
+@keyframes rise{to{opacity:1;transform:none}}
+.board{animation:rise .6s cubic-bezier(.2,.7,.3,1) forwards}
+.board:nth-child(1){animation-delay:.04s}
+.board:nth-child(2){animation-delay:.1s}
+.board:nth-child(3){animation-delay:.16s}
+.board:nth-child(4){animation-delay:.22s}
+.board:nth-child(5){animation-delay:.28s}
+.board:nth-child(6){animation-delay:.34s}
+@media(prefers-reduced-motion:reduce){
+  .board{animation:none;opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="mark">
+      <span class="glyph" aria-hidden="true"></span>
+      <b>Atlas ścieżek · v7</b>
+    </div>
+    <nav class="mast-nav" aria-label="Skróty">
+      <a href="#czym-jest">O projekcie</a>
+      <a href="#tablice">Tablice</a>
+      <a href="#role">Role</a>
+      <a href="#grupy">Grupy ekranów</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" style="border-top:0">
+    <div class="wrap">
+      <p class="eyebrow">Przewodnik po projekcie · panel projektanta</p>
+      <h1>Platforma zapisów na zawody i&nbsp;<em>zajęcia sportowe</em></h1>
+      <p class="lede">To jedna strona, z której wchodzisz we wszystkie <strong>tablice ścieżek</strong> i&nbsp;rozumiesz, jak się łączą. Tablica ścieżki to mapa jednej roli: pokazuje ekrany jako kafle i&nbsp;strzałki między nimi. Niżej znajdziesz krótkie wyjaśnienie całego produktu, sześć tablic do otwarcia oraz spis wszystkich grup ekranów wraz ze stanem prac.</p>
+    </div>
+  </section>
+
+  <section id="czym-jest">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">01</span><h2>Czym jest ten produkt</h2></div>
+      <p class="sec-intro">Najprościej: jeden system, w&nbsp;którym kluby sportowe sprzedają zapisy, a&nbsp;rodziny zarządzają sportem swoich dzieci. Platforma obsługuje wiele klubów naraz, a&nbsp;każdy dostaje własny, obrandowany panel. Cztery pomysły trzymają całość razem.</p>
+      <div class="grid-explain">
+        <div class="note">
+          <span class="tag">Model wielopodmiotowy</span>
+          <h3>Operator gości wielu organizatorów</h3>
+          <p>Na samej górze stoi operator platformy. Pod nim działają organizatorzy, czyli kluby i&nbsp;szkółki. Każdy organizator prowadzi własne wydarzenia albo grupy zajęciowe i&nbsp;widzi swój panel pod własną marką. Koszt nie rośnie z&nbsp;liczbą użytkowników.</p>
+        </div>
+        <div class="note">
+          <span class="tag">Dwa moduły, jedno konto</span>
+          <h3>Zawody i zajęcia obok siebie</h3>
+          <p>Moduł zawodów obsługuje biegi i&nbsp;starty z&nbsp;numerem startowym. Moduł zajęć obsługuje grupy treningowe, kursy i&nbsp;obozy. Łączy je wspólne konto rodzinne, wspólny portfel z&nbsp;kredytami oraz wspólny paszport sportowy dziecka, ten sam po obu stronach.</p>
+        </div>
+        <div class="note">
+          <span class="tag">Projekt od celu</span>
+          <h3>Każdy ekran ma jedno zadanie</h3>
+          <p>Ekrany projektowano od celu użytkownika, nie od pól w&nbsp;bazie. Stąd na każdej makiecie jedna dominująca akcja główna i&nbsp;komplet stanów: ładowanie, pusty, wypełniony, błąd, sukces, brak uprawnień, a&nbsp;przy basenie i&nbsp;na starcie również tryb offline.</p>
+        </div>
+        <div class="note">
+          <span class="tag">Integracje</span>
+          <h3>Czas, pogoda, zdjęcia, płatności</h3>
+          <p>System spina pomiar czasu, API pogodowe oraz RunPixie, które taguje zdjęcia po numerze startowym. Płatności idą przez Przelewy24, PayU i&nbsp;Stripe, a&nbsp;także BLIK oraz karty. Branding każdego klubu zmienia się przez zestaw zmiennych CSS.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="jak-czytac">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">02</span><h2>Jak czytać tablicę ścieżki</h2></div>
+      <p class="sec-intro">Tablice wyglądają różnie, bo każda rola ma własny krój pisma i&nbsp;kolor akcentu, ale język jest ten sam. Kafel to jeden ekran, a&nbsp;kliknięcie miniatury otwiera jego makietę w&nbsp;nowej karcie. Strzałka pokazuje przejście i&nbsp;akcję, która je wywołuje. Kolor strzałki mówi, jakiego rodzaju to ruch.</p>
+      <div class="legend">
+        <div class="leg">
+          <span class="swatch solid" aria-hidden="true"></span>
+          <div><b>Akcja główna</b><span>Dominujące przejście wynikające z&nbsp;głównego przycisku ekranu. Prowadzi dalej w&nbsp;ścieżce.</span></div>
+        </div>
+        <div class="leg">
+          <span class="swatch grey" aria-hidden="true"></span>
+          <div><b>Nawigacja drugorzędna</b><span>Skróty z&nbsp;pulpitu, powroty, podglądy i&nbsp;powiązania boczne.</span></div>
+        </div>
+        <div class="leg">
+          <span class="swatch branch" aria-hidden="true"></span>
+          <div><b>Rozgałęzienie</b><span>Wyjątek lub ruch asynchroniczny: odrzucona płatność, brak miejsc, transfer, zwrot.</span></div>
+        </div>
+      </div>
+      <p class="sec-intro" style="margin-top:26px;margin-bottom:0">Mała etykieta przy miniaturze (badge) to udokumentowany stan alternatywny ekranu, ten sam, który siedzi w&nbsp;jego przełączniku stanu. Kafle z&nbsp;przerywaną obwódką to konteksty spoza danej grupy, na przykład bramka płatności albo strona wydarzenia. Część z&nbsp;nich nie ma jeszcze makiety i&nbsp;dlatego nie jest klikalna.</p>
+    </div>
+  </section>
+
+  <section id="tablice">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">03</span><h2>Sześć tablic ścieżek</h2></div>
+      <p class="sec-intro">Każda karta otwiera jedną tablicę. Trzy role żyją w&nbsp;module zawodów, dwie w&nbsp;module zajęć, a&nbsp;rodzic i&nbsp;dziecko siedzą w&nbsp;warstwie wspólnej, która spina oba moduły. Kolejność poniżej prowadzi od osoby, która coś organizuje, do osoby, która bierze udział.</p>
+      <div class="boards">
+
+        <a class="board" style="--c:var(--ocl)" href="OCL_tablica-sciezki_hifi.html">
+          <div class="topline"><span class="code">OCL</span><span class="module">moduł zajęć</span></div>
+          <h3>Organizator zajęć</h3>
+          <p class="persona">panel klubu · prowadzenie grupy treningowej</p>
+          <p class="journey">Trasa zarządzania jedną grupą: od założenia kursu z&nbsp;poziomami, przez grafik, reguły odrabiania i&nbsp;listy rezerwowe, po frekwencję, karty uczestników, drzewo umiejętności oraz instruktorów.</p>
+          <div class="foot">
+            <span class="count"><b>18</b> ekranów · 12 z&nbsp;makietą</span>
+            <span class="cta">Otwórz tablicę <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M1 5h13M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <a class="board" style="--c:var(--ins)" href="INS_tablica-sciezki_hifi.html">
+          <div class="topline"><span class="code">INS</span><span class="module">moduł zajęć</span></div>
+          <h3>Instruktor</h3>
+          <p class="persona">dzień prowadzącego jedną grupę</p>
+          <p class="journey">Trasa instruktora na przykładzie grupy Delfinki: logowanie, dzisiejsze zajęcia, własny grafik, lista obecności ze skanem QR i&nbsp;trybem offline, aktualizacja umiejętności na drzewie skilli oraz profil uczestnika do odczytu.</p>
+          <div class="foot">
+            <span class="count"><b>10</b> ekranów</span>
+            <span class="cta">Otwórz tablicę <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M1 5h13M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <a class="board" style="--c:var(--vol)" href="VOL_tablica-sciezki_hifi.html">
+          <div class="topline"><span class="code">VOL</span><span class="module">moduł zawodów</span></div>
+          <h3>Wolontariusz</h3>
+          <p class="persona">obsługa wydarzenia w dniu startu</p>
+          <p class="journey">Trasa od zaproszenia po wydanie pakietu: logowanie z&nbsp;zaproszenia, dashboard z&nbsp;zadaniami i&nbsp;zmianami, harmonogram, odprawa ze skanem QR, lista startowa z&nbsp;weryfikacją opłaty oraz most łączący wolontariusza z&nbsp;kontem rodzica.</p>
+          <div class="foot">
+            <span class="count"><b>7</b> ekranów</span>
+            <span class="cta">Otwórz tablicę <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M1 5h13M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <a class="board" style="--c:var(--par)" href="PAR_tablica-sciezki.html">
+          <div class="topline"><span class="code">PAR</span><span class="module">warstwa wspólna</span></div>
+          <h3>Rodzic</h3>
+          <p class="persona">konto rodzinne łączące oba moduły</p>
+          <p class="journey">Najszersza trasa: profile dzieci, zapis na grupę i&nbsp;na zawody, zgłaszanie nieobecności, odrabianie, listy rezerwowe, postępy, dokumenty, lekcje jeden na jeden, paszport sportowy, wolontariat, galeria oraz portfel z&nbsp;fakturami.</p>
+          <div class="foot">
+            <span class="count"><b>16</b> ekranów</span>
+            <span class="cta">Otwórz tablicę <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M1 5h13M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <a class="board" style="--c:var(--ath)" href="ATH_tablica-sciezki_hifi.html">
+          <div class="topline"><span class="code">ATH</span><span class="module">moduł zawodów</span></div>
+          <h3>Zawodnik</h3>
+          <p class="persona">blok startowy · zapis i dzień startu</p>
+          <p class="journey">Trasa od wejścia po metę: zapis z&nbsp;formularzem warunkowym, dodatki, zgody, płatność i&nbsp;numer startowy, a&nbsp;po starcie samoobsługa zgłoszenia, dosprzedaż gadżetów oraz portfel z&nbsp;kredytami. Cztery ekrany wciąż są w&nbsp;planie.</p>
+          <div class="foot">
+            <span class="count"><b>14</b> ekranów · 10 z&nbsp;makietą</span>
+            <span class="cta">Otwórz tablicę <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M1 5h13M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+        <a class="board" style="--c:var(--kid)" href="KID_tablica-sciezki_hifi.html">
+          <div class="topline"><span class="code">KID</span><span class="module">warstwa wspólna</span></div>
+          <h3>Dziecko i nastolatek</h3>
+          <p class="persona">cienka warstwa nad kontem rodziny</p>
+          <p class="journey">Dwa własne ekrany: zgoda opiekuna realizowana z&nbsp;konta dorosłego oraz opcjonalny widok paszportu tylko do odczytu dla nastolatka. Reszta kontekstu pochodzi z&nbsp;rodziny, instruktora i&nbsp;organizatora.</p>
+          <div class="foot">
+            <span class="count"><b>2</b> ekrany</span>
+            <span class="cta">Otwórz tablicę <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M1 5h13M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="role">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Jak łączą się role</h2></div>
+      <p class="sec-intro">Uprawnienia opisano w&nbsp;modelu ról. Operator stoi nad wszystkim, organizator prowadzi swoje wydarzenia i&nbsp;grupy, a&nbsp;rodzina ogląda i&nbsp;kupuje. Jedna osoba bywa w&nbsp;kilku rolach naraz: ten sam rodzic potrafi zgłosić się jako wolontariusz, i&nbsp;ten sam panel obsłuży obie sytuacje.</p>
+      <div class="roles">
+        <div class="role-row">
+          <span class="who"><span class="dot" style="background:#cfd6df"></span><b>Operator</b></span>
+          <p>Właściciel platformy. Zakłada organizatorów, ustawia model rozliczeń, bramki płatności i&nbsp;branding, prowadzi audyt. Grupy ekranów OPR oraz GST opisują ten poziom.</p>
+        </div>
+        <div class="role-row">
+          <span class="who"><span class="dot" style="background:var(--ocl)"></span><b>Organizator</b></span>
+          <p>Klub albo szkółka. Po stronie zawodów to grupa OEV (kreator wydarzenia, listy startowe, pomiar czasu), po stronie zajęć to grupa OCL z&nbsp;własną tablicą ścieżki.</p>
+        </div>
+        <div class="role-row">
+          <span class="who"><span class="dot" style="background:var(--ins)"></span><b>Instruktor i wolontariusz</b></span>
+          <p>Ludzie organizatora w&nbsp;terenie. Instruktor prowadzi zajęcia i&nbsp;ocenia umiejętności (INS). Wolontariusz obsługuje wydarzenie, wydaje pakiety i&nbsp;sprawdza listę startową (VOL).</p>
+        </div>
+        <div class="role-row">
+          <span class="who"><span class="dot" style="background:var(--par)"></span><b>Rodzic i uczestnik</b></span>
+          <p>Strona kupująca. Rodzic prowadzi konto rodzinne (PAR), zawodnik zapisuje się i&nbsp;startuje (ATH). Konto rodzinne, portfel i&nbsp;paszport są wspólne dla obu modułów.</p>
+        </div>
+        <div class="role-row">
+          <span class="who"><span class="dot" style="background:var(--kid)"></span><b>Dziecko</b></span>
+          <p>Małoletni uczestnik. Nie ma pełnego konta. Działa jako cienka warstwa nad rodziną (KID): zgodę wydaje opiekun, a&nbsp;nastolatek dostaje co najwyżej podgląd swojego paszportu.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="grupy">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">05</span><h2>Wszystkie grupy ekranów</h2></div>
+      <p class="sec-intro">Pełny rejestr z&nbsp;manifestu. Dziewięć grup, sto szesnaście ekranów. Sześć grup ma już makiety hi-fi i&nbsp;tablicę ścieżki, którą otworzysz wyżej. Trzy grupy są na razie na poziomie szkiców, więc nie mają jeszcze tablicy.</p>
+      <div class="statwrap">
+        <table>
+          <thead>
+            <tr><th>Grupa</th><th>Moduł</th><th>Ekrany</th><th>Stan</th><th>Tablica</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="gcode">GST</span><br><span class="gname">gość · katalog publiczny</span></td>
+              <td><span class="pill mod">wspólny</span></td>
+              <td>8</td>
+              <td><span class="pill plan">szkice</span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><span class="gcode">OPR</span><br><span class="gname">operator platformy</span></td>
+              <td><span class="pill mod">wspólny</span></td>
+              <td>12</td>
+              <td><span class="pill plan">szkice</span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><span class="gcode">OEV</span><br><span class="gname">organizator zawodów</span></td>
+              <td><span class="pill mod">zawody</span></td>
+              <td>29</td>
+              <td><span class="pill plan">szkice</span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><span class="gcode">OCL</span><br><span class="gname">organizator zajęć</span></td>
+              <td><span class="pill mod">zajęcia</span></td>
+              <td>18 · 12 hi-fi</td>
+              <td><span class="pill live">hi-fi</span></td>
+              <td><a class="linkmini" href="OCL_tablica-sciezki_hifi.html">otwórz →</a></td>
+            </tr>
+            <tr>
+              <td><span class="gcode">INS</span><br><span class="gname">instruktor</span></td>
+              <td><span class="pill mod">zajęcia</span></td>
+              <td>10</td>
+              <td><span class="pill live">hi-fi</span></td>
+              <td><a class="linkmini" href="INS_tablica-sciezki_hifi.html">otwórz →</a></td>
+            </tr>
+            <tr>
+              <td><span class="gcode">VOL</span><br><span class="gname">wolontariusz</span></td>
+              <td><span class="pill mod">zawody</span></td>
+              <td>7</td>
+              <td><span class="pill live">hi-fi</span></td>
+              <td><a class="linkmini" href="VOL_tablica-sciezki_hifi.html">otwórz →</a></td>
+            </tr>
+            <tr>
+              <td><span class="gcode">PAR</span><br><span class="gname">rodzic · konto rodzinne</span></td>
+              <td><span class="pill mod">wspólny</span></td>
+              <td>16</td>
+              <td><span class="pill live">hi-fi</span></td>
+              <td><a class="linkmini" href="PAR_tablica-sciezki.html">otwórz →</a></td>
+            </tr>
+            <tr>
+              <td><span class="gcode">ATH</span><br><span class="gname">zawodnik · blok startowy</span></td>
+              <td><span class="pill mod">zawody</span></td>
+              <td>14 · 10 hi-fi</td>
+              <td><span class="pill live">hi-fi</span></td>
+              <td><a class="linkmini" href="ATH_tablica-sciezki_hifi.html">otwórz →</a></td>
+            </tr>
+            <tr>
+              <td><span class="gcode">KID</span><br><span class="gname">dziecko i nastolatek</span></td>
+              <td><span class="pill mod">wspólny</span></td>
+              <td>2</td>
+              <td><span class="pill live">hi-fi</span></td>
+              <td><a class="linkmini" href="KID_tablica-sciezki_hifi.html">otwórz →</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sec-intro" style="margin-top:24px;margin-bottom:0">Obok tablic w&nbsp;tym samym katalogu leżą dla każdej grupy trzy pliki tekstowe: specyfikacja ekranów (<span style="font-family:var(--font-mono);font-size:13px">_spec.md</span>) z&nbsp;pełnym opisem stanów i&nbsp;walidacji, szkice lo-fi (<span style="font-family:var(--font-mono);font-size:13px">_szkice</span>) oraz kontrakt projektowy (<span style="font-family:var(--font-mono);font-size:13px">_kontrakt-projektowy</span>) z&nbsp;tokenami marki i&nbsp;regułami zachowania. Zaczynaj od tablicy, a&nbsp;po szczegóły danego ekranu sięgaj do specyfikacji.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Przewodnik po makietach hi-fi · język roboczy pl-PL, produkt wielojęzyczny (pl-PL, en-GB)</span>
+    <span class="mono">manifest_ekranow_v7 · 9 grup · 116 ekranów · 6 tablic</span>
+  </div>
+</footer>
+
+</body>
+</html>

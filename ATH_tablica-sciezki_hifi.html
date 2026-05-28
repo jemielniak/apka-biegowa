@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<!--
+  ATH · Tablica ścieżki (panel zawodnika, moduł zawodów)
+  Miniatury ekranów + połączenia. Nie odtwarza pełnych makiet.
+  Tokeny z Bloku startowego ATH (ciemny ink + electric lime, Saira Condensed + Barlow).
+  Ekrany ATH-01..10 są klikalne (otwierają makietę w nowej karcie).
+  Ekrany ATH-11..14 pokazane jako panel "w planie" - nie mają jeszcze plików.
+-->
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATH · Tablica ścieżki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#10141b;
+  --accent:#d6f622;
+
+  --color-success:#3ddc84;
+  --color-warning:#ffb84d;
+  --color-error:#ff6b5e;
+  --color-info:#6aa9ff;
+
+  --surface-1:#181e28;
+  --surface-2:#1f2733;
+  --surface-3:#283241;
+  --hairline:#313c4c;
+  --text-strong:#f2f5f7;
+  --text:#cdd5df;
+  --text-muted:#8c97a6;
+  --on-accent:#10141b;
+  --paper:#f4f5ef;
+
+  --font-display:"Saira Condensed", system-ui;
+  --font-body:"Barlow", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:14px;
+  --shadow:0 10px 30px -12px rgba(0,0,0,.65);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  font-family:var(--font-body);color:var(--text);
+  background:
+    radial-gradient(120% 60% at 85% -5%, rgba(214,246,34,.10), transparent 55%),
+    var(--brand-ink);
+  padding:var(--s8) var(--s5) var(--s10);
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:repeating-linear-gradient(90deg, rgba(255,255,255,.016) 0 1px, transparent 1px 72px);
+  mask-image:linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+/* --- nagłówek strony --- */
+header.page{position:relative;z-index:1;max-width:1080px;margin:0 auto var(--s6);display:flex;flex-direction:column;gap:var(--s3)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+  font-family:var(--font-display);font-weight:700;font-size:12px;line-height:1;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted)}
+.eyebrow::before{content:"";width:26px;height:7px;border-radius:2px;
+  background:repeating-linear-gradient(135deg,var(--accent) 0 6px,var(--brand-ink) 6px 12px);background-size:12px 12px;
+  box-shadow:inset 0 0 0 1px var(--hairline)}
+h1{font-family:var(--font-display);font-weight:800;font-size:34px;line-height:1.03;color:var(--text-strong);letter-spacing:-.005em;max-width:30ch}
+.lede{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch}
+.lede b{color:var(--text-strong);font-weight:600}
+.lede .k{color:var(--accent);font-weight:600}
+
+/* --- legenda --- */
+.legend{position:relative;z-index:1;max-width:1080px;margin:0 auto var(--s6);background:var(--surface-1);
+  border:1px solid var(--hairline);border-radius:var(--radius);
+  padding:var(--s4) var(--s5);display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s4) var(--s5);
+  box-shadow:var(--shadow)}
+.legend h2{grid-column:1/-1;font-family:var(--font-display);font-weight:700;font-size:12px;line-height:1;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-muted)}
+.legend-item{display:flex;align-items:center;gap:12px;font-size:13px;line-height:1.3;color:var(--text)}
+.legend-item b{font-weight:600;color:var(--text-strong)}
+.sw{flex:0 0 auto;width:54px;height:22px;position:relative}
+.sw::after{content:"";position:absolute;left:2px;right:9px;top:50%;height:2px;transform:translateY(-50%)}
+.sw::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;
+  border-left:9px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%)}
+.sw.primary{color:var(--accent)} .sw.primary::after{background:var(--accent)}
+.sw.sec{color:var(--text-muted)} .sw.sec::after{background:var(--text-muted)}
+.sw.branch{color:var(--color-warning)} .sw.branch::after{border-top:2px dashed var(--color-warning);height:0;top:calc(50% - 1px)}
+.sw.ext{width:54px;height:24px;border:1.5px dashed var(--hairline);border-radius:7px;background:var(--surface-2)}
+.sw.ext::after,.sw.ext::before{display:none}
+
+/* --- plansza --- */
+.board-wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;overflow:auto;
+  background:linear-gradient(180deg,var(--surface-1),#141a23);border:1px solid var(--hairline);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:var(--s5)}
+.board{position:relative;width:1040px;height:1480px;margin:0 auto}
+
+/* --- SVG arrows --- */
+.arrows{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.arrows .p-primary{fill:none;stroke:var(--accent);stroke-width:2.2;marker-end:url(#ah-primary)}
+.arrows .p-sec{fill:none;stroke:var(--text-muted);stroke-width:1.7;marker-end:url(#ah-sec)}
+.arrows .p-branch{fill:none;stroke:var(--color-warning);stroke-width:1.8;stroke-dasharray:6 4;marker-end:url(#ah-branch)}
+
+/* --- etykieta przy strzałce --- */
+.label{position:absolute;transform:translate(-50%,-50%);
+  background:var(--surface-2);border:1px solid var(--hairline);border-radius:999px;padding:4px 10px;
+  font-family:var(--font-body);font-weight:600;font-size:11px;line-height:1.1;color:var(--text-strong);
+  white-space:nowrap;z-index:4;letter-spacing:.01em}
+.label.primary{border-color:rgba(214,246,34,.4);color:var(--accent)}
+.label.branch{border-color:rgba(255,184,77,.5);background:rgba(255,184,77,.12);color:var(--color-warning)}
+.label.info{border-color:rgba(106,169,255,.45);color:var(--color-info)}
+
+/* --- węzeł --- */
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;z-index:1}
+.node .cap{margin-top:7px;text-align:center;font-family:var(--font-display);font-weight:700;font-size:12px;line-height:1.2;color:var(--text-strong);width:130px;letter-spacing:.02em}
+.node .cap small{display:block;font-family:var(--font-body);font-weight:500;font-size:10.5px;color:var(--text-muted);margin-top:1px;letter-spacing:0}
+
+a.node{text-decoration:none;color:inherit;cursor:pointer}
+a.node .phone{transition:transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .18s, border-color .18s}
+a.node:hover{z-index:6}
+a.node:hover .phone{transform:translateY(-3px);border-color:var(--accent);
+  box-shadow:0 16px 34px -12px rgba(214,246,34,.45), 0 0 0 2px rgba(214,246,34,.22)}
+a.node:hover .cap{color:var(--accent)}
+a.node:focus-visible{outline:none}
+a.node:focus-visible .phone{box-shadow:0 0 0 3px var(--accent);border-color:var(--accent)}
+
+/* --- miniatura telefonu --- */
+.phone{width:120px;height:188px;background:var(--surface-1);
+  border:1px solid var(--hairline);border-radius:11px;box-shadow:var(--shadow);
+  overflow:hidden;display:flex;flex-direction:column;position:relative}
+.phone .band{height:3px;background:repeating-linear-gradient(135deg,var(--accent) 0 6px,var(--brand-ink) 6px 12px)}
+.phone .hdr{display:flex;align-items:center;justify-content:space-between;gap:4px;
+  padding:5px 7px;border-bottom:1px solid var(--hairline);background:var(--surface-2)}
+.phone .id{font-family:var(--font-display);font-weight:800;font-size:10px;line-height:1;color:var(--text-strong);letter-spacing:.05em}
+.phone .lang{font-family:var(--font-display);font-weight:700;font-size:8px;line-height:1;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase}
+.bd{flex:1;padding:6px;display:flex;flex-direction:column;gap:4px}
+.foot{padding:5px 6px;border-top:1px solid var(--hairline);background:var(--surface-2)}
+.cta{display:block;text-align:center;background:var(--accent);color:var(--on-accent);border-radius:5px;padding:5px 0;
+  font-family:var(--font-display);font-weight:800;font-size:9px;line-height:1;letter-spacing:.02em}
+.cta.sec{background:var(--surface-3);color:var(--text-strong);border:1px solid var(--hairline)}
+
+/* --- prymitywy treści miniatur --- */
+.bar{height:12px;border-radius:4px;background:var(--surface-3);border:1px solid var(--hairline)}
+.row2{display:flex;align-items:center;gap:5px;padding:4px 5px;border-radius:5px;background:var(--surface-2);border:1px solid var(--hairline)}
+.row2 .stripe{width:3px;align-self:stretch;border-radius:2px;background:var(--hairline);flex:0 0 auto}
+.row2.err .stripe{background:var(--color-error)} .row2.warn .stripe{background:var(--color-warning)} .row2.ok .stripe{background:var(--color-success)} .row2.lime .stripe{background:var(--accent)}
+.row2 .lab{font-family:var(--font-body);font-weight:600;font-size:8px;line-height:1.1;color:var(--text)}
+.row2 .lab b{display:block;font-family:var(--font-display);font-weight:700;font-size:9.5px;color:var(--text-strong)}
+.bdg{margin-left:auto;flex:0 0 auto;font-family:var(--font-display);font-weight:700;font-size:7px;line-height:1;letter-spacing:.04em;text-transform:uppercase;padding:2px 5px;border-radius:3px;border:1px solid;font-variant-numeric:tabular-nums}
+.bdg.ok{color:var(--color-success);border-color:rgba(61,220,132,.5);background:rgba(61,220,132,.12)}
+.bdg.warn{color:var(--color-warning);border-color:rgba(255,184,77,.5);background:rgba(255,184,77,.12)}
+.bdg.err{color:var(--color-error);border-color:rgba(255,107,94,.5);background:rgba(255,107,94,.12)}
+.bdg.lime{color:var(--accent);border-color:rgba(214,246,34,.5);background:rgba(214,246,34,.12)}
+.bdg.mut{color:var(--text-muted);border-color:var(--hairline);background:var(--surface-3)}
+.big{flex:1;background:var(--brand-ink);border:1px solid var(--hairline);border-radius:6px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:38px}
+.big .k{font-family:var(--font-display);font-weight:700;font-size:7px;line-height:1;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted)}
+.big .v{font-family:var(--font-display);font-weight:800;font-size:26px;line-height:.9;color:var(--accent);font-variant-numeric:tabular-nums}
+.bibtag{flex:0 0 auto;background:var(--paper);border-radius:5px;padding:3px 6px;text-align:center}
+.bibtag .k{font-family:var(--font-display);font-weight:700;font-size:6px;line-height:1;letter-spacing:.1em;text-transform:uppercase;color:#5a5a52}
+.bibtag .v{font-family:var(--font-display);font-weight:800;font-size:22px;line-height:1;color:#10141b;font-variant-numeric:tabular-nums}
+.confrow{display:flex;align-items:center;gap:6px}
+.qr{width:38px;height:38px;flex:0 0 auto;border-radius:4px;background:var(--paper);position:relative}
+.qr::before,.qr::after{content:"";position:absolute;width:11px;height:11px;border:2.5px solid #10141b}
+.qr::before{top:4px;left:4px;border-right:none;border-bottom:none}
+.qr::after{bottom:4px;right:4px;border-left:none;border-top:none}
+.sum{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-body);font-weight:600;font-size:8px;line-height:1.2;color:var(--text)}
+.sum b{color:var(--text-strong);font-family:var(--font-display);font-weight:700;font-variant-numeric:tabular-nums}
+.sum.neg b{color:var(--color-success)}
+.sum.tot{border-top:1px solid var(--hairline);padding-top:3px;margin-top:1px}
+.sum.tot b{color:var(--accent);font-size:11px}
+.meth{display:flex;gap:3px;margin-top:1px}
+.meth span{flex:1;height:11px;border-radius:3px;border:1px solid var(--hairline);background:var(--surface-3)}
+.meth span.on{border-color:var(--accent);background:rgba(214,246,34,.18)}
+.tog{display:flex;align-items:center;gap:5px;padding:4px 5px;border-radius:5px;background:var(--surface-2);border:1px solid var(--hairline);
+  font-family:var(--font-body);font-weight:600;font-size:8px;line-height:1.1;color:var(--text)}
+.tog .sw2{width:18px;height:11px;border-radius:99px;background:var(--surface-3);border:1px solid var(--hairline);position:relative;flex:0 0 auto;margin-left:auto}
+.tog .sw2::after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:var(--text-muted);top:1px;left:1px}
+.tog.on .sw2{background:var(--accent);border-color:var(--accent)} .tog.on .sw2::after{background:#10141b;left:auto;right:1px}
+.tog .req{margin-left:auto;font-family:var(--font-display);font-weight:700;font-size:7px;line-height:1;text-transform:uppercase;color:var(--color-warning)}
+.prog{display:flex;align-items:center;gap:3px}
+.prog i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--hairline)}
+.prog i.on{background:var(--accent);border-color:var(--accent)}
+.prog .pl{margin-left:auto;font-family:var(--font-display);font-weight:700;font-size:7px;line-height:1;color:var(--text-muted)}
+.grid3{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:3px}
+.grid3 i{border-radius:3px;background:linear-gradient(135deg,var(--surface-3),var(--surface-2));border:1px solid var(--hairline)}
+.wx{flex:1;background:var(--brand-ink);border:1px solid var(--hairline);border-radius:6px;display:flex;align-items:center;justify-content:center;gap:8px;padding:4px}
+.wx .t{font-family:var(--font-display);font-weight:800;font-size:24px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.wx .d{font-family:var(--font-body);font-weight:600;font-size:7px;line-height:1.3;color:var(--text-muted)}
+
+/* badge stanu alternatywnego */
+.altbadge{position:absolute;right:-7px;top:-8px;z-index:5;
+  background:rgba(255,184,77,.14);border:1px solid rgba(255,184,77,.5);color:var(--color-warning);
+  font-family:var(--font-display);font-weight:700;font-size:7px;line-height:1;letter-spacing:.03em;text-transform:uppercase;
+  padding:3px 6px;border-radius:99px;white-space:nowrap;box-shadow:0 2px 8px -3px rgba(0,0,0,.6)}
+
+/* węzeł zewnętrzny */
+.ext .pill{background:var(--surface-2);border:1.5px dashed var(--hairline);border-radius:12px;padding:9px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.ext .pill .tag{font-family:var(--font-display);font-weight:700;font-size:9px;line-height:1;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
+.ext .pill .nm{font-family:var(--font-display);font-weight:700;font-size:13px;line-height:1.2;color:var(--text-strong)}
+.ext .pill .src{font-family:var(--font-body);font-weight:500;font-size:9.5px;line-height:1.2;color:var(--text-muted)}
+.ext.feed .pill{background:rgba(106,169,255,.10);border-color:rgba(106,169,255,.4)}
+.ext.feed .pill .tag{color:var(--color-info)}
+.ext.gate .pill{background:var(--brand-ink);border-color:rgba(214,246,34,.35)}
+.ext.gate .pill .tag{color:var(--accent)}
+
+/* panel "w planie" */
+.plan{position:absolute;z-index:1;border:1.5px dashed var(--hairline);border-radius:var(--radius);
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.012) 0 8px,transparent 8px 16px),var(--surface-1);padding:var(--s4)}
+.plan-h{display:flex;align-items:center;gap:8px;margin-bottom:var(--s3)}
+.plan-h .tag{font-family:var(--font-display);font-weight:700;font-size:9px;line-height:1;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);
+  border:1px solid var(--hairline);border-radius:999px;padding:3px 8px}
+.plan-h .ttl{font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--text-strong)}
+.plan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3)}
+.ptile{border:1px dashed var(--hairline);border-radius:9px;background:var(--surface-2);opacity:.86;
+  display:flex;flex-direction:column;overflow:hidden}
+.ptile .pt-hdr{display:flex;align-items:center;justify-content:space-between;padding:5px 7px;border-bottom:1px solid var(--hairline)}
+.ptile .pt-id{font-family:var(--font-display);font-weight:800;font-size:10px;color:var(--text-strong);letter-spacing:.04em}
+.ptile .pt-soon{font-family:var(--font-display);font-weight:700;font-size:7px;line-height:1;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+.ptile .pt-bd{flex:1;padding:6px;display:flex;flex-direction:column;gap:4px;min-height:96px}
+.ptile .pt-cap{padding:5px 7px;border-top:1px solid var(--hairline);font-family:var(--font-body);font-weight:600;font-size:9.5px;color:var(--text-muted);text-align:center}
+.tbl{display:flex;flex-direction:column;gap:2px}
+.tbl .tr{display:flex;align-items:center;gap:4px;padding:2px 4px;border-radius:3px;background:var(--surface-1);border:1px solid var(--hairline);
+  font-family:var(--font-display);font-weight:700;font-size:8px;color:var(--text);font-variant-numeric:tabular-nums}
+.tbl .tr.me{background:rgba(214,246,34,.12);border-color:rgba(214,246,34,.45);color:var(--accent)}
+.tbl .tr .nm{margin-left:2px} .tbl .tr .pt-pts{margin-left:auto}
+
+footer.page{position:relative;z-index:1;max-width:1080px;margin:var(--s6) auto 0;padding:var(--s4) var(--s5);
+  background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);display:flex;gap:var(--s4);align-items:flex-start}
+footer.page .pill-tag{flex:0 0 auto;background:var(--brand-ink);color:var(--accent);border:1px solid rgba(214,246,34,.3);
+  font-family:var(--font-display);font-weight:700;font-size:10px;line-height:1;letter-spacing:.16em;text-transform:uppercase;padding:6px 10px;border-radius:6px}
+footer.page p{font-size:13px;line-height:1.6;color:var(--text);max-width:74ch}
+footer.page p b{color:var(--text-strong);font-weight:600}
+footer.page p .k{color:var(--accent);font-weight:600}
+
+@media (max-width:1120px){
+  .legend{grid-template-columns:1fr}
+  .board-wrap{padding:var(--s3)}
+}
+</style>
+</head>
+<body>
+
+<header class="page">
+  <span class="eyebrow">Grupa ATH · panel zawodnika · moduł zawodów</span>
+  <h1>Tablica ścieżki: od wejścia po start, samoobsługę i portfel</h1>
+  <p class="lede">
+    Każdy kafel to jeden ekran panelu zawodnika - <b>kliknięcie miniatury otwiera makietę
+    w nowej karcie</b>. Strzałki pokazują przejście między ekranami i akcję, która je wywołuje.
+    <span class="k">Lime</span> to akcje główne, <b>szare</b> to nawigacja drugorzędna i skróty
+    z pulpitu, <span style="color:var(--color-warning);font-weight:600">bursztynowe przerywane</span>
+    to rozgałęzienia (odrzucona płatność, brak miejsc, transfer do nowej osoby). Stany alternatywne,
+    które nie powodują przejścia, oznaczono jako badge przy miniaturze. Ekrany ATH-11 do ATH-14
+    nie mają jeszcze makiet, więc stoją w osobnym panelu „w planie".
+  </p>
+</header>
+
+<section class="legend" aria-label="Legenda">
+  <h2>Legenda</h2>
+  <div class="legend-item"><span class="sw primary"></span><span><b>Akcja główna</b>: jedna dominująca akcja ekranu, prowadzi dalej w ścieżce.</span></div>
+  <div class="legend-item"><span class="sw sec"></span><span><b>Nawigacja drugorzędna</b>: skróty z pulpitu, powroty, użycie kredytu.</span></div>
+  <div class="legend-item"><span class="sw branch"></span><span><b>Rozgałęzienie</b>: odrzucona płatność wraca na płatność, brak miejsc kieruje na rezerwę.</span></div>
+  <div class="legend-item"><span class="sw ext"></span><span><b>Poza panelem / w planie</b>: źródło wejścia, bramka płatności, RunPixie, ekrany jeszcze niezbudowane.</span></div>
+</section>
+
+<div class="board-wrap">
+  <div class="board" role="img" aria-label="Tablica ścieżki przejść między ekranami ATH-01 do ATH-14">
+
+    <!-- ============================ SVG: STRZAŁKI ============================ -->
+    <svg class="arrows" viewBox="0 0 1040 1480" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <marker id="ah-primary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:var(--accent)"/>
+        </marker>
+        <marker id="ah-sec" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:var(--text-muted)"/>
+        </marker>
+        <marker id="ah-branch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:var(--color-warning)"/>
+        </marker>
+      </defs>
+
+      <!-- A: Wejście -> ATH-01 -->
+      <path class="p-primary" d="M340 84 C 470 84, 545 105, 616 108"/>
+      <!-- B: Wejście -> ATH-03 (gość) -->
+      <path class="p-primary" d="M150 128 C 95 320, 100 470, 100 604"/>
+      <!-- C: ATH-01 -> ATH-02 -->
+      <path class="p-primary" d="M680 228 L680 326"/>
+      <!-- I: ATH-02 -> ATH-03 (nowy zapis / dokończ) -->
+      <path class="p-primary" d="M620 452 C 410 486, 195 545, 146 604"/>
+      <!-- D: ATH-03 -> ATH-04 -->
+      <path class="p-primary" d="M160 704 L236 704"/>
+      <!-- E: ATH-04 -> ATH-05 -->
+      <path class="p-primary" d="M360 704 L436 704"/>
+      <!-- F: ATH-05 -> ATH-06 -->
+      <path class="p-primary" d="M560 704 L636 704"/>
+      <!-- G: ATH-06 -> bramka -->
+      <path class="p-primary" d="M700 798 L700 836"/>
+      <!-- H: bramka -> ATH-07 -->
+      <path class="p-primary" d="M760 880 C 882 868, 902 836, 900 802"/>
+
+      <!-- R: bramka -> ATH-06 (płatność odrzucona) BRANCH -->
+      <path class="p-branch" d="M640 876 C 592 858, 612 816, 666 800"/>
+      <!-- S: ATH-03 -> ATH-08 (brak miejsc -> rezerwowa) BRANCH -->
+      <path class="p-branch" d="M100 798 C 100 884, 190 930, 288 958"/>
+      <!-- NEW: ATH-08 -> nowa osoba BRANCH -->
+      <path class="p-branch" d="M240 1010 L196 1014"/>
+
+      <!-- K: ATH-02 -> ATH-06 (alert płatności) -->
+      <path class="p-sec" d="M690 518 C 698 556, 700 580, 700 606"/>
+      <!-- L: ATH-02 -> ATH-10 (portfel) -->
+      <path class="p-sec" d="M716 512 C 822 660, 808 850, 716 956"/>
+      <!-- M1: ATH-07 -> ATH-08 (samoobsługa) -->
+      <path class="p-sec" d="M866 802 C 470 858, 300 900, 300 956"/>
+      <!-- M2: ATH-07 -> ATH-09 (dosprzedaż) -->
+      <path class="p-sec" d="M895 804 C 760 940, 600 948, 502 958"/>
+      <!-- refund: ATH-08 -> ATH-10 -->
+      <path class="p-sec" d="M300 1148 C 470 1200, 590 1186, 698 1150"/>
+      <!-- 09->10 -->
+      <path class="p-sec" d="M560 1042 L636 1042"/>
+      <!-- P: ATH-10 -> ATH-06 (wykorzystaj kredyt) -->
+      <path class="p-sec" d="M748 958 C 826 900, 808 740, 764 706"/>
+      <!-- 02 -> panel w planie -->
+      <path class="p-sec" d="M665 518 C 408 800, 410 1090, 540 1206"/>
+      <!-- 07 -> panel w planie -->
+      <path class="p-sec" d="M900 802 C 988 1020, 902 1170, 766 1206"/>
+      <!-- RunPixie -> panel w planie (galeria) -->
+      <path class="p-sec" d="M190 1300 L236 1300"/>
+    </svg>
+
+    <!-- ============================ ETYKIETY STRZAŁEK ============================ -->
+    <div class="label primary" style="left:478px;top:72px">zaloguj / załóż konto</div>
+    <div class="label primary" style="left:120px;top:330px">wybór dystansu (gość)</div>
+    <div class="label primary" style="left:680px;top:278px">udane wejście</div>
+    <div class="label primary" style="left:372px;top:520px">nowy zapis / dokończ</div>
+    <div class="label primary" style="left:198px;top:690px">dalej: dodatki</div>
+    <div class="label primary" style="left:400px;top:690px">dalej: zgody</div>
+    <div class="label primary" style="left:600px;top:686px">akceptuj → płatność</div>
+    <div class="label primary" style="left:700px;top:820px">zapłać</div>
+    <div class="label primary" style="left:912px;top:834px">zaksięgowano → numer</div>
+
+    <div class="label branch" style="left:585px;top:843px">płatność odrzucona</div>
+    <div class="label branch" style="left:158px;top:880px">brak miejsc → rezerwa</div>
+    <div class="label branch" style="left:150px;top:1000px">transfer</div>
+
+    <div class="label" style="left:700px;top:556px">alert: płatność</div>
+    <div class="label" style="left:826px;top:706px">portfel</div>
+    <div class="label" style="left:548px;top:858px">samoobsługa</div>
+    <div class="label" style="left:706px;top:894px">dosprzedaż</div>
+    <div class="label" style="left:498px;top:1198px">zwrot → portfel</div>
+    <div class="label" style="left:598px;top:1028px">→ portfel</div>
+    <div class="label" style="left:836px;top:850px">użyj kredytu</div>
+    <div class="label" style="left:430px;top:1010px">po biegu / konto</div>
+    <div class="label" style="left:930px;top:1085px">po biegu: zdjęcia, wynik</div>
+    <div class="label info" style="left:120px;top:1336px">zdjęcia po numerze</div>
+
+    <!-- ============================ WĘZŁY ============================ -->
+
+    <!-- Wejście (external) -->
+    <div class="node ext" style="left:40px;top:40px">
+      <div class="pill" style="width:300px">
+        <span class="tag">poza panelem</span>
+        <span class="nm">Wejście do zapisu</span>
+        <span class="src">strona wydarzenia, push, e-mail · GST-02 / GST-04 / GST-05</span>
+      </div>
+    </div>
+
+    <!-- ATH-01 -->
+    <a class="node" style="left:620px;top:40px" href="ATH-01_rejestracja-logowanie_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-01: rejestracja i logowanie">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-01</span><span class="lang">PL</span></div>
+        <div class="bd">
+          <div class="bar"></div>
+          <div class="bar" style="height:9px;width:70%;margin-top:1px"></div>
+          <div class="bar" style="height:9px;width:70%"></div>
+        </div>
+        <div class="foot"><span class="cta">Wyślij link logowania</span></div>
+        <div class="altbadge" title="alt: urządzenie zapamiętane → biometria">⊞ biometria</div>
+      </div>
+      <div class="cap">ATH-01<small>logowanie / rejestracja</small></div>
+    </a>
+
+    <!-- ATH-02 -->
+    <a class="node" style="left:620px;top:330px" href="ATH-02_dashboard-moje-zapisy_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-02: dashboard moje zapisy">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-02</span><span class="lang">sync</span></div>
+        <div class="bd">
+          <div class="row2 err"><span class="stripe"></span><span class="lab"><b>Zaległa płatność</b>dokończ</span><span class="bdg err">!</span></div>
+          <div class="row2 warn"><span class="stripe"></span><span class="lab"><b>Oferta rezerwy</b>okno decyzji</span><span class="bdg warn">09:58</span></div>
+          <div class="row2 lime"><span class="stripe"></span><span class="lab"><b>Numer</b>po opłaceniu</span><span class="bdg lime">—</span></div>
+        </div>
+        <div class="foot"><span class="cta">Najpilniejsza sprawa</span></div>
+        <div class="altbadge" title="alt: offline → dane z ostatniej synchronizacji">⚡ offline</div>
+      </div>
+      <div class="cap">ATH-02<small>pulpit / moje starty</small></div>
+    </a>
+
+    <!-- ATH-03 -->
+    <a class="node" style="left:40px;top:610px" href="ATH-03_formularz-zapisu_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-03: formularz zapisu">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-03</span><span class="lang">PL</span></div>
+        <div class="bd">
+          <div class="prog"><i class="on"></i><i class="on"></i><i></i><i></i><span class="pl">2/4</span></div>
+          <div class="bar"></div>
+          <div class="bar" style="width:80%"></div>
+          <div class="row2"><span class="lab"><b>Kategoria</b>auto: M40</span><span class="bdg mut">zmień</span></div>
+        </div>
+        <div class="foot"><span class="cta">Dalej: dodatki</span></div>
+        <div class="altbadge" title="alt: wyczerpane miejsca → lista rezerwowa">⌫ brak miejsc</div>
+      </div>
+      <div class="cap">ATH-03<small>formularz zapisu</small></div>
+    </a>
+
+    <!-- ATH-04 -->
+    <a class="node" style="left:240px;top:610px" href="ATH-04_dodatki-gadzety_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-04: dodatki i gadżety">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-04</span><span class="lang">magazyn</span></div>
+        <div class="bd">
+          <div class="row2"><span class="lab"><b>Koszulka</b>rozmiar M · 79</span><span class="bdg lime">3 szt</span></div>
+          <div class="row2"><span class="lab"><b>Medal</b>pamiątkowy · 29</span></div>
+          <div class="sum tot"><span>Suma</span><b>199,00 zł</b></div>
+        </div>
+        <div class="foot"><span class="cta">Dalej: zgody</span></div>
+        <div class="altbadge" title="alt: ostatnia sztuka znika z koszyka bez obciążenia">× ostatnia sztuka</div>
+      </div>
+      <div class="cap">ATH-04<small>dodatki i gadżety</small></div>
+    </a>
+
+    <!-- ATH-05 -->
+    <a class="node" style="left:440px;top:610px" href="ATH-05_zgody-regulaminy_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-05: zgody i regulaminy">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-05</span><span class="lang">PL</span></div>
+        <div class="bd">
+          <div class="tog on"><span>Regulamin</span><span class="sw2"></span></div>
+          <div class="tog"><span>Polityka pryw.</span><span class="req">wymag.</span></div>
+          <div class="tog"><span>Wizerunek</span><span class="sw2"></span></div>
+        </div>
+        <div class="foot"><span class="cta">Akceptuj → płatność</span></div>
+        <div class="altbadge" title="alt: ponowna akceptacja po zmianie regulaminu v3 → v4">↻ zmiana v4</div>
+      </div>
+      <div class="cap">ATH-05<small>zgody i regulaminy</small></div>
+    </a>
+
+    <!-- ATH-06 -->
+    <a class="node" style="left:640px;top:610px" href="ATH-06_podsumowanie-platnosc_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-06: podsumowanie i płatność">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-06</span><span class="lang">04:59</span></div>
+        <div class="bd">
+          <div class="sum"><span>Wpisowe</span><b>120,00</b></div>
+          <div class="sum"><span>Koszulka</span><b>79,00</b></div>
+          <div class="sum neg"><span>Kredyt</span><b>−50,00</b></div>
+          <div class="sum tot"><span>Do zapłaty</span><b>149,00</b></div>
+          <div class="meth"><span class="on"></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="foot"><span class="cta">Zapłać i sfinalizuj</span></div>
+        <div class="altbadge" title="alt: płatność odrzucona przez bramkę">× odrzucona</div>
+      </div>
+      <div class="cap">ATH-06<small>podsumowanie / płatność</small></div>
+    </a>
+
+    <!-- ATH-07 -->
+    <a class="node" style="left:840px;top:610px" href="ATH-07_potwierdzenie-zapisu_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-07: potwierdzenie zapisu">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-07</span><span class="lang">opłacone</span></div>
+        <div class="bd">
+          <div class="confrow">
+            <div class="bibtag"><span class="k">numer</span><span class="v">1287</span></div>
+            <div class="qr" aria-hidden="true"></div>
+          </div>
+          <div class="row2 ok"><span class="stripe"></span><span class="lab"><b>Odbiór pakietu</b>17.05 · hala A</span></div>
+        </div>
+        <div class="foot"><span class="cta">Zapisz do telefonu</span></div>
+        <div class="altbadge" title="alt: wpłata zaksięgowana, numer w nadawaniu">… numer w nadawaniu</div>
+      </div>
+      <div class="cap">ATH-07<small>potwierdzenie zapisu</small></div>
+    </a>
+
+    <!-- Bramka płatności (external) -->
+    <div class="node ext gate" style="left:640px;top:840px">
+      <div class="pill" style="width:120px">
+        <span class="tag">poza panelem</span>
+        <span class="nm">Bramka</span>
+        <span class="src">P24 · PayU · Stripe · BLIK · OPR-06</span>
+      </div>
+    </div>
+
+    <!-- Nowa osoba (external) -->
+    <div class="node ext feed" style="left:40px;top:980px">
+      <div class="pill" style="width:150px">
+        <span class="tag">poza panelem</span>
+        <span class="nm">Nowa osoba</span>
+        <span class="src">zaproszenie → ATH-01 + ATH-05</span>
+      </div>
+    </div>
+
+    <!-- ATH-08 -->
+    <a class="node" style="left:240px;top:960px" href="ATH-08_samoobsluga-zgloszenia_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-08: samoobsługa zgłoszenia">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-08</span><span class="lang">#1287</span></div>
+        <div class="bd">
+          <div class="row2"><span class="lab"><b>Transfer</b>do innej osoby</span><span class="bdg lime">20 zł</span></div>
+          <div class="row2"><span class="lab"><b>Odroczenie</b>edycja 2027</span><span class="bdg ok">free</span></div>
+          <div class="row2 err"><span class="stripe"></span><span class="lab"><b>Rezygnacja</b>zwrot do portfela</span></div>
+        </div>
+        <div class="foot"><span class="cta">Wykonaj operację</span></div>
+        <div class="altbadge" title="alt: oferta z listy rezerwowej z odliczaniem">⏱ oferta z rezerwy</div>
+      </div>
+      <div class="cap">ATH-08<small>samoobsługa zgłoszenia</small></div>
+    </a>
+
+    <!-- ATH-09 -->
+    <a class="node" style="left:440px;top:960px" href="ATH-09_dosprzedaz-gadzetow_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-09: dosprzedaż gadżetów">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-09</span><span class="lang">do 12.05</span></div>
+        <div class="bd">
+          <div class="row2 lime"><span class="stripe"></span><span class="lab"><b>Moja koszulka</b>M → zmień rozmiar</span></div>
+          <div class="row2"><span class="lab"><b>Czapka</b>39 zł</span><span class="bdg lime">5 szt</span></div>
+          <div class="sum tot"><span>Nowe</span><b>68,00 zł</b></div>
+        </div>
+        <div class="foot"><span class="cta">Dokup i zapłać</span></div>
+        <div class="altbadge" title="alt: okno zamówień zamknięte">× okno zamknięte</div>
+      </div>
+      <div class="cap">ATH-09<small>dosprzedaż gadżetów</small></div>
+    </a>
+
+    <!-- ATH-10 -->
+    <a class="node" style="left:640px;top:960px" href="ATH-10_portfel-kredyty_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran ATH-10: portfel i kredyty">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">ATH-10</span><span class="lang">sync</span></div>
+        <div class="bd">
+          <div class="row2 lime"><span class="stripe"></span><span class="lab"><b>Organizator A</b>kredyt</span><span class="bdg lime">120,00</span></div>
+          <div class="row2"><span class="lab"><b>Organizator B</b>kredyt</span><span class="bdg mut">0,00</span></div>
+          <div class="sum" style="margin-top:1px"><span>+90,00 zwrot</span><b>+30,00 nadpł.</b></div>
+        </div>
+        <div class="foot"><span class="cta">Wykorzystaj kredyt</span></div>
+        <div class="altbadge" title="alt: pusty portfel bez operacji">∅ pusty portfel</div>
+      </div>
+      <div class="cap">ATH-10<small>portfel i kredyty</small></div>
+    </a>
+
+    <!-- RunPixie (external) -->
+    <div class="node ext feed" style="left:40px;top:1262px">
+      <div class="pill" style="width:150px">
+        <span class="tag">integracja</span>
+        <span class="nm">RunPixie</span>
+        <span class="src">zdjęcia tagowane numerem startowym</span>
+      </div>
+    </div>
+
+    <!-- Panel "w planie" (ATH-11..14) -->
+    <div class="plan" style="left:240px;top:1200px;width:760px">
+      <div class="plan-h"><span class="tag">w planie</span><span class="ttl">Po biegu i konto · ATH-11 do ATH-14</span></div>
+      <div class="plan-grid">
+        <div class="ptile">
+          <div class="pt-hdr"><span class="pt-id">ATH-11</span><span class="pt-soon">wkrótce</span></div>
+          <div class="pt-bd"><div class="grid3"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          <div class="pt-cap">galeria RunPixie</div>
+        </div>
+        <div class="ptile">
+          <div class="pt-hdr"><span class="pt-id">ATH-12</span><span class="pt-soon">wkrótce</span></div>
+          <div class="pt-bd"><div class="tbl">
+            <div class="tr"><span>18</span><span class="nm">Kowalski</span><span class="pt-pts">120</span></div>
+            <div class="tr me"><span>19</span><span class="nm">TY</span><span class="pt-pts">118</span></div>
+            <div class="tr"><span>20</span><span class="nm">Nowak</span><span class="pt-pts">115</span></div>
+          </div></div>
+          <div class="pt-cap">klasyfikacja serii</div>
+        </div>
+        <div class="ptile">
+          <div class="pt-hdr"><span class="pt-id">ATH-13</span><span class="pt-soon">wkrótce</span></div>
+          <div class="pt-bd">
+            <div class="row2 warn" style="padding:3px 5px"><span class="stripe"></span><span class="lab"><b>Ostrzeżenie</b>burze 9–11</span></div>
+            <div class="wx"><span class="t">6°</span><span class="d">odczuw. 3°<br>wiatr 25</span></div>
+          </div>
+          <div class="pt-cap">powiadomienia pogodowe</div>
+        </div>
+        <div class="ptile">
+          <div class="pt-hdr"><span class="pt-id">ATH-14</span><span class="pt-soon">wkrótce</span></div>
+          <div class="pt-bd">
+            <div class="tog on" style="padding:3px 5px"><span>Zgody</span><span class="sw2"></span></div>
+            <div class="tog on" style="padding:3px 5px"><span>Push</span><span class="sw2"></span></div>
+            <div class="tog" style="padding:3px 5px"><span>SMS</span><span class="sw2"></span></div>
+          </div>
+          <div class="pt-cap">ustawienia konta i zgody</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="page">
+  <span class="pill-tag">jak czytać</span>
+  <p>
+    Wejście ma dwie ścieżki: zalogowanie lub założenie konta (<b>ATH-01</b>) oraz zapis od razu
+    jako gość, który wraca do konta przy finalizacji. Trzon to liniowy lejek zapisu
+    <b>ATH-03 → ATH-04 → ATH-05 → ATH-06</b>, a po zaksięgowaniu wpłaty w bramce nadaje się numer
+    i ląduje się na <b>ATH-07</b>. <span class="k">Numer startowy pojawia się dopiero po wpłacie</span> -
+    stąd galeria i klasyfikacja działają później. Pulpit <b>ATH-02</b> jest hubem dla wracającego
+    zawodnika: prowadzi do nieopłaconej płatności, do startu i samoobsługi, do portfela oraz do
+    ekranów po biegu. Kluczowe rozgałęzienie to <b>odrzucona płatność</b>, która wraca na ekran
+    płatności z powodem i propozycją innej metody; obok niego <b>brak miejsc</b> kierujący na listę
+    rezerwową (ATH-08) i <b>transfer</b>, który zaprasza nową osobę przez ATH-01 i ATH-05.
+    Portfel (<b>ATH-10</b>) spina zwroty z ATH-08, płatności z ATH-09 i kredyt użyty w ATH-06.
+    <br><br>
+    Ekrany <b>ATH-11 do ATH-14</b> (galeria, klasyfikacja, pogoda, ustawienia) nie mają jeszcze makiet,
+    więc stoją w panelu „w planie" i nie są klikalne. Dochodzi się do nich z pulpitu ATH-02 i z
+    potwierdzenia ATH-07; pogoda zasila też podpowiedzi gadżetów w ATH-04 i ATH-09.
+    <span class="k">Klikaj miniatury ATH-01 do ATH-10</span>, żeby otworzyć dany ekran w nowej karcie -
+    pliki makiet muszą leżeć w tej samej lokalizacji co ten plik. Pigułki „poza panelem" (wejście,
+    bramka, RunPixie, nowa osoba) są opisowe i nie reprezentują ekranów panelu zawodnika.
+  </p>
+</footer>
+
+</body>
+</html>

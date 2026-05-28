@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INS-01 · Logowanie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#0d1a1e; --accent:#21d8c4;
+  --color-success:#4ade80; --color-warning:#f6b73c; --color-error:#ff6b5e; --color-info:#5aa8ff;
+  --surface-1:#13242a; --surface-2:#1a313a; --surface-3:#234049; --hairline:#2c4b55;
+  --text-strong:#f0f6f5; --text:#c7d6d8; --text-muted:#83a0a5; --on-accent:#062420; --paper:#eef4f1;
+  --font-display:"Bricolage Grotesque", system-ui; --font-body:"IBM Plex Sans", system-ui;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:16px; --shadow:0 12px 32px -14px rgba(0,0,0,.7); --tap:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06100f;color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+.num{font-variant-numeric:tabular-nums}
+.shell{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--brand-ink);position:relative}
+header.app{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border-bottom:1px solid var(--hairline)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);min-height:var(--tap)}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.logo{width:38px;height:38px;border-radius:11px;flex:none;background:
+  radial-gradient(circle at 30% 30%, #2ff0da, var(--accent) 60%, #0fae9e);
+  display:grid;place-items:center;color:var(--on-accent);font-family:var(--font-display);font-weight:800}
+.brand b{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:15px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lang{display:flex;align-items:center;gap:var(--s1);background:var(--surface-3);border:1px solid var(--hairline);color:var(--text-strong);
+  border-radius:999px;padding:0 var(--s3);height:40px;font:600 14px/1 var(--font-body);cursor:pointer}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s4);font-size:12.5px;color:var(--text-muted);border-top:1px solid var(--hairline);background:var(--surface-1)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--color-success) 25%,transparent)}
+.dot.on{background:var(--color-success)} .dot.off{background:var(--color-warning);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-warning) 25%,transparent)}
+.offline-banner{display:none;align-items:flex-start;gap:var(--s3);margin:var(--s4) var(--s4) 0;padding:var(--s3) var(--s4);
+  border:1px solid color-mix(in srgb,var(--color-warning) 50%,var(--hairline));border-left:4px solid var(--color-warning);
+  border-radius:var(--radius);background:color-mix(in srgb,var(--color-warning) 12%,var(--surface-1));color:var(--text-strong);font-size:13.5px}
+body.is-offline .offline-banner{display:flex}
+body.is-offline .dot.on{display:none}
+.offline-banner b{font-weight:600}
+.seg{display:flex;gap:var(--s1);margin:var(--s4) var(--s4) 0;padding:var(--s1);background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px}
+.seg button{flex:1;border:0;background:transparent;color:var(--text-muted);font:600 13.5px/1 var(--font-body);height:40px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected=true]{background:var(--surface-3);color:var(--text-strong)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{flex:1;padding:var(--s5) var(--s4) var(--s10)}
+.fade{animation:rise .5s both} @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h1{font-family:var(--font-display);font-weight:800;color:var(--text-strong);font-size:30px;line-height:1.05;letter-spacing:-.5px;margin:var(--s6) 0 var(--s2)}
+.lead{color:var(--text-muted);font-size:14.5px;margin-bottom:var(--s8)}
+label.field{display:block;font-size:13px;color:var(--text-muted);font-weight:600;margin:0 0 var(--s2)}
+input[type=text]{width:100%;height:var(--tap);background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:var(--radius);
+  color:var(--text-strong);font:500 17px/1 var(--font-body);padding:0 var(--s4)}
+input[type=text]:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-color:var(--accent)}
+.msg{display:flex;gap:var(--s2);margin-top:var(--s3);padding:var(--s3) var(--s4);border-radius:12px;font-size:13.5px;line-height:1.4}
+.msg.err{background:color-mix(in srgb,var(--color-error) 14%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-error) 45%,transparent);color:#ffd9d4}
+.msg b{font-weight:600;color:var(--text-strong)}
+.remember{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s5);min-height:var(--tap);cursor:pointer}
+.remember input{width:26px;height:26px;accent-color:var(--accent);flex:none}
+.remember span{font-size:14.5px;color:var(--text)}
+.biolink{display:flex;align-items:center;gap:var(--s2);margin-top:var(--s4);color:var(--text-muted);font-size:13.5px}
+.biolink::before{content:"";width:34px;height:34px;border-radius:10px;background:var(--surface-3);border:1px solid var(--hairline);flex:none;
+  background-image:radial-gradient(circle at 50% 38%, var(--accent) 0 5px, transparent 6px),
+  radial-gradient(circle at 50% 70%, transparent 0 9px, var(--accent) 10px 11px, transparent 12px);background-repeat:no-repeat}
+.locked{display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--s4);padding:var(--s8) var(--s4)}
+.locked .ic{width:64px;height:64px;border-radius:18px;background:color-mix(in srgb,var(--color-info) 16%,var(--surface-1));
+  border:1px solid color-mix(in srgb,var(--color-info) 45%,transparent);display:grid;place-items:center;color:var(--color-info);font-size:30px}
+.locked h2{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:21px}
+.locked p{color:var(--text-muted);font-size:14px;max-width:34ch}
+footer.app{position:sticky;bottom:0;z-index:20;background:linear-gradient(0deg,var(--surface-2),var(--surface-1));border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom))}
+.saveline{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s3);min-height:18px}
+.cta{width:100%;min-height:var(--tap);border:0;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);
+  font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.2px;cursor:pointer;box-shadow:var(--shadow)}
+.cta:focus-visible{outline:3px solid var(--text-strong);outline-offset:3px}
+.cta[disabled]{opacity:.5}
+.cta.ghost{background:transparent;color:var(--color-info);box-shadow:none;border:1.5px solid color-mix(in srgb,var(--color-info) 45%,transparent);font-size:16px}
+.links{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-top:var(--s4)}
+.links a{color:var(--text-muted);font-size:14px;text-decoration:none;border-bottom:1px solid transparent;min-height:32px;display:inline-flex;align-items:center}
+.links a:hover{color:var(--text-strong)} .links a:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.hide{display:none !important}
+@media(prefers-reduced-motion:reduce){.fade{animation:none}}
+</style>
+</head>
+<body class="pl-PL">
+<div class="shell">
+  <header class="app">
+    <div class="bar">
+      <div class="brand"><span class="logo">D</span><b data-i="org">Klub Pływacki Delfin</b></div>
+      <button class="lang" id="langBtn" aria-label="Zmień język"><span id="langLabel">PL</span> ▾</button>
+    </div>
+    <div class="sys">
+      <span class="dot on" aria-hidden="true"></span>
+      <span data-i="lastLogin">Ostatnie udane logowanie: wczoraj 18:04</span>
+    </div>
+  </header>
+
+  <div class="offline-banner" role="status">
+    <span aria-hidden="true">⚠</span>
+    <span><b data-i="offTitle">Brak sieci.</b> <span data-i="offBody">Logowanie wymaga połączenia. Zmiany zebrane offline czekają na tym urządzeniu:</span> <b class="num">3</b>.</span>
+  </div>
+
+  <div class="seg" role="tablist" aria-label="Podgląd stanu ekranu">
+    <button role="tab" id="tab-default" aria-selected="true" data-state="default" data-i="stDefault">Logowanie</button>
+    <button role="tab" id="tab-locked" aria-selected="false" data-state="locked" data-i="stLocked">Bez placówki</button>
+  </div>
+
+  <main>
+    <!-- DEFAULT -->
+    <section id="view-default" class="fade">
+      <h1 data-i="title">Panel instruktora</h1>
+      <p class="lead" data-i="lead">Zaloguj się jednym dotknięciem - link na e-mail albo skrót biometryczny na zapamiętanym urządzeniu.</p>
+
+      <label class="field" for="ident" data-i="identLabel">Identyfikator lub e-mail</label>
+      <input type="text" id="ident" inputmode="email" autocomplete="username" placeholder="a.mazur@klubdelfin.pl" aria-describedby="identMsg">
+      <div class="msg err hide" id="identMsg" role="alert">
+        <span aria-hidden="true">✕</span>
+        <span><span data-i="vEmpty">Uzupełnij identyfikator albo poproś o nowy link logowania.</span></span>
+      </div>
+
+      <div class="biolink"><span data-i="bio">Na zapamiętanym urządzeniu logowanie potwierdzasz odciskiem, Face ID lub kodem.</span></div>
+
+      <label class="remember">
+        <input type="checkbox" id="remember">
+        <span data-i="remember">Zapamiętaj to urządzenie</span>
+      </label>
+    </section>
+
+    <!-- LOCKED: konto bez przypisanej placówki -->
+    <section id="view-locked" class="locked fade hide" aria-live="polite">
+      <div class="ic" aria-hidden="true">🔒</div>
+      <h2 data-i="lockTitle">Konto bez przypisanej placówki</h2>
+      <p data-i="lockBody">Twoje konto istnieje, ale żadna placówka nie nadała Ci jeszcze dostępu do grup. Dostęp przyznaje organizator - nie da się tego ustawić z panelu instruktora.</p>
+    </section>
+  </main>
+
+  <footer class="app">
+    <div class="saveline">
+      <span class="dot on" aria-hidden="true"></span>
+      <span data-i="ready">Gotowe do logowania</span>
+    </div>
+    <!-- DEFAULT primary -->
+    <button class="cta" id="ctaDefault" data-i="ctaLogin">Zaloguj się linkiem</button>
+    <!-- LOCKED primary -->
+    <button class="cta ghost hide" id="ctaLocked" data-i="ctaContact">Skontaktuj się z organizatorem</button>
+    <div class="links">
+      <a href="#" data-i="aNew">Poproś o nowy link</a>
+      <a href="#" id="aLang" data-i="aLang">Zmień język</a>
+      <a href="#" data-i="aHelp">Pomoc placówki</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const RTL = new Set(["ar","he","fa","ur"]);
+const DATA = { locale:"pl-PL", org:"Klub Pływacki Delfin" };
+
+const I18N = {
+  "pl-PL":{
+    org:"Klub Pływacki Delfin",
+    lastLogin:"Ostatnie udane logowanie: wczoraj 18:04",
+    offTitle:"Brak sieci.", offBody:"Logowanie wymaga połączenia. Zmiany zebrane offline czekają na tym urządzeniu:",
+    stDefault:"Logowanie", stLocked:"Bez placówki",
+    title:"Panel instruktora",
+    lead:"Zaloguj się jednym dotknięciem - link na e-mail albo skrót biometryczny na zapamiętanym urządzeniu.",
+    identLabel:"Identyfikator lub e-mail",
+    vEmpty:"Uzupełnij identyfikator albo poproś o nowy link logowania.",
+    bio:"Na zapamiętanym urządzeniu logowanie potwierdzasz odciskiem, Face ID lub kodem.",
+    remember:"Zapamiętaj to urządzenie",
+    lockTitle:"Konto bez przypisanej placówki",
+    lockBody:"Twoje konto istnieje, ale żadna placówka nie nadała Ci jeszcze dostępu do grup. Dostęp przyznaje organizator - nie da się tego ustawić z panelu instruktora.",
+    ready:"Gotowe do logowania",
+    ctaLogin:"Zaloguj się linkiem", ctaContact:"Skontaktuj się z organizatorem",
+    aNew:"Poproś o nowy link", aLang:"Zmień język", aHelp:"Pomoc placówki"
+  },
+  "en-GB":{
+    org:"Delfin Swim Club",
+    lastLogin:"Last successful sign-in: yesterday 18:04",
+    offTitle:"No connection.", offBody:"Sign-in needs a network. Changes collected offline are waiting on this device:",
+    stDefault:"Sign in", stLocked:"No facility",
+    title:"Instructor panel",
+    lead:"Sign in with one tap - an email link, or a biometric shortcut on a remembered device.",
+    identLabel:"ID or email",
+    vEmpty:"Enter your ID or request a new sign-in link.",
+    bio:"On a remembered device you confirm with fingerprint, Face ID or a code.",
+    remember:"Remember this device",
+    lockTitle:"Account with no facility assigned",
+    lockBody:"Your account exists, but no facility has granted you group access yet. Access is granted by the organiser - it can't be set from the instructor panel.",
+    ready:"Ready to sign in",
+    ctaLogin:"Sign in with a link", ctaContact:"Contact the organiser",
+    aNew:"Request a new link", aLang:"Change language", aHelp:"Facility help"
+  }
+};
+const FALLBACK="en-GB";
+function t(key){const l=I18N[DATA.locale]||{};return (key in l)?l[key]:(I18N[FALLBACK][key]??key);}
+
+function applyLang(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i);});
+  document.getElementById("langLabel").textContent = DATA.locale.split("-")[0].toUpperCase();
+  document.documentElement.lang=DATA.locale;
+  document.documentElement.dir = RTL.has(DATA.locale.split("-")[0]) ? "rtl":"ltr";
+  document.body.className = DATA.locale + (document.body.classList.contains("is-offline")?" is-offline":"");
+}
+function toggleLang(){ DATA.locale = DATA.locale==="pl-PL" ? "en-GB":"pl-PL"; applyLang(); }
+document.getElementById("langBtn").addEventListener("click",toggleLang);
+document.getElementById("aLang").addEventListener("click",e=>{e.preventDefault();toggleLang();});
+
+// state switch
+const tabs=document.querySelectorAll('[role=tab]');
+function setState(s){
+  tabs.forEach(tb=>tb.setAttribute("aria-selected", tb.dataset.state===s));
+  document.getElementById("view-default").classList.toggle("hide", s!=="default");
+  document.getElementById("view-locked").classList.toggle("hide", s!=="locked");
+  document.getElementById("ctaDefault").classList.toggle("hide", s!=="default");
+  document.getElementById("ctaLocked").classList.toggle("hide", s!=="locked");
+}
+tabs.forEach(tb=>tb.addEventListener("click",()=>setState(tb.dataset.state)));
+
+// validation: empty identifier shows the error with a next step; typing clears it
+const ident=document.getElementById("ident");
+const identMsg=document.getElementById("identMsg");
+document.getElementById("ctaDefault").addEventListener("click",()=>{
+  const empty=ident.value.trim()==="";
+  identMsg.classList.toggle("hide",!empty);
+  if(empty){ident.focus();}
+});
+ident.addEventListener("input",()=>{ if(ident.value.trim()!=="") identMsg.classList.add("hide"); });
+
+applyLang();
+</script>
+</body>
+</html>

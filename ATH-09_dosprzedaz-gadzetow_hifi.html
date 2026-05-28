@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<!--
+  ATH-09 - dosprzedaż gadżetów (panel zawodnika, moduł zawodów)
+  Makieta hi-fi, mobile-first, jeden ekran / jeden plik.
+  Stan domyślny: katalog + moje zamówienia + sugestia pogodowa.
+  Stan alternatywny: zamknięte okno zamówień (do kiedy było otwarte, czy odbiór na miejscu).
+  Napisy to klucze tłumaczeń ze znacznikami BCP 47 (pl-PL domyślny, en-GB zapasowy).
+  Motywowanie wyłącznie przez zmienne CSS w :root (TOKENY MARKI).
+-->
+<html lang="pl-PL" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dokup do startu · ATH-09</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   TOKENY MARKI - jedyne miejsce do przemotywowania (zmienne CSS)
+   ========================================================================= */
+:root{
+  --brand-ink:#10141b;
+  --accent:#d6f622;
+
+  --color-success:#3ddc84;
+  --color-warning:#ffb84d;
+  --color-error:#ff6b5e;
+  --color-info:#6aa9ff;
+
+  --surface-1:#181e28;
+  --surface-2:#1f2733;
+  --surface-3:#283241;
+  --hairline:#313c4c;
+  --text-strong:#f2f5f7;
+  --text:#cdd5df;
+  --text-muted:#8c97a6;
+  --on-accent:#10141b;
+  --paper:#f4f5ef;
+
+  --font-display:"Saira Condensed", system-ui;
+  --font-body:"Barlow", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:14px;
+  --shadow:0 10px 30px -12px rgba(0,0,0,.65);
+  --tap:48px;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(120% 60% at 80% -10%, rgba(214,246,34,.10), transparent 60%), var(--brand-ink);
+  color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;min-height:100vh;
+}
+[dir="rtl"] body{direction:rtl}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 64px);
+  mask-image:linear-gradient(180deg, transparent, #000 30%, #000 80%, transparent);}
+
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:176px}
+
+/* ---------- nagłówek ---------- */
+header.bar{position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg, rgba(16,20,27,.96), rgba(16,20,27,.86));
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline);box-shadow:0 1px 0 rgba(214,246,34,.18);}
+.bar-top{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4)}
+.logo{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.mark{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--accent);position:relative;overflow:hidden}
+.mark::before{content:"";position:absolute;inset:0;
+  background:linear-gradient(120deg, transparent 38%, var(--on-accent) 38% 50%, transparent 50% 60%, var(--on-accent) 60% 72%, transparent 72%);}
+.org{display:flex;flex-direction:column;min-width:0}
+.org b{font-family:var(--font-display);font-weight:700;letter-spacing:.3px;color:var(--text-strong);font-size:15px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.org span{font-size:11.5px;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase}
+.lang{margin-inline-start:auto;position:relative}
+.lang select{appearance:none;-webkit-appearance:none;font-family:var(--font-body);font-weight:600;font-size:13px;
+  color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:10px;
+  min-height:var(--tap);padding:0 30px 0 12px;cursor:pointer;}
+.lang::after{content:"▾";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;font-size:12px}
+.lang select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.sys{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:var(--s2) var(--s4) var(--s3);font-size:12.5px;color:var(--text-muted)}
+.dot{display:inline-flex;align-items:center;gap:6px}
+.dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--color-success);box-shadow:0 0 0 3px rgba(61,220,132,.18)}
+.dot.off::before{background:var(--color-warning);box-shadow:0 0 0 3px rgba(255,184,77,.18)}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-weight:600}
+.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 1.4s ease-in-out infinite}
+.win{font-variant-numeric:tabular-nums}
+.win b{color:var(--text);font-weight:600}
+
+/* ---------- przełącznik stanu ---------- */
+.seg{display:flex;gap:var(--s2);padding:var(--s4) var(--s4) var(--s2)}
+.seg button{flex:1;min-height:var(--tap);border-radius:12px;cursor:pointer;
+  font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.3px;
+  background:var(--surface-1);color:var(--text);border:1px solid var(--hairline);transition:all .18s ease}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 18px -8px rgba(214,246,34,.6)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+main{padding:var(--s2) var(--s4) 0}
+.h-section{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-muted);margin:var(--s5) 0 var(--s3);display:flex;align-items:baseline;gap:var(--s2)}
+.h-section .hint{font-family:var(--font-body);font-weight:500;font-size:12px;letter-spacing:.2px;text-transform:none;color:var(--text-muted);opacity:.85}
+
+/* ---------- karta produktu ---------- */
+.card{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);padding:var(--s4);display:flex;gap:var(--s4);align-items:center;animation:rise .4s ease both}
+.cards{display:flex;flex-direction:column;gap:var(--s3)}
+.thumb{flex:0 0 auto;width:52px;height:52px;border-radius:11px;background:linear-gradient(145deg,var(--surface-3),var(--surface-2));display:grid;place-items:center;color:var(--accent);font-size:24px}
+.pc-body{flex:1;min-width:0}
+.pc-name{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--text-strong);line-height:1.12}
+.pc-meta{font-size:12.5px;color:var(--text-muted);margin-top:3px;display:flex;flex-wrap:wrap;gap:var(--s1) var(--s3);align-items:center}
+.stock-ok{color:var(--text-muted)}
+.stock-low{color:var(--color-warning);font-weight:600}
+.pc-price{font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--text-strong);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* stepper */
+.stepper{display:flex;align-items:center;gap:0;border:1px solid var(--hairline);border-radius:11px;overflow:hidden;flex:0 0 auto}
+.stepper button{width:var(--tap);height:var(--tap);border:none;background:var(--surface-2);color:var(--text-strong);font-size:22px;font-family:var(--font-display);cursor:pointer;display:grid;place-items:center}
+.stepper button:disabled{color:var(--text-muted);opacity:.5;cursor:not-allowed}
+.stepper button:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.stepper .q{min-width:38px;text-align:center;font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.add-btn{min-height:var(--tap);padding:0 var(--s5);border:1px solid var(--accent);border-radius:11px;background:transparent;color:var(--accent);
+  font-family:var(--font-display);font-weight:700;font-size:14px;letter-spacing:.4px;cursor:pointer;flex:0 0 auto}
+.add-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* moje zamówienia - wymiana rozmiaru */
+.owned{border-color:rgba(61,220,132,.35)}
+.owned .thumb{color:var(--color-success)}
+.size-row{display:flex;align-items:center;gap:var(--s2);margin-top:var(--s2)}
+.size-row label{font-size:12.5px;color:var(--text-muted)}
+.size-sel{appearance:none;-webkit-appearance:none;min-height:40px;padding:0 28px 0 12px;border-radius:9px;border:1px solid var(--hairline);
+  background:var(--surface-2);color:var(--text-strong);font-family:var(--font-body);font-weight:600;font-size:14px;cursor:pointer}
+.size-sel:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tag-free{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--color-success);background:rgba(61,220,132,.12);border:1px solid rgba(61,220,132,.4);padding:3px 9px;border-radius:999px}
+
+/* sugestia - wyraźnie inna niż domyślny wybór */
+.suggest{border:1.5px dashed var(--hairline);background:linear-gradient(180deg,rgba(106,169,255,.06),transparent)}
+.suggest .thumb{color:var(--color-info)}
+.sug-badge{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--color-info);background:rgba(106,169,255,.12);border:1px solid rgba(106,169,255,.4);padding:3px 9px;border-radius:999px;display:inline-block;margin-bottom:6px}
+.sug-note{font-size:12px;color:var(--text-muted);font-style:italic}
+
+/* walidacja */
+.val{display:none;gap:var(--s3);align-items:flex-start;margin:var(--s3) 0 0;padding:var(--s3);border-radius:11px;font-size:13px}
+.val.show{display:flex}
+.val.warn{background:rgba(255,184,77,.10);border:1px solid rgba(255,184,77,.45);color:#ffd79a}
+.val.info{background:rgba(106,169,255,.10);border:1px solid rgba(106,169,255,.4);color:#cfe2ff}
+.val svg{flex:0 0 auto;margin-top:1px}
+.val .link{background:none;border:none;color:inherit;font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px;cursor:pointer;padding:0;min-height:auto}
+
+/* pasek odbioru / termin */
+.pickup{margin-top:var(--s5);padding:var(--s4);border-radius:var(--radius);background:var(--surface-1);border:1px solid var(--hairline);display:flex;gap:var(--s3);align-items:flex-start;font-size:13px;color:var(--text)}
+.pickup svg{flex:0 0 auto;color:var(--accent);margin-top:1px}
+.pickup b{color:var(--text-strong);font-variant-numeric:tabular-nums}
+
+/* ---------- stan alternatywny: okno zamknięte ---------- */
+.closed{padding-top:var(--s6);text-align:center;animation:rise .4s ease both}
+.closed .ic{width:72px;height:72px;border-radius:50%;margin:0 auto var(--s4);display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--hairline);color:var(--color-warning)}
+.closed h2{font-family:var(--font-display);font-weight:800;font-size:24px;color:var(--text-strong);margin:0 0 var(--s2)}
+.closed p{font-size:14px;color:var(--text);margin:0 auto;max-width:34ch}
+.closed .when{margin-top:var(--s4);display:inline-flex;gap:8px;align-items:center;padding:var(--s2) var(--s4);border-radius:999px;background:var(--surface-2);border:1px solid var(--hairline);font-size:13px;color:var(--text-muted)}
+.closed .when b{color:var(--text);font-variant-numeric:tabular-nums}
+.onsite{margin-top:var(--s5);padding:var(--s4);border-radius:var(--radius);background:rgba(106,169,255,.08);border:1px solid rgba(106,169,255,.35);color:#cfe2ff;font-size:13.5px;display:flex;gap:var(--s3);align-items:flex-start;text-align:start}
+.onsite svg{flex:0 0 auto;color:var(--color-info);margin-top:1px}
+
+/* ---------- dolny pasek akcji ---------- */
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:linear-gradient(180deg, rgba(16,20,27,.4), var(--brand-ink) 40%);border-top:1px solid var(--hairline);
+  padding:var(--s3) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom,0px))}
+.actionbar .inner{max-width:480px;margin:0 auto}
+.summary{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s3)}
+.summary .lbl{font-size:13px;color:var(--text-muted)}
+.summary .tot{font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.wallet{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) 0;margin-bottom:var(--s2);border-top:1px solid var(--hairline)}
+.wallet label{flex:1;font-size:13.5px;color:var(--text);cursor:pointer}
+.wallet label small{display:block;color:var(--text-muted);font-size:12px}
+.switch{flex:0 0 auto;width:52px;height:30px;border-radius:999px;background:var(--surface-3);border:1px solid var(--hairline);position:relative;cursor:pointer;transition:.18s}
+.switch::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:24px;height:24px;border-radius:50%;background:var(--text-muted);transition:.18s}
+.switch[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+.switch[aria-checked="true"]::after{inset-inline-start:24px;background:var(--on-accent)}
+.switch:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.status-line{display:none;align-items:center;gap:8px;justify-content:center;font-size:13px;color:var(--color-success);margin-bottom:var(--s3);font-weight:600}
+.status-line.show{display:flex}
+.status-line.err{color:var(--color-warning)}
+.sec-actions{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);justify-content:center;margin-bottom:var(--s3)}
+.sec-actions button{background:none;border:none;color:var(--text-muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hairline)}
+.sec-actions button:hover{color:var(--text)}
+.sec-actions button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.cta{width:100%;min-height:56px;border:none;border-radius:14px;cursor:pointer;background:var(--accent);color:var(--on-accent);
+  font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 12px 30px -12px rgba(214,246,34,.7);transition:transform .1s ease, opacity .15s ease}
+.cta:active{transform:translateY(1px) scale(.995)}
+.cta:disabled{background:var(--surface-3);color:var(--text-muted);box-shadow:none;cursor:not-allowed}
+.cta-secondary{background:var(--surface-2);color:var(--text-strong);box-shadow:none;border:1px solid var(--hairline)}
+.cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.cta .amt{font-variant-numeric:tabular-nums}
+.spinner{width:18px;height:18px;border:3px solid rgba(16,20,27,.3);border-top-color:var(--on-accent);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.cta.processing .spinner{display:inline-block}
+
+.hidden{display:none !important}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cards .card:nth-child(1){animation-delay:.03s}
+.cards .card:nth-child(2){animation-delay:.08s}
+.cards .card:nth-child(3){animation-delay:.13s}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== NAGŁÓWEK ===================== -->
+  <header class="bar">
+    <div class="bar-top">
+      <div class="logo">
+        <div class="mark" aria-hidden="true"></div>
+        <div class="org">
+          <b id="orgName">Stołeczny Klub Biegacza</b>
+          <span data-i18n="brandContext">dokup do startu</span>
+        </div>
+      </div>
+      <div class="lang">
+        <label class="hidden" for="langSel" data-i18n="langLabel">Język</label>
+        <select id="langSel" aria-label="Język / Language">
+          <option value="pl-PL">PL</option>
+          <option value="en-GB">EN</option>
+        </select>
+      </div>
+    </div>
+    <div class="sys">
+      <span class="dot" id="netDot"><span data-i18n="online">online</span></span>
+      <span class="win"><span data-i18n="windowOpenUntil">okno zamówień do</span> <b id="winDate"></b></span>
+      <span class="live"><span data-i18n="liveStock">magazyn na żywo</span></span>
+    </div>
+  </header>
+
+  <!-- ===================== PRZEŁĄCZNIK STANU ===================== -->
+  <div class="seg" role="group" aria-label="Stan ekranu">
+    <button id="segCat" aria-pressed="true" data-i18n="segCatalog">Katalog</button>
+    <button id="segClosed" aria-pressed="false" data-i18n="segClosed">Okno zamknięte</button>
+  </div>
+
+  <!-- ===================== STAN DOMYŚLNY: KATALOG ===================== -->
+  <main id="viewCat">
+
+    <h2 class="h-section"><span data-i18n="myOrdersHeading">Moje zamówienia</span></h2>
+    <div class="cards">
+      <div class="card owned">
+        <div class="thumb" aria-hidden="true">👕</div>
+        <div class="pc-body">
+          <div class="pc-name" data-i18n="shirtName">Koszulka techniczna</div>
+          <div class="size-row">
+            <label for="sizeSel" data-i18n="sizeLabel">rozmiar</label>
+            <select id="sizeSel" class="size-sel" aria-label="Rozmiar koszulki"></select>
+            <span class="tag-free" data-i18n="swapFree">wymiana darmowa</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="val warn" id="sizeVal" role="alert">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span><span id="sizeValText"></span> <button class="link" id="pickNearest"></button></span>
+    </div>
+
+    <h2 class="h-section"><span data-i18n="catalogHeading">Katalog</span> <span class="hint" data-i18n="catalogHint">ceny brutto</span></h2>
+    <div class="cards" id="catalogList"></div>
+
+    <div class="val info" id="stockVal" role="status">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span id="stockValText"></span>
+    </div>
+
+    <div class="pickup">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 7h18v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" stroke="currentColor" stroke-width="2"/><path d="M3 7l2.5-3h13L21 7M9 11h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span data-i18n="pickupInfo">Odbiór dokupionych rzeczy w biurze zawodów, 17–18.05.2026, razem z pakietem startowym.</span>
+    </div>
+
+  </main>
+
+  <!-- ===================== STAN ALTERNATYWNY: OKNO ZAMKNIĘTE ===================== -->
+  <main id="viewClosed" class="hidden">
+    <div class="closed">
+      <div class="ic" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2 data-i18n="closedHeading">Okno zamówień zostało zamknięte</h2>
+      <p data-i18n="closedBody">Online nie domówisz już gadżetów do tego startu. Zamówienia złożone wcześniej pozostają ważne i czekają w biurze zawodów.</p>
+      <div class="when"><span data-i18n="closedWasOpen">otwarte było do</span> <b id="closedDate"></b></div>
+      <div class="onsite">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/></svg>
+        <span data-i18n="onsiteInfo">Część gadżetów może być dostępna na miejscu, przy odbiorze pakietu w biurze zawodów. Dostępność zależy od stanu magazynu organizatora.</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== DOLNY PASEK AKCJI ===================== -->
+  <div class="actionbar">
+    <div class="inner" id="actionInner">
+      <div class="summary">
+        <span class="lbl" data-i18n="orderSum">Suma nowego zamówienia</span>
+        <span class="tot" id="sumVal">0,00 zł</span>
+      </div>
+      <div class="wallet">
+        <label for="walletSwitch">
+          <span data-i18n="walletCover">Pokryj z portfela</span>
+          <small id="walletInfo"></small>
+        </label>
+        <button id="walletSwitch" class="switch" role="switch" aria-checked="false" aria-label="Pokryj z portfela"></button>
+      </div>
+      <div class="status-line" id="statusLine">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="statusText"></span>
+      </div>
+      <div class="sec-actions">
+        <button id="secTable" data-i18n="secSizeTable">Tabela rozmiarów</button>
+        <button id="secClear" data-i18n="secClear">Wyczyść koszyk</button>
+        <button id="secSkip" data-i18n="secSkip">Pomiń</button>
+      </div>
+      <button class="cta" id="mainCta" disabled>
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="ctaLabel" data-i18n="ctaIdle">Dodaj coś z katalogu</span>
+        <span class="amt" id="ctaAmt"></span>
+      </button>
+    </div>
+
+    <!-- pasek akcji dla stanu zamkniętego -->
+    <div class="inner hidden" id="closedBar">
+      <button class="cta cta-secondary" id="backCta" data-i18n="backToStart">Wróć do mojego startu</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================================
+   i18n - klucze tłumaczeń, BCP 47. Domyślny pl-PL, zapasowy en-GB.
+   ========================================================================= */
+const I18N = {
+  "pl-PL":{
+    brandContext:"dokup do startu", langLabel:"Język",
+    online:"online", offline:"offline — podgląd z danych lokalnych",
+    windowOpenUntil:"okno zamówień do", liveStock:"magazyn na żywo",
+    segCatalog:"Katalog", segClosed:"Okno zamknięte",
+    myOrdersHeading:"Moje zamówienia",
+    shirtName:"Koszulka techniczna", sizeLabel:"rozmiar", swapFree:"wymiana darmowa",
+    sizeUnavailableTpl:"Rozmiar {size} jest niedostępny.",
+    pickNearestTpl:"Wybierz najbliższy: {size}",
+    catalogHeading:"Katalog", catalogHint:"ceny brutto",
+    capName:"Czapka biegowa", capDesc:"oddychająca, regulowana",
+    medalName:"Medal dla osoby towarzyszącej", medalDesc:"grawer z datą biegu",
+    buffName:"Buff / komin", buffDesc:"ochrona karku i twarzy",
+    suggestBadge:"podpowiedź", suggestReasonTpl:"dobrane do pogody na starcie: {temp}",
+    stockLeftTpl:"zostały {n} szt.", stockLastOne:"ostatnia sztuka",
+    add:"Dodaj",
+    stockVanishedTpl:"Ostatnia sztuka „{name}” właśnie zniknęła z magazynu. Pozycję usunęliśmy z koszyka — bez obciążenia.",
+    pickupInfo:"Odbiór dokupionych rzeczy w biurze zawodów, 17–18.05.2026, razem z pakietem startowym.",
+    closedHeading:"Okno zamówień zostało zamknięte",
+    closedBody:"Online nie domówisz już gadżetów do tego startu. Zamówienia złożone wcześniej pozostają ważne i czekają w biurze zawodów.",
+    closedWasOpen:"otwarte było do",
+    onsiteInfo:"Część gadżetów może być dostępna na miejscu, przy odbiorze pakietu w biurze zawodów. Dostępność zależy od stanu magazynu organizatora.",
+    orderSum:"Suma nowego zamówienia", walletCover:"Pokryj z portfela",
+    walletBalTpl:"saldo: {bal} · u tego organizatora",
+    walletAppliedTpl:"użyto {used}, do zapłaty inną metodą: {rest}",
+    secSizeTable:"Tabela rozmiarów", secClear:"Wyczyść koszyk", secSkip:"Pomiń",
+    ctaIdle:"Dodaj coś z katalogu", ctaPay:"Dokup i zapłać", ctaConfirm:"Potwierdź zamówienie",
+    processing:"Przetwarzanie…", savedTpl:"Zamówienie przyjęte: {sum}",
+    backToStart:"Wróć do mojego startu",
+    tempValue:"6°C, wiatr"
+  },
+  "en-GB":{
+    brandContext:"add to your race", langLabel:"Language",
+    online:"online", offline:"offline — showing local data",
+    windowOpenUntil:"orders open until", liveStock:"live stock",
+    segCatalog:"Catalogue", segClosed:"Window closed",
+    myOrdersHeading:"My orders",
+    shirtName:"Technical T-shirt", sizeLabel:"size", swapFree:"free swap",
+    sizeUnavailableTpl:"Size {size} is unavailable.",
+    pickNearestTpl:"Pick the nearest: {size}",
+    catalogHeading:"Catalogue", catalogHint:"prices incl. VAT",
+    capName:"Running cap", capDesc:"breathable, adjustable",
+    medalName:"Medal for a companion", medalDesc:"engraved with the race date",
+    buffName:"Buff / neck gaiter", buffDesc:"neck and face cover",
+    suggestBadge:"suggestion", suggestReasonTpl:"matched to start-line weather: {temp}",
+    stockLeftTpl:"{n} left", stockLastOne:"last one",
+    add:"Add",
+    stockVanishedTpl:"The last “{name}” just sold out. We removed it from your basket — no charge.",
+    pickupInfo:"Collect add-on items at the race office, 17–18 May 2026, with your race pack.",
+    closedHeading:"The ordering window has closed",
+    closedBody:"You can no longer order add-ons online for this race. Orders placed earlier remain valid and wait at the race office.",
+    closedWasOpen:"was open until",
+    onsiteInfo:"Some items may be available on site when you collect your pack at the race office. Availability depends on the organiser's stock.",
+    orderSum:"New order total", walletCover:"Pay from wallet",
+    walletBalTpl:"balance: {bal} · with this organiser",
+    walletAppliedTpl:"used {used}, remaining by other method: {rest}",
+    secSizeTable:"Size chart", secClear:"Clear basket", secSkip:"Skip",
+    ctaIdle:"Add something from the catalogue", ctaPay:"Buy and pay", ctaConfirm:"Confirm order",
+    processing:"Processing…", savedTpl:"Order received: {sum}",
+    backToStart:"Back to my race",
+    tempValue:"6°C, windy"
+  }
+};
+const RTL = new Set(["ar","he","fa","ur"]);
+
+/* ----- model danych (kwoty i stany przykładowe) ----- */
+const DATA = {
+  locale:"pl-PL",
+  online:true,
+  windowClose:new Date("2026-05-12T23:59:00"),
+  walletBalance:50,
+  shirtSizes:[{v:"S",avail:false},{v:"M",avail:true},{v:"L",avail:true},{v:"XL",avail:true}],
+  shirtSize:"M",
+  catalog:[
+    {id:"cap",   key:"cap",   price:39, stock:5,  qty:0, last:false},
+    {id:"medal", key:"medal", price:29, stock:20, qty:0, last:false},
+    {id:"buff",  key:"buff",  price:19, stock:1,  qty:0, last:true, suggestion:true}
+  ]
+};
+const UI = { view:"cat", wallet:false };
+
+/* ----- formatery regionalne ----- */
+const fmtMoney=(v)=>new Intl.NumberFormat(DATA.locale,{style:"currency",currency:"PLN"}).format(v);
+const fmtDate =(d)=>new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit",year:"numeric"}).format(d);
+const fmtNum  =(n)=>new Intl.NumberFormat(DATA.locale).format(n);
+function t(key){const L=I18N[DATA.locale]||{};const F=I18N["en-GB"];return (key in L)?L[key]:(F[key]??key);}
+function tpl(key,map){let s=t(key);for(const k in map)s=s.replace("{"+k+"}",map[k]);return s;}
+
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* ----- render ----- */
+function applyStaticI18n(){ $$("[data-i18n]").forEach(el=>el.textContent=t(el.getAttribute("data-i18n"))); }
+
+function renderSys(){
+  $("#winDate").textContent=fmtDate(DATA.windowClose);
+  $("#closedDate").textContent=fmtDate(DATA.windowClose);
+  const dot=$("#netDot");dot.classList.toggle("off",!DATA.online);
+  dot.querySelector("span").textContent=DATA.online?t("online"):t("offline");
+}
+
+function renderShirt(){
+  const sel=$("#sizeSel");sel.innerHTML="";
+  DATA.shirtSizes.forEach(s=>{
+    const o=document.createElement("option");o.value=s.v;
+    o.textContent=s.avail?s.v:`${s.v} — ${t("sizeUnavailableTpl").replace("{size}","").trim().replace(/[.:]$/,"")}`;
+    o.textContent=s.avail?s.v:`${s.v} ✕`;
+    sel.appendChild(o);
+  });
+  sel.value=DATA.shirtSize;
+}
+
+function nearestAvailable(size){
+  const order=DATA.shirtSizes.map(s=>s.v);
+  const i=order.indexOf(size);
+  for(let d=1;d<order.length;d++){
+    for(const j of [i+d,i-d]){ if(j>=0&&j<order.length&&DATA.shirtSizes[j].avail) return order[j]; }
+  }
+  return "M";
+}
+
+function renderCatalog(){
+  const list=$("#catalogList");list.innerHTML="";
+  DATA.catalog.forEach(it=>{
+    const card=document.createElement("div");
+    card.className="card"+(it.suggestion?" suggest":"");
+    const stockTxt = it.last ? `<span class="stock-low">${t("stockLastOne")}</span>`
+      : (it.stock<=5 ? `<span class="stock-low">${tpl("stockLeftTpl",{n:fmtNum(it.stock)})}</span>`
+                     : `<span class="stock-ok">${tpl("stockLeftTpl",{n:fmtNum(it.stock)})}</span>`);
+    const ctrl = it.qty>0 ? `
+        <div class="stepper" aria-label="${t(it.key+'Name')}">
+          <button class="dec" data-id="${it.id}" aria-label="−">−</button>
+          <span class="q" id="q-${it.id}">${it.qty}</span>
+          <button class="inc" data-id="${it.id}" aria-label="+" ${it.qty>=it.stock?'disabled':''}>+</button>
+        </div>`
+      : `<button class="add-btn inc" data-id="${it.id}">${t("add")}</button>`;
+    card.innerHTML=`
+      <div class="thumb" aria-hidden="true">${it.suggestion?"🧣":(it.id==="medal"?"🏅":"🧢")}</div>
+      <div class="pc-body">
+        ${it.suggestion?`<span class="sug-badge">${t("suggestBadge")}</span>`:""}
+        <div class="pc-name">${t(it.key+"Name")}</div>
+        <div class="pc-meta">${t(it.key+"Desc")} · ${stockTxt}</div>
+        ${it.suggestion?`<div class="sug-note">${tpl("suggestReasonTpl",{temp:t("tempValue")})}</div>`:""}
+      </div>
+      <div class="pc-price">${fmtMoney(it.price)}</div>
+      ${ctrl}
+    `;
+    list.appendChild(card);
+  });
+  bindStepperEvents();
+}
+
+function bindStepperEvents(){
+  $$("#catalogList .inc").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.id,+1)));
+  $$("#catalogList .dec").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.id,-1)));
+}
+
+function changeQty(id,delta){
+  const it=DATA.catalog.find(c=>c.id===id);if(!it)return;
+  const next=Math.max(0,Math.min(it.stock,it.qty+delta));
+  it.qty=next;
+  hideStatus();$("#stockVal").classList.remove("show");
+  renderCatalog();renderSummary();
+  // przypadek brzegowy: dodanie ostatniej sztuki -> magazyn live ją zabiera (bez obciążenia)
+  if(it.last && it.qty===1){
+    setTimeout(()=>{
+      if(it.qty>0){
+        it.qty=0;it.stock=0;
+        renderCatalog();renderSummary();
+        $("#stockValText").textContent=tpl("stockVanishedTpl",{name:t(it.key+"Name")});
+        $("#stockVal").classList.add("show");
+      }
+    },1600);
+  }
+}
+
+function cartTotal(){return DATA.catalog.reduce((s,c)=>s+c.price*c.qty,0);}
+
+function renderSummary(){
+  const total=cartTotal();
+  $("#sumVal").textContent=fmtMoney(total);
+  // portfel
+  const used=UI.wallet?Math.min(DATA.walletBalance,total):0;
+  const rest=total-used;
+  $("#walletSwitch").setAttribute("aria-checked",UI.wallet?"true":"false");
+  $("#walletInfo").textContent = UI.wallet && total>0
+    ? tpl("walletAppliedTpl",{used:fmtMoney(used),rest:fmtMoney(rest)})
+    : tpl("walletBalTpl",{bal:fmtMoney(DATA.walletBalance)});
+  // CTA
+  const cta=$("#mainCta"),label=$("#ctaLabel"),amt=$("#ctaAmt");
+  cta.classList.remove("processing");$(".spinner").style.display="";
+  if(total===0){cta.disabled=true;label.textContent=t("ctaIdle");amt.textContent="";return;}
+  cta.disabled=false;
+  if(rest===0){label.textContent=t("ctaConfirm");amt.textContent="";}
+  else{label.textContent=t("ctaPay");amt.textContent=" · "+fmtMoney(rest);}
+}
+
+/* ----- status / przetwarzanie ----- */
+let statusTimer=null;
+function showStatus(text,err){$("#statusText").textContent=text;const l=$("#statusLine");l.classList.add("show");l.classList.toggle("err",!!err);}
+function hideStatus(){$("#statusLine").classList.remove("show");}
+function runProcessing(onDone){
+  const cta=$("#mainCta"),label=$("#ctaLabel"),amt=$("#ctaAmt");
+  cta.disabled=true;cta.classList.add("processing");amt.textContent="";label.textContent=t("processing");
+  $(".spinner").style.display="inline-block";
+  clearTimeout(statusTimer);statusTimer=setTimeout(()=>{cta.classList.remove("processing");onDone();},1100);
+}
+
+/* ----- widok ----- */
+function setView(v){
+  UI.view=v;
+  $("#segCat").setAttribute("aria-pressed",v==="cat");
+  $("#segClosed").setAttribute("aria-pressed",v==="closed");
+  $("#viewCat").classList.toggle("hidden",v!=="cat");
+  $("#viewClosed").classList.toggle("hidden",v!=="closed");
+  $("#actionInner").classList.toggle("hidden",v==="closed");
+  $("#closedBar").classList.toggle("hidden",v!=="closed");
+  hideStatus();
+}
+
+/* ----- język ----- */
+function setLocale(loc){
+  DATA.locale=loc;
+  document.documentElement.lang=loc;
+  document.documentElement.dir=RTL.has(loc.split("-")[0])?"rtl":"ltr";
+  applyStaticI18n();renderSys();renderShirt();renderCatalog();renderSummary();
+}
+
+/* =========================================================================
+   INICJALIZACJA
+   ========================================================================= */
+document.addEventListener("DOMContentLoaded",()=>{
+  setLocale("pl-PL");
+  $("#langSel").value="pl-PL";
+  $("#langSel").addEventListener("change",e=>setLocale(e.target.value));
+
+  $("#segCat").addEventListener("click",()=>setView("cat"));
+  $("#segClosed").addEventListener("click",()=>setView("closed"));
+
+  // wymiana rozmiaru -> walidacja na niedostępny wariant
+  $("#sizeSel").addEventListener("change",e=>{
+    const v=e.target.value;
+    const s=DATA.shirtSizes.find(x=>x.v===v);
+    const valBox=$("#sizeVal"),btn=$("#pickNearest");
+    if(s && !s.avail){
+      const near=nearestAvailable(v);
+      $("#sizeValText").textContent=tpl("sizeUnavailableTpl",{size:v});
+      btn.textContent=tpl("pickNearestTpl",{size:near});
+      btn.onclick=()=>{DATA.shirtSize=near;$("#sizeSel").value=near;valBox.classList.remove("show");showStatus(t("savedTpl").replace("{sum}",t("shirtName")+" · "+near));};
+      valBox.classList.add("show");
+    }else{
+      DATA.shirtSize=v;valBox.classList.remove("show");
+      showStatus(t("savedTpl").replace("{sum}",t("shirtName")+" · "+v));
+    }
+  });
+
+  // portfel
+  $("#walletSwitch").addEventListener("click",()=>{UI.wallet=!UI.wallet;renderSummary();});
+
+  // akcje drugorzędne
+  $("#secClear").addEventListener("click",()=>{DATA.catalog.forEach(c=>c.qty=0);hideStatus();$("#stockVal").classList.remove("show");renderCatalog();renderSummary();});
+  $("#secSkip").addEventListener("click",()=>setView("closed"));
+  $("#secTable").addEventListener("click",()=>showStatus(t("secSizeTable")+" — S 92–96 · M 96–100 · L 100–104 · XL 104–110 cm"));
+
+  // główna akcja
+  $("#mainCta").addEventListener("click",()=>{
+    const total=cartTotal();if(total===0)return;
+    const used=UI.wallet?Math.min(DATA.walletBalance,total):0;
+    runProcessing(()=>{
+      showStatus(t("savedTpl").replace("{sum}",fmtMoney(total)) + (used>0?` · −${fmtMoney(used)}`:""));
+      DATA.catalog.forEach(c=>c.qty=0);renderCatalog();renderSummary();
+    });
+  });
+
+  $("#backCta").addEventListener("click",()=>setView("cat"));
+});
+</script>
+</body>
+</html>

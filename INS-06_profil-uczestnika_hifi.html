@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INS-06 · Profil uczestnika</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#0d1a1e; --accent:#21d8c4;
+  --color-success:#4ade80; --color-warning:#f6b73c; --color-error:#ff6b5e; --color-info:#5aa8ff;
+  --surface-1:#13242a; --surface-2:#1a313a; --surface-3:#234049; --hairline:#2c4b55;
+  --text-strong:#f0f6f5; --text:#c7d6d8; --text-muted:#83a0a5; --on-accent:#062420; --paper:#eef4f1;
+  --font-display:"Bricolage Grotesque", system-ui; --font-body:"IBM Plex Sans", system-ui;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:16px; --shadow:0 12px 32px -14px rgba(0,0,0,.7); --tap:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06100f;color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%}
+.num{font-variant-numeric:tabular-nums}
+.shell{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--brand-ink)}
+header.app{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border-bottom:1px solid var(--hairline)}
+.bar{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);min-height:var(--tap)}
+.back{display:flex;align-items:center;gap:6px;height:40px;padding:0 12px 0 8px;border-radius:11px;border:1px solid var(--hairline);background:var(--surface-3);color:var(--text);font:600 13px/1 var(--font-body);cursor:pointer;flex:none}
+.back:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.nm{flex:1;min-width:0;font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lang{display:flex;align-items:center;gap:var(--s1);background:var(--surface-3);border:1px solid var(--hairline);color:var(--text-strong);border-radius:999px;padding:0 var(--s3);height:40px;font:600 14px/1 var(--font-body);cursor:pointer;flex:none}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);font-size:12.5px;color:var(--text-muted);border-top:1px solid var(--hairline);background:var(--surface-1)}
+.grp{font-family:var(--font-display);font-weight:700;color:var(--text-strong)}
+.spacer{flex:1}.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.on{background:var(--color-success);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-success) 25%,transparent)}
+body.is-offline .dot.on{background:var(--color-warning);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-warning) 25%,transparent)}
+.netnote .off{display:none;color:var(--color-warning);font-weight:600}body.is-offline .netnote .on{display:none}body.is-offline .netnote .off{display:inline}
+.offline-banner{display:none;align-items:flex-start;gap:var(--s3);margin:var(--s4) var(--s4) 0;padding:var(--s3) var(--s4);border:1px solid color-mix(in srgb,var(--color-warning) 50%,var(--hairline));border-left:4px solid var(--color-warning);border-radius:var(--radius);background:color-mix(in srgb,var(--color-warning) 12%,var(--surface-1));color:var(--text-strong);font-size:13.5px;line-height:1.4}
+body.is-offline .offline-banner{display:flex}.offline-banner b{font-weight:600}
+.seg{display:flex;gap:var(--s1);margin:var(--s4) var(--s4) 0;padding:var(--s1);background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px}
+.seg button{flex:1;border:0;background:transparent;color:var(--text-muted);font:600 13px/1 var(--font-body);height:40px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected=true]{background:var(--surface-3);color:var(--text-strong)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{flex:1;padding:var(--s4) var(--s4) calc(var(--s10)*2)}
+.safety{display:flex;gap:var(--s3);padding:var(--s4);border-radius:var(--radius);margin-bottom:var(--s4);animation:rise .45s both;
+  background:color-mix(in srgb,var(--color-info) 15%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-info) 50%,transparent);border-left:5px solid var(--color-info)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.safety .ic{width:38px;height:38px;border-radius:11px;background:color-mix(in srgb,var(--color-info) 30%,transparent);color:#fff;display:grid;place-items:center;font-size:20px;flex:none}
+.safety .h{font:700 11.5px/1 var(--font-display);letter-spacing:1.4px;text-transform:uppercase;color:var(--color-info)}
+.safety .c{color:var(--text-strong);font-size:15px;font-weight:500;margin-top:5px}
+.safety.neutral{background:var(--surface-1);border-color:var(--hairline);border-left-color:var(--text-muted)}
+.safety.neutral .ic{background:var(--surface-3);color:var(--text-muted)} .safety.neutral .h{color:var(--text-muted)} .safety.neutral .c{color:var(--text-muted);font-weight:400}
+.safety.locked{background:var(--surface-1);border-color:var(--hairline);border-left-color:var(--color-warning)}
+.safety.locked .ic{background:color-mix(in srgb,var(--color-warning) 22%,transparent);color:var(--color-warning)} .safety.locked .h{color:var(--color-warning)}
+.stat{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:var(--tap);padding:var(--s3) var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);margin-bottom:var(--s2);cursor:pointer;color:inherit;text-align:left}
+.stat:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stat .lbl{flex:1;color:var(--text);font-size:14.5px}
+.stat .val{font-family:var(--font-display);font-weight:800;color:var(--text-strong);font-size:20px}
+.stat .val small{font-size:13px;color:var(--text-muted);font-weight:600}
+.stat .ch{color:var(--text-muted);flex:none}
+body.is-restricted .stat{opacity:.55;pointer-events:none}
+.kv{display:flex;align-items:center;gap:var(--s3);padding:var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);margin-top:var(--s2)}
+.kv .k{color:var(--text-muted);font-size:13px}.kv .v{margin-left:auto;color:var(--text-strong);font-weight:600;font-size:14px}
+.note{display:flex;gap:var(--s3);margin-top:var(--s4);padding:var(--s3) var(--s4);border-radius:12px;font-size:13px;line-height:1.4;background:var(--surface-1);border:1px solid var(--hairline);color:var(--text-muted)}
+.restricted-note{display:none}body.is-restricted .restricted-note{display:flex}
+.hide{display:none!important}
+footer.app{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:20;background:linear-gradient(0deg,var(--surface-2),var(--surface-1));border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom))}
+.saveline{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s3)}
+.cta{width:100%;min-height:var(--tap);border:0;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
+.cta:focus-visible{outline:3px solid var(--text-strong);outline-offset:3px}
+.links{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);justify-content:center;margin-top:var(--s4)}
+.links a{color:var(--text-muted);font-size:14px;text-decoration:none;min-height:40px;display:inline-flex;align-items:center;gap:6px}
+.links a .ic{color:var(--accent)}
+.links a:hover{color:var(--text-strong)}.links a:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+@media(prefers-reduced-motion:reduce){.safety{animation:none}}
+</style>
+</head>
+<body class="pl-PL">
+<div class="shell">
+  <header class="app">
+    <div class="bar">
+      <button class="back"><span aria-hidden="true">←</span> <span data-i="bGroup">Grupa</span></button>
+      <span class="nm">Kowalska, Zofia</span>
+      <button class="lang" id="langBtn" aria-label="Zmień język"><span id="langLabel">PL</span> ▾</button>
+    </div>
+    <div class="sys">
+      <span class="grp" data-i="grpLvl">Delfinki · poziom 3</span>
+      <span class="spacer"></span>
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="netnote"><span class="on" data-i="fresh">Dane świeże</span><span class="off" data-i="offShort">Offline · dane z ostatniego pobrania</span></span>
+    </div>
+  </header>
+
+  <div class="offline-banner" role="status">
+    <span aria-hidden="true">⚠</span>
+    <span><b data-i="offTitle">Tryb offline.</b> <span data-i="offBody">Pokazujemy ostatnio pobrane dane profilu.</span></span>
+  </div>
+
+  <div class="seg" role="tablist" aria-label="Podgląd stanu ekranu">
+    <button role="tab" aria-selected="true" data-state="full" data-i="stFull">Pełny wgląd</button>
+    <button role="tab" aria-selected="false" data-state="restricted" data-i="stRestricted">Ograniczony wgląd</button>
+  </div>
+
+  <main>
+    <!-- safety: full -->
+    <div class="safety full-only" role="note">
+      <span class="ic" aria-hidden="true">＋</span>
+      <div><div class="h" data-i="safetyH">Uwagi bezpieczeństwa</div><div class="c" data-i="safetyC">Astma wysiłkowa - inhalator w torbie dziecka. Przy dużym wysiłku obserwować oddech.</div></div>
+    </div>
+    <!-- safety: restricted/locked -->
+    <div class="safety locked restricted-only hide" role="note">
+      <span class="ic" aria-hidden="true">🔒</span>
+      <div><div class="h" data-i="lockH">Uwagi poufne</div><div class="c" data-i="lockC">Organizator nie udostępnił uwag zdrowotnych do Twojego wglądu. W nagłej sytuacji skorzystaj z kontaktu do opiekuna poniżej.</div></div>
+    </div>
+
+    <button class="stat">
+      <span class="lbl" data-i="progLbl">Postęp na drzewie umiejętności</span>
+      <span class="val num">5<small>/12</small></span>
+      <span class="ch" aria-hidden="true">›</span>
+    </button>
+    <button class="stat">
+      <span class="lbl" data-i="attLbl">Frekwencja (30 dni)</span>
+      <span class="val num">92<small>%</small></span>
+      <span class="ch" aria-hidden="true">›</span>
+    </button>
+
+    <div class="kv">
+      <span class="k" data-i="contactK">Kontakt na czas zajęć</span>
+      <span class="v" id="contactV">opiekun · +48 600 123 456</span>
+    </div>
+
+    <div class="note restricted-note" role="note">
+      <span aria-hidden="true">ⓘ</span>
+      <span data-i="restNote">Część sekcji jest poza zakresem instruktora. Pełna karta dziecka jest po stronie organizatora.</span>
+    </div>
+    <div class="note full-only" role="note">
+      <span aria-hidden="true">ⓘ</span>
+      <span data-i="fullNote">Widzisz tylko to, co potrzebne do prowadzenia zajęć. Pełna karta dziecka jest u organizatora.</span>
+    </div>
+  </main>
+
+  <footer class="app">
+    <div class="saveline"><span class="dot on" aria-hidden="true"></span><span data-i="readonly">Profil tylko do odczytu</span></div>
+    <button class="cta" data-i="ctaUpdate">Aktualizuj umiejętności</button>
+    <div class="links">
+      <a href="tel:+48600123456"><span class="ic" aria-hidden="true">☎</span><span data-i="aCall">Zadzwoń do opiekuna</span></a>
+      <a href="#"><span class="ic" aria-hidden="true">📊</span><span data-i="aAtt">Otwórz frekwencję</span></a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL", guardianPhone:"+48600123456"};
+const I18N={
+ "pl-PL":{bGroup:"Grupa", grpLvl:"Delfinki · poziom 3", fresh:"Dane świeże", offShort:"Offline · dane z ostatniego pobrania",
+  offTitle:"Tryb offline.", offBody:"Pokazujemy ostatnio pobrane dane profilu.",
+  stFull:"Pełny wgląd", stRestricted:"Ograniczony wgląd",
+  safetyH:"Uwagi bezpieczeństwa", safetyC:"Astma wysiłkowa - inhalator w torbie dziecka. Przy dużym wysiłku obserwować oddech.",
+  lockH:"Uwagi poufne", lockC:"Organizator nie udostępnił uwag zdrowotnych do Twojego wglądu. W nagłej sytuacji skorzystaj z kontaktu do opiekuna poniżej.",
+  progLbl:"Postęp na drzewie umiejętności", attLbl:"Frekwencja (30 dni)",
+  contactK:"Kontakt na czas zajęć", guardian:"opiekun",
+  restNote:"Część sekcji jest poza zakresem instruktora. Pełna karta dziecka jest po stronie organizatora.",
+  fullNote:"Widzisz tylko to, co potrzebne do prowadzenia zajęć. Pełna karta dziecka jest u organizatora.",
+  readonly:"Profil tylko do odczytu", ctaUpdate:"Aktualizuj umiejętności", aCall:"Zadzwoń do opiekuna", aAtt:"Otwórz frekwencję"
+ },
+ "en-GB":{bGroup:"Group", grpLvl:"Dolphins · level 3", fresh:"Data fresh", offShort:"Offline · last fetched data",
+  offTitle:"Offline mode.", offBody:"Showing the last fetched profile data.",
+  stFull:"Full view", stRestricted:"Restricted view",
+  safetyH:"Safety notes", safetyC:"Exercise-induced asthma - inhaler in the child's bag. Watch breathing under heavy effort.",
+  lockH:"Confidential notes", lockC:"The organiser hasn't released health notes for your view. In an emergency, use the guardian contact below.",
+  progLbl:"Progress on the skill tree", attLbl:"Attendance (30 days)",
+  contactK:"Contact during class", guardian:"guardian",
+  restNote:"Some sections are outside the instructor's scope. The full child record sits with the organiser.",
+  fullNote:"You see only what's needed to run the class. The full child record sits with the organiser.",
+  readonly:"Profile is read-only", ctaUpdate:"Update skills", aCall:"Call guardian", aAtt:"Open attendance"
+ }
+};
+const FALLBACK="en-GB";
+function t(k){const l=I18N[DATA.locale]||{};return (k in l)?l[k]:(I18N[FALLBACK][k]??k);}
+function fmtPhone(p){const d=p.replace(/[^\d+]/g,"");if(d.startsWith("+48")&&d.length===12)return "+48 "+d.slice(3,6)+" "+d.slice(6,9)+" "+d.slice(9);return p;}
+function applyLang(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i);});
+  document.getElementById("contactV").textContent=t("guardian")+" · "+fmtPhone(DATA.guardianPhone);
+  document.getElementById("langLabel").textContent=DATA.locale.split("-")[0].toUpperCase();
+  document.documentElement.lang=DATA.locale;document.documentElement.dir=RTL.has(DATA.locale.split("-")[0])?"rtl":"ltr";
+}
+document.getElementById("langBtn").addEventListener("click",()=>{DATA.locale=DATA.locale==="pl-PL"?"en-GB":"pl-PL";applyLang();});
+
+const tabs=document.querySelectorAll('[role=tab]');
+tabs.forEach(tb=>tb.addEventListener("click",()=>{
+  tabs.forEach(x=>x.setAttribute("aria-selected",x===tb));
+  const r=tb.dataset.state==="restricted";
+  document.body.classList.toggle("is-restricted",r);
+  document.querySelectorAll(".full-only").forEach(e=>e.classList.toggle("hide",r));
+  document.querySelectorAll(".restricted-only").forEach(e=>e.classList.toggle("hide",!r));
+}));
+
+applyLang();
+</script>
+</body>
+</html>

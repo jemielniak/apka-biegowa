@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OCL-10 · Drzewo umiejętności</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500..700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#1a1f2e;
+  --accent:#4f46e5;
+
+  --color-success:#15803d;
+  --color-warning:#b45309;
+  --color-error:#dc2626;
+  --color-info:#2563eb;
+
+  --paper:#f6f8fc;
+  --surface-1:#ffffff;
+  --surface-2:#eef1f8;
+  --surface-3:#e3e7f1;
+  --hairline:#d5dae6;
+  --text-strong:#1a1f2e;
+  --text:#3b4252;
+  --text-muted:#6b7385;
+  --on-accent:#ffffff;
+
+  --font-display:"Space Grotesk", system-ui, sans-serif;
+  --font-body:"Source Sans 3", system-ui;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:12px;
+  --shadow:0 8px 24px -16px rgba(26,31,46,.30);
+  --tap:44px;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  background:var(--paper);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.kpi-num,.nav-label,th{font-family:var(--font-display)}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- top bar (canonical OCL-01) ---------- */
+.topbar{position:sticky;top:0;z-index:40;background:var(--surface-1);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--s4);padding:var(--s3) var(--s5);min-height:60px;}
+.logo{display:flex;align-items:center;gap:var(--s3);font-family:var(--font-display);font-weight:700;color:var(--text-strong);white-space:nowrap;}
+.logo .mark{width:30px;height:30px;border-radius:8px;flex:0 0 auto;background:linear-gradient(150deg,var(--accent),#3730a3);display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;}
+.logo small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--text-muted);letter-spacing:.02em;}
+.topbar .spacer{flex:1;}
+.ctx{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;}
+.ctxfield{display:flex;flex-direction:column;gap:2px;}
+.ctxfield label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600;}
+.ctxfield select{font-family:var(--font-body);font-size:14px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:7px 28px 7px 10px;min-height:36px;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7385' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 9px center;}
+.ctxfield select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.acct{width:36px;height:36px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface-3);display:grid;place-items:center;font-weight:600;color:var(--text-strong);font-size:13px;}
+
+/* ---------- shell (canonical OCL-01) ---------- */
+.shell{display:flex;min-height:calc(100vh - 60px);}
+.rail{width:228px;flex:0 0 228px;background:var(--surface-1);border-right:1px solid var(--hairline);padding:var(--s4) var(--s3);position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;}
+.rail .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700;padding:var(--s3) var(--s3) var(--s2);}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:9px;color:var(--text);text-decoration:none;font-weight:500;font-size:14.5px;margin-bottom:2px;min-height:40px;}
+.nav-item svg{flex:0 0 auto;}
+.nav-item:hover{background:var(--surface-2);}
+.nav-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600;}
+.nav-item .badge{margin-left:auto;background:var(--color-error);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center;}
+.main{flex:1;min-width:0;}
+.wrap{max-width:1280px;margin:0 auto;padding:var(--s6) var(--s6) var(--s10);display:flex;flex-direction:column;gap:var(--s4);}
+
+/* ---------- demo state toggle (canonical OCL-01) ---------- */
+.demobar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--hairline);border-radius:10px;padding:var(--s2) var(--s3);margin-bottom:var(--s5);}
+.demobar .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:700;}
+.seg-toggle{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:8px;padding:2px;}
+.seg-toggle button{border:0;background:transparent;color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;min-height:32px;cursor:pointer;font-family:inherit;}
+.seg-toggle button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);}
+
+/* empty state */
+.empty{text-align:center;padding:var(--s10) var(--s5);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);}
+.empty .ill{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);display:grid;place-items:center;margin:0 auto var(--s4);}
+.empty h2{font-size:20px;margin-bottom:var(--s2);}
+.empty p{color:var(--text-muted);max-width:520px;margin:0 auto var(--s4);}
+
+/* ---------- page head ---------- */
+.pagehead{display:flex;align-items:flex-end;gap:var(--s4);flex-wrap:wrap}
+.pagehead h1{font-size:23px;margin:0;color:var(--text-strong);font-weight:600}
+.crumb{font-size:12.5px;color:var(--text-muted);margin-bottom:2px}
+.pagehead .right{margin-left:auto;display:flex;gap:var(--s2);align-items:center}
+.sysclock{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--color-success);display:inline-block}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);
+  height:40px;padding:0 var(--s4);border-radius:10px;
+  border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);
+  font:inherit;font-weight:600;font-size:14px;cursor:pointer;
+}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);box-shadow:var(--shadow)}
+.btn-primary:hover{background:#4338ca}
+.btn-danger{color:var(--color-error);border-color:#f0c9c9}
+.btn-danger:hover{background:#fdf0f0}
+.btn-sm{height:34px;padding:0 var(--s3);font-size:13px}
+.btn:focus-visible,.ctrl:focus-visible,.acct:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--accent) 55%,white);outline-offset:2px;
+}
+
+/* ---------- cards ---------- */
+.card{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;gap:var(--s3);padding:var(--s4) var(--s4);border-bottom:1px solid var(--hairline)}
+.card-h h2{font-size:15px;margin:0;color:var(--text-strong);font-weight:600}
+.card-h .sub{font-size:12.5px;color:var(--text-muted)}
+.card-b{padding:var(--s4)}
+
+.editor{display:grid;grid-template-columns:1fr 360px;gap:var(--s4);align-items:start}
+
+/* tree */
+.tree{font-size:14px}
+.tree .branch{margin-bottom:var(--s3)}
+.tree .b-head{display:flex;align-items:center;gap:var(--s2);font-weight:600;color:var(--text-strong);padding:var(--s2);border-radius:8px;cursor:pointer}
+.tree .b-head:hover{background:var(--surface-2)}
+.tree .caret{transition:transform .15s}
+.tree .leaf{
+  display:flex;align-items:center;gap:var(--s2);
+  padding:var(--s2) var(--s3);margin-left:var(--s5);border-radius:8px;
+  border-left:2px solid var(--surface-3);cursor:pointer;
+}
+.tree .leaf:hover{background:var(--surface-2)}
+.tree .leaf.sel{background:color-mix(in srgb,var(--accent) 9%,white);border-left-color:var(--accent);font-weight:600;color:var(--text-strong)}
+.tree .leaf .crit{margin-left:auto;font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.editflag{font-size:11px;color:var(--accent);font-weight:600}
+.versionline{margin-top:var(--s4);padding-top:var(--s3);border-top:1px dashed var(--hairline);font-size:12.5px;color:var(--text-muted);display:flex;gap:var(--s3);align-items:center}
+
+/* form */
+.field{margin-bottom:var(--s3)}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:4px}
+.input,textarea,select{
+  width:100%;height:40px;padding:0 var(--s3);
+  border:1px solid var(--hairline);border-radius:9px;background:var(--surface-1);
+  font:inherit;font-size:14px;color:var(--text-strong);
+}
+textarea{height:auto;min-height:64px;padding:var(--s2) var(--s3);resize:vertical}
+.preview-box{border:1px dashed var(--hairline);border-radius:9px;padding:var(--s3);background:var(--surface-2);margin-top:var(--s2)}
+.seg{display:inline-flex;border:1px solid var(--hairline);border-radius:9px;overflow:hidden;background:var(--surface-1)}
+.seg button{border:0;background:transparent;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:600}
+.filebtn{display:flex;align-items:center;justify-content:center;gap:8px;border:1px dashed var(--hairline);border-radius:9px;height:44px;background:var(--surface-2);cursor:pointer;color:var(--text);font-weight:600}
+
+/* import dropzone */
+.import{margin-top:var(--s4)}
+.dropzone{border:1.5px dashed var(--hairline);border-radius:var(--radius);padding:var(--s5);text-align:center;background:var(--surface-2)}
+.dropzone .ic{font-size:26px}
+.dropzone .hint{font-size:12.5px;color:var(--text-muted);margin-top:6px}
+
+/* validation note */
+.note{display:flex;gap:var(--s2);padding:var(--s3);border-radius:9px;font-size:13px;line-height:1.45;margin-top:var(--s3)}
+.note .ic{flex:none}
+.note-warn{background:#fef6ec;border:1px solid #f3dcc0;color:#7c4a08}
+.note-err{background:#fdf0f0;border:1px solid #f0c9c9;color:#8d2020}
+.note-info{background:#eef3fd;border:1px solid #cdddf6;color:#1c4a8a}
+
+/* import error table */
+.imp-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:var(--s2)}
+.imp-table th,.imp-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--hairline)}
+.imp-table th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);font-weight:600}
+.imp-table td{font-variant-numeric:tabular-nums}
+.imp-table tr.bad{background:#fdf0f0}
+.imp-table tr.bad td{color:#8d2020}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.badge.ok{background:#e6f4ea;color:var(--color-success)}
+.badge.bad{background:#fbe0e0;color:var(--color-error)}
+
+/* action bar */
+.actionbar{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap;padding-top:var(--s2)}
+.actionbar .danger-slot{margin-left:auto}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+  background:var(--brand-ink);color:#fff;padding:12px 18px;border-radius:10px;
+  font-size:14px;font-weight:600;box-shadow:0 12px 30px -10px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;transition:.25s;z-index:60;display:flex;gap:10px;align-items:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .ic{color:#86efac}
+
+/* state switch hidden - replaced by .demobar in main */
+.stateswitch{display:none;}
+
+.hidden{display:none !important}
+
+@media (max-width:1080px){
+  .editor{grid-template-columns:1fr}
+}
+@media (max-width:880px){
+  .rail{display:none}
+  .wrap{padding:var(--s4)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+}
+.reveal{animation:rise .4s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo"><span class="mark">D</span><span data-i18n="brand.name">Klub Pływacki Delfin<small data-i18n="brand.role">Panel organizatora</small></span></div>
+  <div class="spacer"></div>
+  <div class="ctx">
+    <div class="ctxfield">
+      <label for="mode" data-i18n="ctx.mode">Tryb</label>
+      <select id="mode" aria-label="Tryb">
+        <option value="zajecia" data-i18n="mode.classes">Zajęcia</option>
+        <option value="zawody" data-i18n="mode.events">Zawody</option>
+      </select>
+    </div>
+    <div class="ctxfield">
+      <label for="facility" data-i18n="ctx.facility">Placówka</label>
+      <select id="facility" aria-label="Placówka">
+        <option data-i18n="facility.all">Wszystkie</option>
+        <option selected>Klub Pływacki Delfin</option>
+        <option>Szkoła Pływania Nurek</option>
+      </select>
+    </div>
+    <div class="ctxfield">
+      <label for="lang" data-i18n="ctx.lang">Język</label>
+      <select id="lang" aria-label="Język / Language">
+        <option value="pl-PL">Polski</option>
+        <option value="en-GB">English</option>
+      </select>
+    </div>
+    <div class="acct" title="Konto" aria-label="Konto">JN</div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Nawigacja panelu">
+    <div class="grp" data-i18n="navSection">Zajęcia</div>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="t" data-i18n="navDash">Pulpit</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="18" cy="9" r="2"/></svg><span class="t" data-i18n="navGroups">Grupy</span></a>
+    <a class="nav-item active" href="#" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8"/><path d="M5 14c0-3.866 3.134-7 7-7s7 3.134 7 7"/><circle cx="5" cy="14" r="2"/><circle cx="19" cy="14" r="2"/><circle cx="12" cy="4" r="2"/></svg><span class="t" data-i18n="navSkills">Drzewo umiejętności</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span class="t" data-i18n="navSchedule">Grafik</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8M5 12v7h14"/></svg><span class="t" data-i18n="navEnrol">Zapisy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="t" data-i18n="navParticipants">Uczestnicy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="14" width="3" height="3"/></svg><span class="t" data-i18n="navAttendance">Frekwencja</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4l3 3-9 9-3-3z"/><path d="M5 19l-1 3 3-1"/><circle cx="18" cy="6" r="2"/></svg><span class="t" data-i18n="navStaff">Kadra</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span class="t" data-i18n="navPayments">Płatności</span><span class="badge tnum">4</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-3"/></svg><span class="t" data-i18n="navReports">Raporty</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><span class="t" data-i18n="navSettings">Ustawienia</span></a>
+  </nav>
+
+  <main class="main">
+    <div class="wrap">
+
+    <div class="demobar" role="group" aria-label="Podgląd stanu makiety">
+      <span class="lbl" data-i18n="stateLabel">Podgląd stanu</span>
+      <div class="seg-toggle">
+        <button id="btnFilled" aria-pressed="true" data-i18n="stFilled">Wypełniony</button>
+        <button id="btnEmpty" aria-pressed="false" data-i18n="stEmpty">Pusty (nowy poziom)</button>
+        <button id="btnImport" aria-pressed="false" data-i18n="stImport">Błąd importu</button>
+      </div>
+    </div>
+
+    <div class="pagehead">
+      <div>
+        <div class="crumb"><span data-i18n="navSkills">Drzewo umiejętności</span> · <span data-i18n="levelLabel">Poziom</span> P2</div>
+        <h1 data-i18n="pageTitle">Drzewo umiejętności: P2</h1>
+      </div>
+      <div class="right">
+        <span class="sysclock"><span class="dot"></span><span data-i18n="updated">Zaktualizowano</span> <span id="updTime" class="tnum">11:42</span></span>
+      </div>
+    </div>
+
+
+    <!-- ====================== STATE: FILLED ====================== -->
+    <section id="state-filled" class="card reveal">
+      <div class="card-h">
+        <h2 data-i18n="editorTitle">Edytor drzewa</h2>
+        <span class="sub" data-i18n="editorSub">Hierarchia gałęzi i umiejętności dla poziomu P2</span>
+      </div>
+      <div class="card-b">
+        <div class="editor">
+          <!-- left: tree -->
+          <div>
+            <div class="tree" role="tree" aria-label="Struktura drzewa">
+              <div class="branch">
+                <div class="b-head" role="treeitem" aria-expanded="true"><span class="caret">▾</span><span data-i18n="br1">Pływanie - podstawy</span></div>
+                <div class="leaf" role="treeitem"><span>•</span><span data-i18n="sk1">Zanurzenie twarzy</span><span class="crit">3 s</span></div>
+                <div class="leaf" role="treeitem"><span>•</span><span data-i18n="sk2">Wydech do wody</span><span class="crit tnum">5×</span></div>
+              </div>
+              <div class="branch">
+                <div class="b-head" role="treeitem" aria-expanded="true"><span class="caret">▾</span><span data-i18n="br2">Technika kraul</span></div>
+                <div class="leaf" role="treeitem"><span>•</span><span data-i18n="sk3">Praca nóg</span><span class="crit tnum">10 m</span></div>
+                <div class="leaf sel" role="treeitem" aria-selected="true"><span>•</span><span data-i18n="sk4">Oddychanie</span><span class="editflag" data-i18n="editing">edytowane</span></div>
+              </div>
+              <div class="branch">
+                <div class="b-head" role="treeitem" aria-expanded="true"><span class="caret">▾</span><span data-i18n="br3">Nawroty</span></div>
+                <div class="leaf" role="treeitem"><span>•</span><span data-i18n="sk5">Nawrót prosty</span><span class="crit tnum">2×</span></div>
+              </div>
+            </div>
+            <div class="versionline">
+              <span data-i18n="version">Wersja</span> <b class="tnum">4</b> · <a href="#" style="color:var(--accent)" data-i18n="history">historia zmian</a> ▾
+            </div>
+
+            <div class="import">
+              <h3 style="font-size:13px;color:var(--text-strong);margin:0 0 8px"><span data-i18n="importTitle">Import z arkusza</span></h3>
+              <div class="dropzone">
+                <div class="ic">⬆</div>
+                <div style="font-weight:600;color:var(--text-strong)"><span data-i18n="dropMain">Przeciągnij plik .csv lub .xlsx</span></div>
+                <div class="hint"><span data-i18n="dropHint">Wymagane kolumny: poziom, gałąź, umiejętność, kryterium</span></div>
+                <button class="btn btn-sm" style="margin-top:12px"><span data-i18n="chooseFile">Wybierz plik</span></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- right: skill form -->
+          <div>
+            <div class="card" style="box-shadow:none;background:var(--surface-2)">
+              <div class="card-h" style="border-color:var(--hairline)"><h2 data-i18n="skillFormTitle">Umiejętność</h2></div>
+              <div class="card-b">
+                <div class="field">
+                  <label for="skName" data-i18n="fName">Nazwa</label>
+                  <input class="input" id="skName" value="Oddychanie" data-i18n-val="vName">
+                </div>
+                <div class="field">
+                  <label for="skDesc" data-i18n="fDesc">Opis</label>
+                  <textarea id="skDesc" data-i18n-val="vDesc">Rytmiczny wydech do wody i wdech z obrotem głowy w technice kraul.</textarea>
+                </div>
+                <div class="field">
+                  <label for="skCrit" data-i18n="fCrit">Kryterium zaliczenia</label>
+                  <input class="input tnum" id="skCrit" value="5 wydechów rytmicznych" data-i18n-val="vCrit">
+                </div>
+                <div class="field">
+                  <label data-i18n="fVideo">Film instruktażowy</label>
+                  <div class="filebtn">＋ <span data-i18n="attach">dołącz film</span></div>
+                </div>
+                <div class="field" style="margin-bottom:0">
+                  <label data-i18n="fPreview">Podgląd oczami</label>
+                  <div class="preview-box">
+                    <div class="seg" role="group" aria-label="Podgląd">
+                      <button data-i18n="asParent">rodzic</button>
+                      <button aria-pressed="true" data-i18n="asInstr">instruktor</button>
+                    </div>
+                    <p style="margin:10px 0 0;font-size:13px;color:var(--text-muted)" data-i18n="previewInstr">Instruktor zaznacza zaliczenie po spełnieniu kryterium. Rodzic widzi tylko status: w toku / zaliczone.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="note note-info"><span class="ic">ℹ</span><span data-i18n="reqHint">Umiejętność bez nazwy nie zostanie zapisana. Nazwy są kluczami tłumaczeń z fallbackiem na en-GB.</span></div>
+          </div>
+        </div>
+
+        <div class="actionbar">
+          <button class="btn btn-primary" id="saveBtn" data-i18n="save">Zapisz drzewo</button>
+          <button class="btn btn-sm" data-i18n="addBranch">Dodaj gałąź</button>
+          <button class="btn btn-sm" data-i18n="attachVideo">Dołącz film</button>
+          <button class="btn btn-sm" data-i18n="previewParent">Podgląd rodzica</button>
+          <button class="btn btn-sm" data-i18n="clone">Sklonuj na poziom</button>
+          <span class="danger-slot"><button class="btn btn-sm btn-danger" data-i18n="delete">Usuń umiejętność</button></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================== STATE: IMPORT ERROR ====================== -->
+    <section id="state-import" class="card reveal hidden">
+      <div class="card-h">
+        <h2 data-i18n="impResultTitle">Wynik importu z arkusza</h2>
+        <span class="sub">poziomy_p2_v4.csv · 12 <span data-i18n="rows">wierszy</span></span>
+      </div>
+      <div class="card-b">
+        <div class="note note-err">
+          <span class="ic">⚠</span>
+          <span><b data-i18n="impErrHead">Import wstrzymany - wiersz 7 jest niepoprawny.</b><br>
+          <span data-i18n="impErrBody">Brakuje wartości w kolumnie „poziom". Oczekiwany format kolumny: jedna z etykiet P1, P2, P3. Popraw wiersz i wgraj plik ponownie - pozostałe wiersze są gotowe do zapisu.</span></span>
+        </div>
+
+        <table class="imp-table">
+          <thead>
+            <tr>
+              <th data-i18n="thRow">#</th>
+              <th data-i18n="thLevel">poziom</th>
+              <th data-i18n="thBranch">gałąź</th>
+              <th data-i18n="thSkill">umiejętność</th>
+              <th data-i18n="thCrit">kryterium</th>
+              <th data-i18n="thStatus">status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>5</td><td>P2</td><td>Technika kraul</td><td>Praca nóg</td><td>10 m</td><td><span class="badge ok" data-i18n="ok">OK</span></td></tr>
+            <tr><td>6</td><td>P2</td><td>Technika kraul</td><td>Oddychanie</td><td>5×</td><td><span class="badge ok" data-i18n="ok">OK</span></td></tr>
+            <tr class="bad"><td>7</td><td>—</td><td>Nawroty</td><td>Nawrót prosty</td><td>2×</td><td><span class="badge bad" data-i18n="missing">brak poziomu</span></td></tr>
+            <tr><td>8</td><td>P2</td><td>Nawroty</td><td>Nawrót z odbiciem</td><td>3×</td><td><span class="badge ok" data-i18n="ok">OK</span></td></tr>
+          </tbody>
+        </table>
+
+        <div class="note note-warn"><span class="ic">⚠</span><span data-i18n="impMixHint">Plik zawiera nazwy polskie i angielskie w jednej kolumnie — to dozwolone, system mapuje je na klucze tłumaczeń. Walidacja dotyczy tylko brakujących pól wymaganych.</span></div>
+
+        <div class="actionbar">
+          <button class="btn btn-primary" id="retryBtn" data-i18n="fixReupload">Popraw i wgraj ponownie</button>
+          <button class="btn btn-sm" id="importValidBtn" data-i18n="importValid">Zaimportuj 11 poprawnych wierszy</button>
+          <button class="btn btn-sm" data-i18n="downloadErr">Pobierz raport błędów</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATE: EMPTY (nowy poziom bez drzewa) -->
+    <section id="state-empty" class="empty hidden reveal">
+      <div class="ill">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22V8"/><path d="M5 14c0-3.866 3.134-7 7-7s7 3.134 7 7"/><circle cx="12" cy="4" r="2"/></svg>
+      </div>
+      <h2 data-i18n="emptyTitle">Brak drzewa dla poziomu P2</h2>
+      <p data-i18n="emptyBody">Ten poziom nie ma jeszcze zdefiniowanych umiejętności. Zacznij od gotowego szablonu (zalecane) albo zaimportuj plan z arkusza. Postęp dzieci i widok rodzica zaczną działać, kiedy drzewo istnieje.</p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" id="useTemplate" data-i18n="emptyTemplate">Użyj szablonu „P2 — pływanie wspomagane"</button>
+        <button class="btn" id="emptyImport" data-i18n="emptyImport">Zaimportuj z arkusza</button>
+        <button class="btn" id="emptyScratch" data-i18n="emptyScratch">Zacznij od pustego drzewa</button>
+      </div>
+    </section>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"><span class="ic">✓</span><span id="toastMsg">Zapisano</span></div>
+
+<script>
+const I18N = {
+  "pl-PL":{
+    "brand.name":"Klub Pływacki Delfin","brand.role":"Panel organizatora",
+    "ctx.mode":"Tryb","ctx.facility":"Placówka","ctx.lang":"Język",
+    "mode.classes":"Zajęcia","mode.events":"Zawody","facility.all":"Wszystkie",
+    navSection:"Zajęcia",
+    navDash:"Pulpit", navGroups:"Grupy", navSchedule:"Grafik", navEnrol:"Zapisy", navParticipants:"Uczestnicy",
+    navSkills:"Drzewo umiejętności", navAttendance:"Frekwencja", navStaff:"Kadra",
+    navPayments:"Płatności", navReports:"Raporty", navSettings:"Ustawienia",
+    stateLabel:"Podgląd stanu", stFilled:"Wypełniony", stEmpty:"Pusty (nowy poziom)", stImport:"Błąd importu",
+    levelLabel:"Poziom", pageTitle:"Drzewo umiejętności: P2", updated:"Zaktualizowano",
+    editorTitle:"Edytor drzewa", editorSub:"Hierarchia gałęzi i umiejętności dla poziomu P2",
+    br1:"Pływanie — podstawy", br2:"Technika kraul", br3:"Nawroty",
+    sk1:"Zanurzenie twarzy", sk2:"Wydech do wody", sk3:"Praca nóg", sk4:"Oddychanie", sk5:"Nawrót prosty",
+    editing:"edytowane", version:"Wersja", history:"historia zmian",
+    importTitle:"Import z arkusza", dropMain:"Przeciągnij plik .csv lub .xlsx", dropHint:"Wymagane kolumny: poziom, gałąź, umiejętność, kryterium", chooseFile:"Wybierz plik",
+    skillFormTitle:"Umiejętność", fName:"Nazwa", fDesc:"Opis", fCrit:"Kryterium zaliczenia", fVideo:"Film instruktażowy", attach:"dołącz film",
+    fPreview:"Podgląd oczami", asParent:"rodzic", asInstr:"instruktor",
+    previewInstr:"Instruktor zaznacza zaliczenie po spełnieniu kryterium. Rodzic widzi tylko status: w toku / zaliczone.",
+    reqHint:"Umiejętność bez nazwy nie zostanie zapisana. Nazwy są kluczami tłumaczeń z fallbackiem na en-GB.",
+    save:"Zapisz drzewo", addBranch:"Dodaj gałąź", attachVideo:"Dołącz film", previewParent:"Podgląd rodzica", clone:"Sklonuj na poziom", delete:"Usuń umiejętność",
+    emptyTitle:"Brak drzewa dla poziomu P2",
+    emptyBody:"Ten poziom nie ma jeszcze zdefiniowanych umiejętności. Zacznij od gotowego szablonu (zalecane) albo zaimportuj plan z arkusza. Postęp dzieci i widok rodzica zaczną działać, kiedy drzewo istnieje.",
+    emptyTemplate:"Użyj szablonu „P2 — pływanie wspomagane”", emptyImport:"Zaimportuj z arkusza", emptyScratch:"Zacznij od pustego drzewa",
+    impResultTitle:"Wynik importu z arkusza", rows:"wierszy",
+    impErrHead:"Import wstrzymany — wiersz 7 jest niepoprawny.",
+    impErrBody:"Brakuje wartości w kolumnie „poziom”. Oczekiwany format kolumny: jedna z etykiet P1, P2, P3. Popraw wiersz i wgraj plik ponownie — pozostałych 11 wierszy jest gotowych do zapisu.",
+    thRow:"#", thLevel:"poziom", thBranch:"gałąź", thSkill:"umiejętność", thCrit:"kryterium", thStatus:"status",
+    ok:"OK", missing:"brak poziomu",
+    impMixHint:"Plik zawiera nazwy polskie i angielskie w jednej kolumnie — to dozwolone, system mapuje je na klucze tłumaczeń. Walidacja dotyczy tylko brakujących pól wymaganych.",
+    fixReupload:"Popraw i wgraj ponownie", downloadErr:"Pobierz raport błędów", importValid:"Zaimportuj 11 poprawnych wierszy",
+    toastSaved:"Zapisano drzewo — utworzono wersję 5", toastRetry:"Wgraj poprawiony plik, aby kontynuować",
+    toastTemplate:"Wstawiono szablon „P2 — pływanie wspomagane” — sprawdź i zapisz",
+    toastValid:"Zaimportowano 11 poprawnych wierszy, wiersz 7 pominięto",
+    toastScratch:"Utworzono puste drzewo — dodaj pierwszą gałąź",
+    vName:"Oddychanie", vDesc:"Rytmiczny wydech do wody i wdech z obrotem głowy w technice kraul.", vCrit:"5 wydechów rytmicznych"
+  },
+  "en-GB":{
+    "brand.name":"Delfin Swim Club","brand.role":"Organiser panel",
+    "ctx.mode":"Mode","ctx.facility":"Facility","ctx.lang":"Language",
+    "mode.classes":"Classes","mode.events":"Events","facility.all":"All",
+    navSection:"Classes",
+    navDash:"Dashboard", navGroups:"Groups", navSchedule:"Schedule", navEnrol:"Enrolment", navParticipants:"Participants",
+    navSkills:"Skill tree", navAttendance:"Attendance", navStaff:"Staff",
+    navPayments:"Payments", navReports:"Reports", navSettings:"Settings",
+    stateLabel:"State preview", stFilled:"Populated", stEmpty:"Empty (new level)", stImport:"Import error",
+    levelLabel:"Level", pageTitle:"Skill tree: P2", updated:"Updated",
+    editorTitle:"Tree editor", editorSub:"Branch and skill hierarchy for level P2",
+    br1:"Swimming — basics", br2:"Front crawl technique", br3:"Turns",
+    sk1:"Face submersion", sk2:"Exhale into water", sk3:"Leg kick", sk4:"Breathing", sk5:"Simple turn",
+    editing:"editing", version:"Version", history:"change history",
+    importTitle:"Import from sheet", dropMain:"Drop a .csv or .xlsx file", dropHint:"Required columns: level, branch, skill, criterion", chooseFile:"Choose file",
+    skillFormTitle:"Skill", fName:"Name", fDesc:"Description", fCrit:"Pass criterion", fVideo:"Tutorial video", attach:"attach video",
+    fPreview:"Preview as", asParent:"parent", asInstr:"instructor",
+    previewInstr:"The instructor marks a pass once the criterion is met. Parents only see status: in progress / passed.",
+    reqHint:"A skill without a name will not be saved. Names are translation keys with an en-GB fallback.",
+    save:"Save tree", addBranch:"Add branch", attachVideo:"Attach video", previewParent:"Parent preview", clone:"Clone to level", delete:"Delete skill",
+    emptyTitle:"No skill tree for level P2",
+    emptyBody:"This level has no skills defined yet. Start from a template (recommended) or import a plan from a sheet. Child progress and the parent view will start working once the tree exists.",
+    emptyTemplate:"Use template “P2 — assisted swimming”", emptyImport:"Import from sheet", emptyScratch:"Start from empty tree",
+    impResultTitle:"Sheet import result", rows:"rows",
+    impErrHead:"Import paused — row 7 is invalid.",
+    impErrBody:"Missing value in the “level” column. Expected format: one of P1, P2, P3. Fix the row and re-upload — the other 11 rows are ready to save.",
+    thRow:"#", thLevel:"level", thBranch:"branch", thSkill:"skill", thCrit:"criterion", thStatus:"status",
+    ok:"OK", missing:"no level",
+    impMixHint:"The file mixes Polish and English names in one column — that is allowed, the system maps them to translation keys. Validation only flags missing required fields.",
+    fixReupload:"Fix and re-upload", downloadErr:"Download error report", importValid:"Import 11 valid rows",
+    toastSaved:"Tree saved — version 5 created", toastRetry:"Upload the corrected file to continue",
+    toastTemplate:"Template “P2 — assisted swimming” inserted — review and save",
+    toastValid:"Imported 11 valid rows, row 7 skipped",
+    toastScratch:"Empty tree created — add the first branch",
+    vName:"Breathing", vDesc:"Rhythmic exhale into the water and inhale with a head turn in front crawl.", vCrit:"5 rhythmic exhales"
+  }
+};
+const FALLBACK = "en-GB";
+const FACILITY_REGION = "pl-PL";
+const RTL = new Set(["ar","he","fa","ur"]);
+let lang = "pl-PL";
+
+function t(key){
+  const d = I18N[lang] || {};
+  if (key in d) return d[key];
+  const f = I18N[FALLBACK] || {};
+  return (key in f) ? f[key] : key;
+}
+
+function applyLang(){
+  const dict = I18N[lang] || I18N[FALLBACK];
+  document.documentElement.lang = lang.split("-")[0];
+  document.documentElement.dir = RTL.has(lang.split("-")[0]) ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const k = el.getAttribute("data-i18n");
+    if (k === "brand.name"){ el.firstChild.textContent = t(k); return; }
+    if (dict[k] !== undefined) el.textContent = dict[k];
+  });
+  document.querySelectorAll("[data-i18n-val]").forEach(el=>{
+    const k = el.getAttribute("data-i18n-val");
+    if (dict[k] !== undefined) el.value = dict[k];
+  });
+}
+
+function toast(key){
+  const t = document.getElementById("toast");
+  document.getElementById("toastMsg").textContent = I18N[lang][key] || key;
+  t.classList.add("show");
+  clearTimeout(window.__tt); window.__tt = setTimeout(()=>t.classList.remove("show"),2600);
+}
+
+document.getElementById("lang").addEventListener("change", e=>{
+  lang = e.target.value; applyLang();
+});
+
+// state switch (3 states: filled / empty / import)
+const stFilled = document.getElementById("state-filled");
+const stEmpty = document.getElementById("state-empty");
+const stImport = document.getElementById("state-import");
+const bF = document.getElementById("btnFilled");
+const bE = document.getElementById("btnEmpty");
+const bI = document.getElementById("btnImport");
+function setState(s){
+  stFilled.classList.toggle("hidden", s!=="filled");
+  stEmpty.classList.toggle("hidden", s!=="empty");
+  stImport.classList.toggle("hidden", s!=="import");
+  bF.setAttribute("aria-pressed", s==="filled");
+  bE.setAttribute("aria-pressed", s==="empty");
+  bI.setAttribute("aria-pressed", s==="import");
+}
+bF.addEventListener("click",()=>setState("filled"));
+bE.addEventListener("click",()=>setState("empty"));
+bI.addEventListener("click",()=>setState("import"));
+
+document.getElementById("saveBtn").addEventListener("click",()=>toast("toastSaved"));
+document.getElementById("retryBtn").addEventListener("click",()=>toast("toastRetry"));
+document.getElementById("importValidBtn").addEventListener("click",()=>{ setState("filled"); toast("toastValid"); });
+document.getElementById("useTemplate").addEventListener("click",()=>{ setState("filled"); toast("toastTemplate"); });
+document.getElementById("emptyImport").addEventListener("click",()=>setState("import"));
+document.getElementById("emptyScratch").addEventListener("click",()=>{ setState("filled"); toast("toastScratch"); });
+
+// preview segmented toggle (inside skill form)
+document.querySelectorAll(".preview-box .seg").forEach(seg=>{
+  seg.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true");
+  }));
+});
+
+applyLang();
+</script>
+</body>
+</html>

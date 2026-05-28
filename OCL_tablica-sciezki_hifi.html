@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCL · Tablica ścieżki: zarządzanie jedną grupą</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500..700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#1a1f2e;
+  --accent:#4f46e5;
+  --accent-strong:#4338ca;
+
+  --color-success:#15803d;
+  --color-warning:#b45309;
+  --color-error:#dc2626;
+  --color-info:#2563eb;
+
+  --paper:#f6f8fc;
+  --surface-1:#ffffff;
+  --surface-2:#eef1f8;
+  --surface-3:#e3e7f1;
+  --hairline:#d5dae6;
+  --text-strong:#1a1f2e;
+  --text:#3b4252;
+  --text-muted:#6b7385;
+  --on-accent:#ffffff;
+
+  --tint-success-bg:#e6f4ea;
+  --tint-success-border:#a6d8b8;
+  --tint-success-text:#0f5d2a;
+  --tint-warning-bg:#fef6ec;
+  --tint-warning-border:#f3dcc0;
+  --tint-warning-text:#7c4a08;
+  --tint-error-bg:#fdf0f0;
+  --tint-error-border:#f0c9c9;
+  --tint-error-text:#8d2020;
+  --tint-info-bg:#eef3fd;
+  --tint-info-border:#cdddf6;
+  --tint-info-text:#1c4a8a;
+
+  --font-display:"Space Grotesk", system-ui, sans-serif;
+  --font-body:"Source Sans 3", system-ui, sans-serif;
+
+  --u:4px;
+  --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3);
+  --s4:calc(var(--u)*4); --s5:calc(var(--u)*5); --s6:calc(var(--u)*6);
+  --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+
+  --radius:12px;
+  --shadow:0 10px 26px -14px rgba(26,31,46,.30);
+  --tap:44px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;}
+body{
+  font-family:var(--font-body);color:var(--text);
+  background:
+    radial-gradient(120% 80% at 0% 0%, var(--surface-2) 0, transparent 50%),
+    radial-gradient(120% 80% at 100% 100%, var(--surface-2) 0, transparent 50%),
+    var(--paper);
+  padding:var(--s8) var(--s5) calc(var(--s10) + env(safe-area-inset-bottom));
+  -webkit-font-smoothing:antialiased;
+  line-height:1.45;
+}
+
+/* ---------- nagłówek strony ---------- */
+header.page{max-width:1140px;margin:0 auto var(--s6);display:flex;flex-direction:column;gap:var(--s3);}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+  font:600 11px/1 var(--font-display);letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-muted);
+}
+.eyebrow::before{
+  content:"";width:20px;height:20px;border-radius:5px;
+  background:linear-gradient(150deg,var(--accent),#3730a3);
+}
+h1{font:700 32px/1.05 var(--font-display);color:var(--text-strong);letter-spacing:-.01em;max-width:34ch;}
+.lede{font:400 15px/1.55 var(--font-body);color:var(--text);max-width:64ch;}
+.lede b{color:var(--text-strong);font-weight:600;}
+
+/* ---------- legenda ---------- */
+.legend{
+  max-width:1140px;margin:0 auto var(--s6);
+  background:var(--surface-1);border:1px solid var(--hairline);
+  border-radius:var(--radius);padding:var(--s4) var(--s5);
+  display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4);
+  box-shadow:var(--shadow);
+}
+.legend h2{
+  grid-column:1/-1;font:700 11px/1 var(--font-display);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--s1);
+}
+.legend-item{display:flex;align-items:center;gap:10px;font:500 13px/1.35 var(--font-body);color:var(--text);}
+.legend-item b{font-weight:600;color:var(--text-strong);}
+.legend-swatch{flex:0 0 auto;width:48px;height:24px;border-radius:6px;display:grid;place-items:center;position:relative;}
+.swatch-primary::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:2px;background:var(--accent);transform:translateY(-50%);}
+.swatch-primary::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;border-left:8px solid var(--accent);border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%);}
+.swatch-sec::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:2px;background:var(--text-muted);transform:translateY(-50%);}
+.swatch-sec::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;border-left:8px solid var(--text-muted);border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%);}
+.swatch-branch::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:0;border-top:2px dashed var(--color-warning);transform:translateY(-1px);}
+.swatch-branch::before{content:"";position:absolute;right:0;top:50%;width:0;height:0;border-left:8px solid var(--color-warning);border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%);}
+.swatch-alt{
+  background:var(--tint-warning-bg);border:1px solid var(--tint-warning-border);color:var(--tint-warning-text);
+  font:700 9px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;
+}
+
+/* ---------- plansza ---------- */
+.board-wrap{
+  max-width:1140px;margin:0 auto;overflow:auto;
+  background:var(--surface-1);border:1px solid var(--hairline);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:var(--s5);
+}
+.board{position:relative;width:1080px;height:1180px;margin:0 auto;}
+
+/* ---------- SVG strzałki ---------- */
+.arrows{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+.arrows .path-primary{fill:none;stroke:var(--accent);stroke-width:2.2;marker-end:url(#arrowhead-primary);}
+.arrows .path-sec{fill:none;stroke:var(--text-muted);stroke-width:1.8;marker-end:url(#arrowhead-sec);}
+.arrows .path-branch{fill:none;stroke:var(--color-warning);stroke-width:1.8;stroke-dasharray:6 4;marker-end:url(#arrowhead-branch);}
+
+/* ---------- etykiety przy strzałkach ---------- */
+.label{
+  position:absolute;transform:translate(-50%,-50%);
+  background:var(--surface-1);border:1px solid var(--hairline);
+  border-radius:999px;padding:4px 10px;
+  font:600 11px/1.1 var(--font-body);color:var(--text-strong);
+  white-space:nowrap;z-index:2;letter-spacing:.01em;
+  box-shadow:0 1px 0 rgba(26,31,46,.04);
+}
+.label.primary{border-color:rgba(79,70,229,.35);color:var(--accent);}
+.label.branch{border-color:var(--tint-warning-border);background:var(--tint-warning-bg);color:var(--tint-warning-text);}
+
+/* ---------- węzeł (kontener miniatury + caption) ---------- */
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;z-index:1;}
+.node .cap{margin-top:8px;text-align:center;font:600 12px/1.25 var(--font-body);color:var(--text-strong);width:130px;}
+.node .cap small{display:block;font-weight:500;color:var(--text-muted);margin-top:1px;}
+
+a.node{text-decoration:none;color:inherit;cursor:pointer;}
+a.node .phone{transition:transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .18s, border-color .18s;}
+a.node:hover{z-index:5;}
+a.node:hover .phone{
+  transform:translateY(-3px);border-color:var(--accent);
+  box-shadow:0 16px 32px -12px rgba(79,70,229,.4), 0 0 0 2px rgba(79,70,229,.18);
+}
+a.node:hover .cap{color:var(--accent);}
+a.node:focus-visible{outline:none;}
+a.node:focus-visible .phone{
+  box-shadow:0 0 0 3px rgba(79,70,229,.45), 0 14px 30px -12px rgba(26,31,46,.34);
+  border-color:var(--accent);
+}
+a.node:focus-visible .cap{color:var(--accent);}
+
+/* ---------- ramka „telefonu” ---------- */
+.phone{
+  width:120px;height:188px;background:var(--surface-1);
+  border:1px solid var(--hairline);border-radius:10px;
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;position:relative;
+}
+.phone .band{height:3px;background:linear-gradient(90deg,var(--accent),#3730a3);}
+.phone .hdr{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:5px 7px;border-bottom:1px solid var(--hairline);background:var(--surface-1);}
+.phone .id{font:700 10px/1 var(--font-display);color:var(--text-strong);letter-spacing:.04em;}
+.phone .lang{font:600 8px/1 var(--font-display);color:var(--text-muted);letter-spacing:.06em;}
+.phone .body{flex:1;padding:6px;display:flex;flex-direction:column;gap:4px;background:var(--surface-1);min-height:0;}
+.phone .foot{padding:5px 6px;border-top:1px solid var(--hairline);background:var(--surface-2);}
+.phone .cta{
+  display:block;width:100%;background:var(--accent);color:var(--on-accent);
+  text-align:center;padding:4px 0;border-radius:5px;
+  font:600 9px/1 var(--font-display);letter-spacing:.02em;
+}
+
+/* ---------- annotacja: stan alternatywny (badge na miniaturze) ---------- */
+.altbadge{
+  position:absolute;right:-6px;top:-6px;
+  background:var(--tint-warning-bg);border:1px solid var(--tint-warning-border);color:var(--tint-warning-text);
+  font:700 8px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;
+  padding:3px 6px;border-radius:999px;z-index:3;white-space:nowrap;
+  box-shadow:0 2px 6px -3px rgba(26,31,46,.4);
+}
+
+/* ============================================================ */
+/* ====== WARIANTY BODY (uproszczone miniatury 12 ekranów) ===== */
+/* ============================================================ */
+
+/* OCL-01: dashboard KPIs (2x2) */
+.o-dash{display:grid;grid-template-columns:1fr 1fr;gap:3px;flex:1;}
+.o-dash .kpi{background:var(--surface-2);border:1px solid var(--hairline);border-radius:4px;padding:4px 5px;display:flex;flex-direction:column;justify-content:center;gap:1px;}
+.o-dash .kpi .l{font:600 7px/1 var(--font-display);text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);}
+.o-dash .kpi .v{font:700 14px/1 var(--font-display);color:var(--text-strong);font-variant-numeric:tabular-nums;}
+.o-dash .kpi.alert{background:var(--tint-error-bg);border-color:var(--tint-error-border);}
+.o-dash .kpi.alert .v{color:var(--tint-error-text);}
+
+/* OCL-02: group list */
+.o-grp{display:flex;flex-direction:column;gap:3px;flex:1;}
+.o-search{display:flex;align-items:center;gap:4px;padding:3px 5px;border-radius:4px;background:var(--surface-2);border:1px solid var(--hairline);font:500 8px/1 var(--font-body);color:var(--text-muted);}
+.o-row{display:flex;align-items:center;gap:5px;padding:4px 5px;border-radius:4px;background:var(--surface-2);border:1px solid var(--hairline);}
+.o-row .rn{flex:1;font:600 9px/1 var(--font-body);color:var(--text-strong);}
+.o-row .rt{font:700 8px/1 var(--font-display);color:var(--accent);background:#fff;border:1px solid var(--hairline);border-radius:3px;padding:2px 5px;}
+.o-row.sel{background:rgba(79,70,229,.09);border-color:rgba(79,70,229,.35);}
+.o-row.sel .rn{color:var(--accent);}
+
+/* OCL-03: schedule mini calendar */
+.o-cal{display:flex;flex-direction:column;gap:2px;flex:1;}
+.o-cal .ch{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;font:700 7px/1 var(--font-display);color:var(--text-muted);text-align:center;}
+.o-cal .cg{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(4,1fr);gap:1px;flex:1;}
+.o-cal .cc{background:var(--surface-2);border-radius:2px;font-size:0;}
+.o-cal .cc.b1{background:var(--accent);}
+.o-cal .cc.b2{background:#7c75f0;}
+.o-cal .cc.b3{background:#a5b4fc;}
+.o-cal .cc.bx{background:repeating-linear-gradient(45deg,var(--tint-error-bg) 0 4px,var(--tint-error-border) 4px 5px);border:1px solid var(--color-error);}
+
+/* OCL-04: rules */
+.o-rule{background:var(--surface-2);border:1px solid var(--hairline);border-radius:5px;padding:4px 6px;display:flex;flex-direction:column;gap:2px;}
+.o-rule b{font:600 9px/1.1 var(--font-body);color:var(--text-strong);}
+.o-rule small{font:500 7.5px/1.2 var(--font-body);color:var(--text-muted);}
+
+/* OCL-05: enrolment list */
+.o-line{display:flex;align-items:center;gap:4px;padding:3px 5px;border-radius:4px;background:var(--surface-2);}
+.o-line .nm{flex:1;font:500 9px/1 var(--font-body);color:var(--text-strong);}
+.o-line .bd{font:700 7px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;padding:2px 4px;border-radius:3px;border:1px solid;}
+.o-line .bd.ok{background:var(--tint-success-bg);border-color:var(--tint-success-border);color:var(--tint-success-text);}
+.o-line .bd.wait{background:var(--tint-warning-bg);border-color:var(--tint-warning-border);color:var(--tint-warning-text);}
+.o-line .bd.no{background:var(--tint-error-bg);border-color:var(--tint-error-border);color:var(--tint-error-text);}
+
+/* OCL-06: camp */
+.o-camp{flex:1;background:linear-gradient(150deg,#fef6ec,#f3dcc0);border:1px solid var(--tint-warning-border);border-radius:5px;padding:6px;display:flex;flex-direction:column;gap:3px;color:var(--tint-warning-text);}
+.o-camp .cmp-h{font:700 10px/1 var(--font-display);}
+.o-camp .cmp-d{font:600 11px/1 var(--font-display);color:var(--brand-ink);font-variant-numeric:tabular-nums;}
+.o-camp .cmp-l{font:500 8px/1.2 var(--font-body);color:var(--text-muted);}
+.o-camp .cmp-meta{margin-top:auto;display:flex;justify-content:space-between;font:700 7px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);}
+
+/* OCL-07: pricing */
+.o-price{display:flex;align-items:center;gap:5px;padding:4px 5px;border-radius:4px;background:var(--surface-2);border:1px solid var(--hairline);}
+.o-price .pt{flex:1;font:500 8px/1 var(--font-body);color:var(--text-strong);}
+.o-price .pv{font:700 11px/1 var(--font-display);color:var(--accent);font-variant-numeric:tabular-nums;}
+
+/* OCL-08: participant list */
+.o-part{display:flex;align-items:center;gap:4px;padding:3px 5px;border-radius:4px;background:var(--surface-2);}
+.av{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font:700 7px/1 var(--font-display);flex:0 0 auto;letter-spacing:.04em;}
+.av.b{background:#7c75f0;}
+.av.c{background:#a5b4fc;color:var(--brand-ink);}
+.av.big{width:32px;height:32px;font:700 11px/1 var(--font-display);}
+.o-part .pn{flex:1;font:500 9px/1.1 var(--font-body);color:var(--text-strong);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.o-part .pg{font:700 7px/1 var(--font-display);color:var(--text-muted);letter-spacing:.04em;}
+
+/* OCL-09: profile */
+.o-prof{flex:1;display:flex;flex-direction:column;gap:4px;}
+.o-prof .ph{display:flex;align-items:center;gap:5px;padding:4px 5px;background:var(--surface-2);border-radius:4px;}
+.o-prof .ph .nm{display:flex;flex-direction:column;gap:1px;}
+.o-prof .ph .nm b{font:700 9px/1.1 var(--font-display);color:var(--text-strong);}
+.o-prof .ph .nm small{font:500 7.5px/1 var(--font-body);color:var(--text-muted);}
+.o-prof .tabs{display:flex;gap:2px;font:600 7.5px/1.2 var(--font-display);letter-spacing:.02em;color:var(--text-muted);}
+.o-prof .tabs span{padding:3px 4px;border-radius:3px 3px 0 0;border-bottom:2px solid transparent;}
+.o-prof .tabs span.on{color:var(--accent);border-bottom-color:var(--accent);}
+.o-prof .ph-meta{display:flex;flex-direction:column;gap:2px;font:500 8px/1.2 var(--font-body);color:var(--text);}
+.o-prof .ph-meta .k{color:var(--text-muted);font-weight:600;}
+
+/* OCL-10: skill tree */
+.o-tree{display:flex;flex-direction:column;gap:1px;flex:1;font-family:var(--font-body);}
+.o-tree .br{font:700 8.5px/1.3 var(--font-display);color:var(--text-strong);padding:2px 3px;}
+.o-tree .lf{font:500 8px/1.3 var(--font-body);color:var(--text);padding:1px 3px 1px 12px;border-left:2px solid var(--surface-3);margin-left:5px;}
+.o-tree .lf.sel{background:rgba(79,70,229,.08);border-left-color:var(--accent);color:var(--accent);font-weight:600;}
+
+/* OCL-11: attendance bars */
+.o-bars-wrap{flex:1;display:flex;flex-direction:column;gap:4px;}
+.o-bars{flex:1;display:flex;align-items:flex-end;gap:3px;padding-bottom:2px;border-bottom:1px solid var(--hairline);}
+.o-bars .bar{flex:1;background:linear-gradient(to top,var(--accent),#7c75f0);border-radius:2px 2px 0 0;min-height:4px;}
+.o-bars .bar.lo{background:linear-gradient(to top,var(--color-error),#f87171);}
+.o-bars-meta{display:flex;justify-content:space-between;font:600 7.5px/1 var(--font-display);color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase;}
+.o-bars-meta b{color:var(--text-strong);font-weight:700;font-variant-numeric:tabular-nums;}
+
+/* OCL-12: staff */
+.o-staff{display:flex;align-items:center;gap:5px;padding:3px 5px;border-radius:4px;background:var(--surface-2);}
+.o-staff .si{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0;}
+.o-staff .si b{font:600 9px/1.1 var(--font-body);color:var(--text-strong);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.o-staff .si small{font:500 7.5px/1 var(--font-body);color:var(--text-muted);}
+.o-staff .stat{font:700 7px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;padding:2px 4px;border-radius:3px;border:1px solid;}
+.o-staff .stat.act{background:var(--tint-success-bg);border-color:var(--tint-success-border);color:var(--tint-success-text);}
+.o-staff .stat.inv{background:var(--tint-info-bg);border-color:var(--tint-info-border);color:var(--tint-info-text);}
+
+/* ---------- nota ---------- */
+footer.page{
+  max-width:1140px;margin:var(--s6) auto 0;padding:var(--s4) var(--s5);
+  background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);
+  display:flex;gap:var(--s4);align-items:flex-start;
+}
+footer.page .pill-tag{
+  flex:0 0 auto;background:var(--brand-ink);color:#fff;
+  font:700 10px/1 var(--font-display);letter-spacing:.16em;text-transform:uppercase;
+  padding:6px 10px;border-radius:6px;
+}
+footer.page p{font:400 13.5px/1.6 var(--font-body);color:var(--text);max-width:74ch;}
+footer.page p b{color:var(--text-strong);font-weight:600;}
+
+@media (max-width:1180px){
+  .board-wrap{padding:var(--s3);}
+}
+@media (prefers-reduced-motion:reduce){
+  a.node:hover .phone{transform:none;transition:none;}
+}
+</style>
+</head>
+<body>
+
+<header class="page">
+  <span class="eyebrow">OCL · panel organizatora · moduł zajęć</span>
+  <h1>Tablica ścieżki: zarządzanie jedną grupą</h1>
+  <p class="lede">
+    Trasa organizatora dla pojedynczej grupy „Delfiny (P2)" - od pierwszego założenia
+    po prowadzenie zajęć, frekwencję i karty uczestników. Każdy kafel to jeden ekran
+    panelu organizatora; <b>kliknięcie miniatury otwiera odpowiednią makietę w nowej karcie</b>.
+    Strzałki pokazują, która akcja prowadzi do następnego ekranu. <b>Indygo</b> to akcje
+    główne, <b>szary</b> to nawigacja drugorzędna (konfiguracja, podgląd), <b>bursztynowe
+    przerywane</b> to rozgałęzienia od wyjątków (zaległość, ryzyko spadku frekwencji).
+    Stany alternatywne, które nie powodują przejścia (kolizja terminu, limit miejsc,
+    brak ważnego dokumentu), oznaczono jako badge przy miniaturze.
+  </p>
+</header>
+
+<section class="legend" aria-label="Legenda">
+  <h2>Legenda</h2>
+  <div class="legend-item"><span class="legend-swatch swatch-primary"></span><span><b>Akcja główna</b>: dominujące przejście wynikające z CTA ekranu.</span></div>
+  <div class="legend-item"><span class="legend-swatch swatch-sec"></span><span><b>Nawigacja drugorzędna</b>: konfiguracja, powiązanie, podgląd boczny.</span></div>
+  <div class="legend-item"><span class="legend-swatch swatch-branch"></span><span><b>Rozgałęzienie</b>: wyjątek prowadzący do karty uczestnika.</span></div>
+  <div class="legend-item"><span class="legend-swatch swatch-alt">× alt</span><span><b>Stan alt.</b>: pętla zwrotna na ten sam ekran.</span></div>
+</section>
+
+<div class="board-wrap">
+  <div class="board" role="img" aria-label="Tablica ścieżki przejść między ekranami OCL-01 do OCL-12 dla zarządzania jedną grupą">
+
+    <!-- ============================ SVG: STRZAŁKI ============================ -->
+    <svg class="arrows" viewBox="0 0 1080 1180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <marker id="arrowhead-primary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:#4f46e5"/>
+        </marker>
+        <marker id="arrowhead-sec" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:#6b7385"/>
+        </marker>
+        <marker id="arrowhead-branch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" style="fill:#b45309"/>
+        </marker>
+      </defs>
+
+      <!-- 1: OCL-01 → OCL-02 (otwórz grupę) -->
+      <path class="path-primary" d="M 540 204 L 540 290"/>
+      <!-- 2: OCL-02 → OCL-10 (wybierz poziom) -->
+      <path class="path-primary" d="M 480 374 L 245 374"/>
+      <!-- 3: OCL-10 → OCL-02 (wróć z poziomem) -->
+      <path class="path-primary" d="M 240 396 L 475 396"/>
+      <!-- 4: OCL-02 → OCL-12 (przypisz instruktora) -->
+      <path class="path-primary" d="M 600 384 L 835 384"/>
+      <!-- 5: OCL-02 → OCL-03 (ustaw termin) -->
+      <path class="path-primary" d="M 540 478 L 540 565"/>
+      <!-- 6: OCL-03 → OCL-05 (opublikuj zapisy) -->
+      <path class="path-primary" d="M 510 753 C 380 800, 220 810, 145 840"/>
+      <!-- 7: OCL-05 → OCL-08 (przyjęci) -->
+      <path class="path-primary" d="M 200 934 L 320 934"/>
+      <!-- 8: OCL-08 → OCL-09 (otwórz kartę) -->
+      <path class="path-primary" d="M 445 934 L 565 934"/>
+      <!-- 9: OCL-08 → OCL-11 (frekwencja grupy, arc nad OCL-09) -->
+      <path class="path-primary" d="M 415 870 C 500 800, 760 800, 845 870"/>
+
+      <!-- 10: OCL-02 → OCL-07 (konfiguruj cennik) -->
+      <path class="path-sec" d="M 480 460 C 360 510, 130 540, 90 565"/>
+      <!-- 11: OCL-02 → OCL-04 (reguły odrabiania) -->
+      <path class="path-sec" d="M 500 478 C 400 510, 285 540, 285 565"/>
+      <!-- 12: OCL-02 → OCL-06 (powiąż obóz) -->
+      <path class="path-sec" d="M 600 460 C 720 510, 880 540, 900 565"/>
+      <!-- 13: OCL-12 → OCL-03 (dostępność → grafik) -->
+      <path class="path-sec" d="M 840 444 C 720 500, 620 540, 575 565"/>
+
+      <!-- 14: OCL-11 → OCL-09 (spadek frekwencji → karta) -->
+      <path class="path-branch" d="M 815 970 L 695 970"/>
+      <!-- 15: OCL-07 → OCL-09 (zaległość → karta) -->
+      <path class="path-branch" d="M 90 753 C 90 1000, 400 1080, 600 1028"/>
+    </svg>
+
+    <!-- ============================ ETYKIETY STRZAŁEK ============================ -->
+    <div class="label primary" style="left:540px;top:247px">otwórz grupę</div>
+    <div class="label primary" style="left:362px;top:362px">wybierz poziom</div>
+    <div class="label primary" style="left:362px;top:408px">wróć z poziomem</div>
+    <div class="label primary" style="left:718px;top:372px">przypisz instruktora</div>
+    <div class="label primary" style="left:540px;top:522px">ustaw termin tygodniowy</div>
+    <div class="label primary" style="left:330px;top:800px">opublikuj zapisy</div>
+    <div class="label primary" style="left:262px;top:921px">przyjęci do grupy</div>
+    <div class="label primary" style="left:505px;top:921px">otwórz kartę</div>
+    <div class="label primary" style="left:630px;top:805px">frekwencja grupy</div>
+
+    <div class="label" style="left:260px;top:520px">konfiguruj cennik</div>
+    <div class="label" style="left:380px;top:530px">reguły odrabiania</div>
+    <div class="label" style="left:780px;top:520px">powiąż obóz lato</div>
+    <div class="label" style="left:680px;top:510px">dostępność → grafik</div>
+
+    <div class="label branch" style="left:755px;top:982px">spadek frekwencji</div>
+    <div class="label branch" style="left:300px;top:1050px">zaległość rodzica</div>
+
+    <!-- ============================ WĘZŁY ============================ -->
+
+    <!-- OCL-01 Dashboard zajęć -->
+    <a class="node" style="left:480px;top:16px" href="OCL-01_dashboard-zajec_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-01: dashboard zajęć">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-01</span><span class="lang">PL</span></div>
+        <div class="body">
+          <div class="o-dash">
+            <div class="kpi"><span class="l">aktywne</span><span class="v">12</span></div>
+            <div class="kpi"><span class="l">zapisy/tyg</span><span class="v">28</span></div>
+            <div class="kpi alert"><span class="l">zaległości</span><span class="v">4</span></div>
+            <div class="kpi"><span class="l">frekwencja</span><span class="v">82%</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Otwórz grupę</span></div>
+      </div>
+      <div class="cap">OCL-01<small>dashboard zajęć</small></div>
+    </a>
+
+    <!-- OCL-10 Drzewo umiejętności -->
+    <a class="node" style="left:120px;top:290px" href="OCL-10_drzewo-umiejetnosci_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-10: drzewo umiejętności">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-10</span><span class="lang">P2</span></div>
+        <div class="body">
+          <div class="o-tree">
+            <div class="br">▾ Kraul</div>
+            <div class="lf">• Praca nóg</div>
+            <div class="lf sel">• Oddychanie</div>
+            <div class="br">▾ Nawroty</div>
+            <div class="lf">• Nawrót prosty</div>
+            <div class="br">▾ Podstawy</div>
+            <div class="lf">• Wydech do wody</div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Zapisz drzewo</span></div>
+      </div>
+      <div class="cap">OCL-10<small>drzewo umiejętności</small></div>
+    </a>
+
+    <!-- OCL-02 Grupy z poziomami (HUB) -->
+    <a class="node" style="left:480px;top:290px" href="OCL-02_grupy-z-poziomami_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-02: grupy z poziomami">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-02</span><span class="lang">PL</span></div>
+        <div class="body">
+          <div class="o-grp">
+            <div class="o-search">⌕ szukaj grupy</div>
+            <div class="o-row sel"><span class="rn">Delfiny</span><span class="rt">P2</span></div>
+            <div class="o-row"><span class="rn">Żabki</span><span class="rt">P1</span></div>
+            <div class="o-row"><span class="rn">Rekiny</span><span class="rt">P3</span></div>
+            <div class="o-row"><span class="rn">Karpie</span><span class="rt">P2</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Zapisz zmiany</span></div>
+      </div>
+      <div class="cap">OCL-02<small>grupy z poziomami</small></div>
+    </a>
+
+    <!-- OCL-12 Instruktorzy -->
+    <a class="node" style="left:840px;top:290px" href="OCL-12_instruktorzy_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-12: instruktorzy">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-12</span><span class="lang">PL</span></div>
+        <div class="body">
+          <div class="o-staff"><span class="av">MN</span><span class="si"><b>Marek N.</b><small>P2 · P3</small></span><span class="stat act">akt</span></div>
+          <div class="o-staff"><span class="av b">KK</span><span class="si"><b>Katarzyna K.</b><small>P1</small></span><span class="stat act">akt</span></div>
+          <div class="o-staff"><span class="av c">PL</span><span class="si"><b>Paweł Lis</b><small>P3</small></span><span class="stat inv">zap</span></div>
+          <div class="o-staff"><span class="av b">AM</span><span class="si"><b>Agata M.</b><small>P2</small></span><span class="stat act">akt</span></div>
+        </div>
+        <div class="foot"><span class="cta">Zaproś instruktora</span></div>
+      </div>
+      <div class="cap">OCL-12<small>instruktorzy</small></div>
+    </a>
+
+    <!-- OCL-07 Cennik i płatności -->
+    <a class="node" style="left:30px;top:565px" href="OCL-07_cennik-platnosci_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-07: cennik i płatności">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-07</span><span class="lang">PLN</span></div>
+        <div class="body">
+          <div class="o-price"><span class="pt">Semestr</span><span class="pv">720,00 zł</span></div>
+          <div class="o-price"><span class="pt">Miesiąc</span><span class="pv">160,00 zł</span></div>
+          <div class="o-price"><span class="pt">Pojedyncze</span><span class="pv">45,00 zł</span></div>
+          <div class="o-price"><span class="pt">Rodzeństwo</span><span class="pv">−10%</span></div>
+        </div>
+        <div class="foot"><span class="cta">Zapisz cennik</span></div>
+        <div class="altbadge" title="alt: zaległość rodzica → karta uczestnika">× zaległość</div>
+      </div>
+      <div class="cap">OCL-07<small>cennik i płatności</small></div>
+    </a>
+
+    <!-- OCL-04 Reguły odrabiania -->
+    <a class="node" style="left:215px;top:565px" href="OCL-04_reguly-odrabiania_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-04: reguły odrabiania">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-04</span><span class="lang">PL</span></div>
+        <div class="body">
+          <div class="o-rule"><b>Limit miesięczny</b><small>2× odrobienia / mies.</small></div>
+          <div class="o-rule"><b>Ważność prawa</b><small>do końca semestru</small></div>
+          <div class="o-rule"><b>Wymagane usprawied.</b><small>min. 24 h przed</small></div>
+        </div>
+        <div class="foot"><span class="cta">Zapisz reguły</span></div>
+      </div>
+      <div class="cap">OCL-04<small>reguły odrabiania</small></div>
+    </a>
+
+    <!-- OCL-03 Grafik zajęć -->
+    <a class="node" style="left:480px;top:565px" href="OCL-03_grafik-zajec_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-03: grafik zajęć">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-03</span><span class="lang">tyg</span></div>
+        <div class="body">
+          <div class="o-cal">
+            <div class="ch"><span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span></div>
+            <div class="cg">
+              <div class="cc"></div><div class="cc b1"></div><div class="cc"></div><div class="cc"></div><div class="cc b3"></div>
+              <div class="cc"></div><div class="cc b1"></div><div class="cc b2"></div><div class="cc"></div><div class="cc"></div>
+              <div class="cc"></div><div class="cc"></div><div class="cc b2"></div><div class="cc"></div><div class="cc bx"></div>
+              <div class="cc b3"></div><div class="cc"></div><div class="cc"></div><div class="cc b1"></div><div class="cc"></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Opublikuj termin</span></div>
+        <div class="altbadge" title="alt: kolizja terminu - blok wraca">× kolizja</div>
+      </div>
+      <div class="cap">OCL-03<small>grafik zajęć</small></div>
+    </a>
+
+    <!-- OCL-06 Obozy i półkolonie -->
+    <a class="node" style="left:840px;top:565px" href="OCL-06_obozy-polkolonie_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-06: obozy i półkolonie">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-06</span><span class="lang">lato</span></div>
+        <div class="body">
+          <div class="o-camp">
+            <span class="cmp-h">Obóz lato I</span>
+            <span class="cmp-d">15-26.07.2026</span>
+            <span class="cmp-l">Mikołajki · ośr. Mazury</span>
+            <div class="cmp-meta"><span>24/30</span><span>P2 · P3</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Otwórz zapisy</span></div>
+      </div>
+      <div class="cap">OCL-06<small>obozy i półkolonie</small></div>
+    </a>
+
+    <!-- OCL-05 Listy rezerwowe -->
+    <a class="node" style="left:80px;top:840px" href="OCL-05_listy-rezerwowe_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-05: listy rezerwowe">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-05</span><span class="lang">8/12</span></div>
+        <div class="body">
+          <div class="o-line"><span class="nm">Piotr K.</span><span class="bd ok">przyj.</span></div>
+          <div class="o-line"><span class="nm">Anna N.</span><span class="bd ok">przyj.</span></div>
+          <div class="o-line"><span class="nm">Maja W.</span><span class="bd wait">oczek.</span></div>
+          <div class="o-line"><span class="nm">Zofia K.</span><span class="bd wait">oczek.</span></div>
+          <div class="o-line"><span class="nm">Jan B.</span><span class="bd no">odm.</span></div>
+        </div>
+        <div class="foot"><span class="cta">Przesuń z listy</span></div>
+        <div class="altbadge" title="alt: limit pełen - dopisz do oczekujących">× limit pełen</div>
+      </div>
+      <div class="cap">OCL-05<small>listy rezerwowe</small></div>
+    </a>
+
+    <!-- OCL-08 Uczestnicy i rodziny -->
+    <a class="node" style="left:325px;top:840px" href="OCL-08_uczestnicy-rodziny_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-08: uczestnicy i rodziny">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-08</span><span class="lang">PL</span></div>
+        <div class="body">
+          <div class="o-search">⌕ dziecko / rodzic</div>
+          <div class="o-part"><span class="av">PK</span><span class="pn">Piotr Kowalski</span><span class="pg">P2</span></div>
+          <div class="o-part"><span class="av b">AN</span><span class="pn">Anna Nowak</span><span class="pg">P2</span></div>
+          <div class="o-part"><span class="av c">MW</span><span class="pn">Maja Wójcik</span><span class="pg">P2</span></div>
+          <div class="o-part"><span class="av">ZK</span><span class="pn">Zofia K.</span><span class="pg">P2</span></div>
+        </div>
+        <div class="foot"><span class="cta">Otwórz kartę</span></div>
+      </div>
+      <div class="cap">OCL-08<small>uczestnicy i rodziny</small></div>
+    </a>
+
+    <!-- OCL-09 Karta uczestnika -->
+    <a class="node" style="left:570px;top:840px" href="OCL-09_karta-uczestnika_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-09: karta uczestnika">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-09</span><span class="lang">PK</span></div>
+        <div class="body">
+          <div class="o-prof">
+            <div class="ph"><span class="av big">PK</span><span class="nm"><b>Piotr Kowalski</b><small>8 lat · Delfiny</small></span></div>
+            <div class="tabs"><span class="on">Dane</span><span>Postęp</span><span>Dok.</span><span>Płatn.</span></div>
+            <div class="ph-meta"><span><span class="k">rodzic:</span> Jan Nowak</span><span><span class="k">tel:</span> 600 100 200</span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Edytuj kartę</span></div>
+        <div class="altbadge" title="alt: brak ważnego dokumentu - blokada udziału">× brak dok.</div>
+      </div>
+      <div class="cap">OCL-09<small>karta uczestnika</small></div>
+    </a>
+
+    <!-- OCL-11 Frekwencja -->
+    <a class="node" style="left:815px;top:840px" href="OCL-11_obecnosc-frekwencja_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran OCL-11: obecność i frekwencja">
+      <div class="phone">
+        <div class="band" aria-hidden="true"></div>
+        <div class="hdr"><span class="id">OCL-11</span><span class="lang">78%</span></div>
+        <div class="body">
+          <div class="o-bars-wrap">
+            <div class="o-bars">
+              <div class="bar" style="height:72%"></div>
+              <div class="bar" style="height:80%"></div>
+              <div class="bar" style="height:65%"></div>
+              <div class="bar" style="height:84%"></div>
+              <div class="bar lo" style="height:48%"></div>
+              <div class="bar" style="height:79%"></div>
+              <div class="bar lo" style="height:42%"></div>
+              <div class="bar lo" style="height:38%"></div>
+            </div>
+            <div class="o-bars-meta"><span>tyg 1-8</span><span>śr. <b>78%</b></span></div>
+          </div>
+        </div>
+        <div class="foot"><span class="cta">Otwórz przypadek</span></div>
+      </div>
+      <div class="cap">OCL-11<small>frekwencja</small></div>
+    </a>
+
+  </div>
+</div>
+
+<footer class="page">
+  <span class="pill-tag">jak czytać</span>
+  <p>
+    Trasa rozpoczyna się na <b>OCL-01</b> (pulpit organizatora) - kliknięcie kafla
+    grupy otwiera <b>OCL-02</b>, który jest centralnym węzłem tablicy. Z niego
+    rozchodzą się cztery wątki konfiguracyjne: poziom z drzewa (<b>OCL-10</b>),
+    instruktor (<b>OCL-12</b>), cennik (<b>OCL-07</b>) i reguły odrabiania
+    (<b>OCL-04</b>). Po skonfigurowaniu grupy przechodzi się na grafik (<b>OCL-03</b>),
+    który publikuje termin i otwiera zapisy. <b>OCL-05</b> to listy rezerwowe;
+    przyjęci trafiają na <b>OCL-08</b>, skąd otwiera się indywidualną kartę
+    uczestnika (<b>OCL-09</b>) albo widok frekwencji grupy (<b>OCL-11</b>).
+    <b>OCL-06</b> jest poboczny - grupa Delfiny może być powiązana z obozem letnim,
+    ale to osobny moduł zapisów.
+    <br><br>
+    Bursztynowe linie to <b>rozgałęzienia od wyjątków</b>: spadek frekwencji
+    z OCL-11 prowadzi prosto na kartę dziecka, żeby otworzyć przypadek do reakcji;
+    zaległość z OCL-07 też wpada na kartę, na zakładkę płatności. Stany alternatywne
+    oznaczone jako badge przy miniaturze (kolizja terminu, limit pełen, brak
+    dokumentu) są pętlami zwrotnymi - <b>nie są oddzielnymi ekranami</b>, tylko
+    odpowiedzią systemu na ten sam ekran.
+    <br><br>
+    <b>Klikaj miniatury</b>, żeby otworzyć właściwą makietę w nowej karcie - pliki
+    HTML leżą obok tego pliku w tej samej lokalizacji.
+  </p>
+</footer>
+
+</body>
+</html>

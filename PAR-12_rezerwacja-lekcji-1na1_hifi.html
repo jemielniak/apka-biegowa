@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR-12 · Rezerwacja lekcji 1:1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..800;1,9..144,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#241c17;--accent:#ef5a3c;
+  --color-success:#1f9d57;--color-warning:#c47d0a;--color-error:#d6402a;--color-info:#2f72d6;
+  --paper:#faf5ee;--surface-1:#ffffff;--surface-2:#fff9f2;--surface-3:#f3ebe0;--hairline:#e7ddcf;
+  --text-strong:#241c17;--text:#4a4039;--text-muted:#8a7d70;--on-accent:#fff7f3;
+  --kid-1:#ef5a3c;--kid-2:#1f9d8f;--kid-3:#7a5cd6;--kid-4:#c47d0a;
+  --font-display:"Fraunces", Georgia, serif;--font-body:"Hanken Grotesk", system-ui;
+  --u:4px;--s1:calc(var(--u)*1);--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:20px;--shadow:0 14px 34px -16px rgba(60,40,30,.28);--tap:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);color:var(--text);
+  background:radial-gradient(120% 80% at 85% -8%,#fff 0%,transparent 52%),radial-gradient(90% 70% at -10% 108%,#fff4ea 0%,transparent 60%),var(--paper);
+  min-height:100%;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+.appbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s4) var(--s5) var(--s3);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline)}
+.brand{display:flex;align-items:center;gap:var(--s3);min-width:0}
+.iconbtn{width:36px;height:36px;flex:none;border-radius:11px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);display:grid;place-items:center;font-size:17px;cursor:pointer}
+.title-h{font-family:var(--font-display);font-weight:600;color:var(--text-strong);font-size:18px}
+.lang{display:inline-flex;gap:var(--s1);flex:none}
+.lang button{font-weight:600;font-size:12px;min-height:32px;padding:0 var(--s3);border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-muted);border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+.lang button:focus-visible,.kid:focus-visible,.seg button:focus-visible,.btn:focus-visible,.link:focus-visible,.slot:focus-visible,.input:focus-visible,select:focus-visible,.method:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.kidbar{position:sticky;top:57px;z-index:29;display:flex;gap:var(--s3);align-items:center;overflow-x:auto;padding:var(--s3) var(--s5);background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--hairline);scrollbar-width:none}
+.kidbar::-webkit-scrollbar{display:none}
+.kid{display:inline-flex;align-items:center;gap:var(--s2);flex:none;cursor:pointer;min-height:38px;padding:0 var(--s3) 0 5px;border-radius:999px;background:var(--surface-1);border:1.5px solid var(--hairline);font-family:var(--font-body);font-weight:600;font-size:13px;color:var(--text)}
+.kid .tok{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:none}
+.kid[aria-pressed="true"]{border-color:var(--brand-ink);background:var(--surface-2)}
+.kid[data-kid="zofia"] .tok{background:var(--kid-2)} .kid[data-kid="jan"] .tok{background:var(--kid-1)}
+
+.modmark{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s5);font-size:11px;color:var(--text-muted)}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-3);border:1px solid var(--hairline);border-radius:999px;padding:3px 10px;font-weight:600;font-size:11px;color:var(--text)}
+.chip i{width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--color-info)}
+
+.statebar{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s5);background:var(--surface-3);border-bottom:1px dashed var(--hairline);font-size:12px;color:var(--text-muted)}
+.statebar .lbl{font-weight:600;letter-spacing:.03em;text-transform:uppercase;font-size:10.5px}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;cursor:pointer;border-radius:999px;font-weight:600;font-size:12px;color:var(--text-muted);min-height:30px;padding:0 var(--s3);font-family:var(--font-body)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+
+main{flex:1;padding:var(--s4) var(--s5) calc(var(--s10) + 132px)}
+
+.instr{display:flex;align-items:center;gap:var(--s3);margin:var(--s3) 0 var(--s4)}
+.instr label{font-weight:600;font-size:13px;color:var(--text-strong);flex:none}
+select.instrSel{flex:1;min-height:44px;font-family:var(--font-body);font-size:15px;color:var(--text-strong);background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:12px;padding:0 var(--s3)}
+
+h2.sec{font-family:var(--font-body);text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--text-muted);font-weight:700;margin:var(--s4) 0 var(--s3)}
+
+.cal{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--s2)}
+.cal .day{text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;padding-bottom:var(--s1)}
+.slot{min-height:46px;border-radius:11px;border:1.5px solid var(--hairline);background:var(--surface-1);cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:13.5px;color:var(--text-strong);display:grid;place-items:center}
+.slot.empty{border-style:dashed;color:var(--text-muted);cursor:default;background:var(--surface-2);font-weight:400}
+.slot[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+
+.goal{margin-top:var(--s5)}
+.goal label{display:block;font-weight:600;font-size:13px;color:var(--text-strong);margin-bottom:var(--s2)}
+.input{width:100%;min-height:var(--tap);font-family:var(--font-body);font-size:16px;color:var(--text-strong);background:var(--surface-2);border:1.5px solid var(--hairline);border-radius:14px;padding:var(--s3) var(--s4)}
+.goal .h{display:flex;gap:var(--s2);align-items:flex-start;font-size:12.5px;color:var(--text-muted);margin-top:var(--s2)}
+.goal .h .i{color:var(--color-warning);font-weight:700}
+
+.costline{display:flex;justify-content:space-between;align-items:center;background:var(--surface-2);border:1px solid var(--hairline);border-radius:14px;padding:var(--s4);margin-top:var(--s4);font-size:14.5px}
+.costline .v{font-family:var(--font-display);font-weight:700;color:var(--text-strong)}
+.methods{display:flex;gap:var(--s2);margin-top:var(--s3)}
+.method{flex:1;min-height:44px;border:1.5px solid var(--hairline);background:var(--surface-1);border-radius:12px;cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:13.5px;color:var(--text)}
+.method[aria-pressed="true"]{border-color:var(--accent);background:var(--surface-2);color:var(--text-strong)}
+
+.mybookings{margin-top:var(--s5)}
+.bk{display:flex;justify-content:space-between;align-items:center;background:var(--surface-1);border:1px solid var(--hairline);border-radius:12px;padding:var(--s3) var(--s4)}
+.bk .w{font-weight:600;color:var(--text-strong)}
+.bk .st{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;background:#fbf0d8;color:#7a5410}
+
+/* ALT cancel */
+.cancelBox{display:none;margin-top:var(--s4);border:1px solid #f3c9bd;background:#fdeee9;border-radius:16px;padding:var(--s5)}
+body[data-state="alt"] .cancelBox{display:block}
+body[data-state="alt"] .cal,body[data-state="alt"] .goal,body[data-state="alt"] .costline,body[data-state="alt"] .methods,body[data-state="alt"] .instr,body[data-state="alt"] .sec.calsec{opacity:.4;pointer-events:none}
+.cancelBox .h{display:flex;gap:var(--s3);align-items:flex-start}
+.cancelBox .ico{flex:none;width:26px;height:26px;border-radius:8px;background:var(--color-error);color:#fff;display:grid;place-items:center;font-weight:700}
+.cancelBox .ttl{font-family:var(--font-display);font-weight:600;font-size:17px;color:#8f2c1c}
+.cancelBox p{font-size:13.5px;color:#7a2c1c;margin-top:var(--s2)}
+.cancelBox .wallet{display:flex;gap:var(--s2);align-items:center;margin-top:var(--s3);font-weight:700;color:var(--color-success);font-size:14px}
+.reasonSel{width:100%;min-height:44px;margin-top:var(--s3);font-family:var(--font-body);font-size:15px;color:var(--text-strong);background:#fff;border:1.5px solid #f3c9bd;border-radius:12px;padding:0 var(--s3)}
+
+.actionbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:30;background:color-mix(in srgb,var(--surface-1) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--hairline);padding:var(--s3) var(--s5) calc(var(--s4)+env(safe-area-inset-bottom))}
+.status{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s2)}
+.status b{color:var(--text-strong);font-variant-numeric:tabular-nums;font-family:var(--font-display);font-size:15px}
+.second{display:flex;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s3)}
+.link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13.5px;cursor:pointer;font-family:var(--font-body)}
+.danger{color:var(--color-error)}
+.btn{width:100%;min-height:var(--tap);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:16px;border-radius:14px;border:1.5px solid transparent}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 10px 22px -12px rgba(239,90,60,.9)}
+.btn-danger{background:var(--color-error);color:#fff}
+
+[data-when]{display:none}
+body[data-state="default"] [data-when="default"]{display:revert}
+body[data-state="alt"] [data-when="alt"]{display:revert}
+.reveal{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}}
+[dir="rtl"] .instr,[dir="rtl"] .costline,[dir="rtl"] .bk,[dir="rtl"] .status,[dir="rtl"] .cancelBox .h,[dir="rtl"] .goal .h,[dir="rtl"] .cancelBox .wallet{flex-direction:row-reverse}
+</style>
+</head>
+<body data-state="default">
+<div class="app">
+  <header class="appbar">
+    <div class="brand"><button class="iconbtn" aria-label="Menu">☰</button><span class="title-h" data-i18n="par12.h1">Lekcja 1:1</span></div>
+    <div class="lang" role="group" aria-label="Język"><button data-lang="pl-PL" aria-pressed="true">PL</button><button data-lang="en-GB" aria-pressed="false">EN</button></div>
+  </header>
+
+  <div class="kidbar" role="group" aria-label="Wybór dziecka">
+    <button class="kid" data-kid="zofia" aria-pressed="true"><span class="tok">Z</span>Zofia</button>
+    <button class="kid" data-kid="jan" aria-pressed="false"><span class="tok">J</span>Jan</button>
+  </div>
+
+  <div class="modmark"><span class="chip"><i></i><span data-i18n="mod.classes">zajęcia</span></span><span data-i18n="par12.org">· Szkoła Pływania Nurek</span></div>
+
+  <div class="statebar">
+    <span class="lbl" data-i18n="state.label">Stan makiety</span>
+    <div class="seg" role="group" aria-label="Stan ekranu">
+      <button data-state-btn="default" aria-pressed="true" data-i18n="state.default">kalendarz okien</button>
+      <button data-state-btn="alt" aria-pressed="false" data-i18n="state.alt12">odwołanie rezerwacji</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="instr reveal">
+      <label for="instrSel" data-i18n="par12.instr">Instruktor</label>
+      <select id="instrSel" class="instrSel"><option data-i18n-opt="par12.instr1">Nowak · poziom 3</option><option data-i18n-opt="par12.instr2">Mazur · technika</option></select>
+    </div>
+
+    <h2 class="sec calsec" data-i18n="par12.secCal">Wolne okna w tym tygodniu</h2>
+    <div class="cal reveal" id="cal"></div>
+
+    <div class="goal reveal">
+      <label for="goal" data-i18n="par12.goalLbl">Cel lekcji</label>
+      <input class="input" id="goal" placeholder="np. poprawa nawrotu">
+      <div class="h"><span class="i" aria-hidden="true">⚠</span><span data-i18n="par12.goalHint">Ogranicz do informacji potrzebnej instruktorowi — bez danych wrażliwych.</span></div>
+    </div>
+
+    <div class="costline reveal">
+      <span data-i18n="par12.cost">Koszt lekcji</span>
+      <span><span class="v" id="cost">90,00 zł</span> <span style="font-size:12.5px;color:var(--text-muted)" id="walletNote">· portfel 40 zł → 50 zł</span></span>
+    </div>
+    <div class="methods">
+      <button class="method" data-m="blik" aria-pressed="true">BLIK</button>
+      <button class="method" data-m="card" aria-pressed="false" data-i18n="par12.card">karta</button>
+    </div>
+
+    <!-- ALT cancel -->
+    <div class="cancelBox" role="alert">
+      <div class="h">
+        <span class="ico" aria-hidden="true">⚠</span>
+        <div>
+          <div class="ttl" id="cancelTitle"></div>
+          <p data-i18n="par12.cancel.body">Do lekcji zostało mniej niż 24 h. Według zasad Szkoły Pływania Nurek zwrot za tak późne odwołanie może być częściowy. Zwrócone środki trafią do portfela jako kredyt, nie na konto.</p>
+          <div class="wallet"><span aria-hidden="true">↩</span><span id="cancelWallet"></span></div>
+          <select class="reasonSel" aria-label="Powód odwołania"><option data-i18n-opt="par12.cancel.r0">Wybierz powód odwołania</option><option data-i18n-opt="par12.cancel.r1">choroba dziecka</option><option data-i18n-opt="par12.cancel.r2">kolizja terminów</option><option data-i18n-opt="par12.cancel.r3">inny</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="mybookings" data-when="default">
+      <h2 class="sec" data-i18n="par12.secMine">Moje rezerwacje</h2>
+      <div class="bk"><span class="w" id="bkWhen">czw 17:00 · Nowak</span><span class="st" data-i18n="par12.pending">oczekująca</span></div>
+    </div>
+  </main>
+
+  <div class="actionbar">
+    <div class="status">
+      <span data-i18n="par12.barChild">Lekcja dla: <b style="color:var(--text-strong)">Zofia</b></span>
+      <span data-when="default"><span data-i18n="par12.barDue">Do zapłaty:</span> <b id="barDue">50,00 zł</b></span>
+    </div>
+    <div class="second" data-when="default">
+      <button class="link" data-i18n="par12.recurring">Rezerwacja cykliczna</button>
+      <button class="link" data-i18n="par12.changeInstr">Zmień instruktora</button>
+      <button class="link danger" data-i18n="par12.cancelLink">Odwołaj rezerwację</button>
+    </div>
+    <button class="btn btn-primary" data-when="default" id="cta" data-i18n="par12.cta">Zarezerwuj okno i zapłać · 50 zł</button>
+    <button class="btn btn-danger" data-when="alt" data-i18n="par12.cancelCta">Potwierdź odwołanie</button>
+  </div>
+</div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "state.label":"Stan makiety","state.default":"kalendarz okien","state.alt12":"odwołanie rezerwacji","mod.classes":"zajęcia",
+  "par12.h1":"Lekcja 1:1","par12.org":"· Szkoła Pływania Nurek",
+  "par12.instr":"Instruktor","par12.instr1":"Nowak · poziom 3","par12.instr2":"Mazur · technika",
+  "par12.secCal":"Wolne okna w tym tygodniu",
+  "par12.goalLbl":"Cel lekcji","par12.goalHint":"Ogranicz do informacji potrzebnej instruktorowi — bez danych wrażliwych.",
+  "par12.cost":"Koszt lekcji","par12.card":"karta",
+  "par12.cancel.title.tpl":"Odwołać rezerwację {d}?","par12.cancel.body":"Do lekcji zostało mniej niż 24 h. Według zasad Szkoły Pływania Nurek zwrot za tak późne odwołanie może być częściowy. Zwrócone środki trafią do portfela jako kredyt, nie na konto.","par12.cancel.wallet.tpl":"Do portfela wróci do {m} kredytu",
+  "par12.cancel.r0":"Wybierz powód odwołania","par12.cancel.r1":"choroba dziecka","par12.cancel.r2":"kolizja terminów","par12.cancel.r3":"inny",
+  "par12.secMine":"Moje rezerwacje","par12.pending":"oczekująca",
+  "par12.barChild":"Lekcja dla:","par12.barDue":"Do zapłaty:",
+  "par12.recurring":"Rezerwacja cykliczna","par12.changeInstr":"Zmień instruktora","par12.cancelLink":"Odwołaj rezerwację",
+  "par12.cta":"Zarezerwuj okno i zapłać","par12.cancelCta":"Potwierdź odwołanie",
+  "par12.free":"wolne","par12.taken":"zajęte",
+  "wallet.note.tpl":"· portfel {bal} → {after}","par12.bkWhen.tpl":"{d} · Nowak"
+ },
+ "en-GB":{
+  "state.label":"Mockup state","state.default":"window calendar","state.alt12":"cancel booking","mod.classes":"classes",
+  "par12.h1":"1:1 lesson","par12.org":"· Nurek Swim School",
+  "par12.instr":"Instructor","par12.instr1":"Nowak · level 3","par12.instr2":"Mazur · technique",
+  "par12.secCal":"Free windows this week",
+  "par12.goalLbl":"Lesson goal","par12.goalHint":"Keep it to what the instructor needs — no sensitive data.",
+  "par12.cost":"Lesson cost","par12.card":"card",
+  "par12.cancel.title.tpl":"Cancel the {d} booking?","par12.cancel.body":"Less than 24 h to the lesson. Under Nurek Swim School's rules a refund for such a late cancellation may be partial. Refunded funds go to the wallet as credit, not to your account.","par12.cancel.wallet.tpl":"Up to {m} credit returns to the wallet",
+  "par12.cancel.r0":"Choose a cancellation reason","par12.cancel.r1":"child's illness","par12.cancel.r2":"schedule clash","par12.cancel.r3":"other",
+  "par12.secMine":"My bookings","par12.pending":"pending",
+  "par12.barChild":"Lesson for:","par12.barDue":"To pay:",
+  "par12.recurring":"Recurring booking","par12.changeInstr":"Change instructor","par12.cancelLink":"Cancel booking",
+  "par12.cta":"Book the window and pay","par12.cancelCta":"Confirm cancellation",
+  "par12.free":"free","par12.taken":"taken",
+  "wallet.note.tpl":"· wallet {bal} → {after}","par12.bkWhen.tpl":"{d} · Nowak"
+ }
+};
+const RTL=new Set(["ar","he","fa","ur"]);
+let lang="pl-PL";
+const COST=90, WALLET_BAL=40, REFUND_TO_WALLET=45;
+const TODAY=new Date("2025-05-15");
+/* czwartek 17:00 jako data, sformatujemy ją przez Intl */
+const BOOKED=new Date("2025-05-15"); BOOKED.setHours(17,0,0,0);
+const t=k=>(I18N[lang]&&I18N[lang][k])??(I18N["en-GB"]&&I18N["en-GB"][k])??k;
+const money=v=>new Intl.NumberFormat(lang,{style:"currency",currency:"PLN"}).format(v);
+const fmtDayTime=d=>{
+  const wd=new Intl.DateTimeFormat(lang,{weekday:"short"}).format(d);
+  const tm=new Intl.DateTimeFormat(lang,{hour:"2-digit",minute:"2-digit"}).format(d);
+  return `${wd} ${tm}`;
+};
+// week grid: 5 days, two rows of windows; nazwy dni przez Intl
+const GRID=[
+ [null,"16:00",null,"17:00",null],
+ [null,"17:00",null,null,"18:00"]
+];
+let sel={r:0,c:3}; // czw 17:00
+function dayHeads(){
+  /* skróty dni z Intl.DateTimeFormat - poniedziałek..piątek */
+  const out=[];const base=new Date("2025-05-12"); // poniedziałek
+  for(let i=0;i<5;i++){const d=new Date(base);d.setDate(base.getDate()+i);out.push(new Intl.DateTimeFormat(lang,{weekday:"short"}).format(d));}
+  return out;
+}
+function buildCal(){
+  const cal=document.getElementById("cal");cal.innerHTML="";
+  dayHeads().forEach(d=>{const h=document.createElement("div");h.className="day";h.textContent=d;cal.appendChild(h);});
+  GRID.forEach((row,r)=>row.forEach((val,c)=>{
+    const b=document.createElement("button");
+    if(val){b.className="slot";b.textContent=val;b.setAttribute("aria-pressed",String(sel.r===r&&sel.c===c));
+      b.addEventListener("click",()=>{sel={r,c};buildCal();});}
+    else{b.className="slot empty";b.textContent="—";b.disabled=true;b.setAttribute("aria-hidden","true");}
+    cal.appendChild(b);
+  }));
+}
+function render(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n"));});
+  document.querySelectorAll("[data-i18n-opt]").forEach(el=>{el.textContent=t(el.getAttribute("data-i18n-opt"));});
+  const dueAfterWallet=Math.max(0,COST-WALLET_BAL);
+  document.getElementById("cost").textContent=money(COST);
+  /* nota o portfelu - obie kwoty przez Intl */
+  document.getElementById("walletNote").textContent=t("wallet.note.tpl").replace("{bal}",money(WALLET_BAL)).replace("{after}",money(dueAfterWallet));
+  document.getElementById("barDue").textContent=money(dueAfterWallet);
+  document.getElementById("cta").textContent=`${t("par12.cta")} · ${money(dueAfterWallet)}`;
+  /* nazwa zarezerwowanego okna - dzień przez Intl */
+  const dayTime=fmtDayTime(BOOKED);
+  document.getElementById("bkWhen").textContent=t("par12.bkWhen.tpl").replace("{d}",dayTime);
+  /* tytuł odwołania i kwota powrotu do portfela */
+  document.getElementById("cancelTitle").textContent=t("par12.cancel.title.tpl").replace("{d}",dayTime);
+  document.getElementById("cancelWallet").textContent=t("par12.cancel.wallet.tpl").replace("{m}",money(REFUND_TO_WALLET));
+  buildCal();
+}
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;document.querySelectorAll(".lang button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();}));
+document.querySelectorAll(".kid").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".kid").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+document.querySelectorAll(".method").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".method").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+document.querySelectorAll("[data-state-btn]").forEach(b=>b.addEventListener("click",()=>{document.body.dataset.state=b.dataset.stateBtn;document.querySelectorAll("[data-state-btn]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));}));
+render();
+</script>
+</body>
+</html>

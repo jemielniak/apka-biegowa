@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCL-09 · Karta uczestnika</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500..700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#1a1f2e;--accent:#4f46e5;
+  --color-success:#15803d;--color-warning:#b45309;--color-error:#dc2626;--color-info:#2563eb;
+  --paper:#f6f8fc;--surface-1:#ffffff;--surface-2:#eef1f8;--surface-3:#e3e7f1;--hairline:#d5dae6;
+  --text-strong:#1a1f2e;--text:#3b4252;--text-muted:#6b7385;--on-accent:#ffffff;
+  --font-display:"Space Grotesk", system-ui, sans-serif;--font-body:"Source Sans 3", system-ui;
+  --u:4px;--s2:calc(var(--u)*2);--s3:calc(var(--u)*3);--s4:calc(var(--u)*4);--s5:calc(var(--u)*5);--s6:calc(var(--u)*6);--s8:calc(var(--u)*8);--s10:calc(var(--u)*10);
+  --radius:12px;--shadow:0 8px 24px -16px rgba(26,31,46,.30);--tap:44px;--rail-w:228px;
+}
+*{box-sizing:border-box;}html,body{margin:0;padding:0;}
+body{font-family:var(--font-body);background:var(--paper);color:var(--text);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;}
+.tnum{font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-family:var(--font-display);color:var(--text-strong);margin:0;font-weight:600;letter-spacing:-.01em;}
+button{font-family:var(--font-body);cursor:pointer;}
+
+.topbar{position:sticky;top:0;z-index:40;background:var(--surface-1);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--s4);padding:var(--s3) var(--s5);min-height:60px;}
+.logo{display:flex;align-items:center;gap:var(--s3);font-family:var(--font-display);font-weight:700;color:var(--text-strong);white-space:nowrap;}
+.logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(150deg,var(--accent),#3730a3);display:grid;place-items:center;color:#fff;font-weight:700;}
+.logo small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--text-muted);}
+.topbar .spacer{flex:1;}
+.ctx{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;}
+.field{display:flex;flex-direction:column;gap:2px;}
+.field label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600;}
+select{font-family:var(--font-body);font-size:14px;color:var(--text-strong);background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:7px 28px 7px 10px;min-height:36px;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7385' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 9px center;}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.acct{width:36px;height:36px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface-3);display:grid;place-items:center;font-weight:600;color:var(--text-strong);font-size:13px;}
+
+.shell{display:flex;min-height:calc(100vh - 60px);}
+.rail{width:var(--rail-w);flex:0 0 var(--rail-w);background:var(--surface-1);border-right:1px solid var(--hairline);padding:var(--s4) var(--s3);position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto;}
+.rail .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:700;padding:var(--s3) var(--s3) var(--s2);}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:9px;color:var(--text);text-decoration:none;font-weight:500;font-size:14.5px;margin-bottom:2px;min-height:40px;position:relative;}
+.nav-item:hover{background:var(--surface-2);}
+.nav-item.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600;}
+.nav-item .badge{margin-left:auto;background:var(--color-error);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center;}
+
+.main{flex:1;min-width:0;}
+.wrap{max-width:1080px;margin:0 auto;padding:var(--s5) var(--s6) var(--s10);}
+.demobar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--hairline);border-radius:10px;padding:var(--s2) var(--s3);margin-bottom:var(--s4);}
+.demobar .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:700;}
+.seg{display:inline-flex;background:var(--surface-1);border:1px solid var(--hairline);border-radius:8px;padding:2px;}
+.seg button{border:0;background:transparent;color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;min-height:32px;}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);}
+
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--text-muted);font-size:13.5px;font-weight:600;background:none;border:0;padding:6px 0;margin-bottom:var(--s3);}
+.back:hover{color:var(--accent);}
+
+/* profile header */
+.phead{display:flex;align-items:center;gap:var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);padding:var(--s4) var(--s5);margin-bottom:var(--s4);flex-wrap:wrap;}
+.avatar{width:58px;height:58px;border-radius:16px;background:linear-gradient(140deg,var(--accent),#0e7490);color:#fff;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:22px;flex:0 0 auto;}
+.pinfo h1{font-size:22px;}
+.pinfo .meta{color:var(--text-muted);font-size:13.5px;margin-top:3px;}
+.lvl{display:inline-flex;align-items:center;justify-content:center;min-width:28px;padding:1px 7px;border-radius:6px;background:var(--surface-3);color:var(--text-strong);font-weight:700;font-size:12px;font-family:var(--font-display);}
+.sibswitch{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.sibswitch button{width:38px;height:38px;border-radius:9px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text);font-size:16px;display:grid;place-items:center;}
+.sibswitch button:hover{background:var(--surface-2);}
+.sibswitch .sn{font-weight:600;color:var(--text-strong);font-size:14px;min-width:96px;text-align:center;}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--hairline);margin-bottom:var(--s4);flex-wrap:wrap;}
+.tab{border:0;background:none;color:var(--text-muted);font-weight:600;font-size:14.5px;padding:11px 14px;border-bottom:2px solid transparent;margin-bottom:-1px;min-height:44px;display:inline-flex;align-items:center;gap:7px;}
+.tab:hover{color:var(--text-strong);}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);}
+.tab .dot{width:8px;height:8px;border-radius:50%;}
+.tab .dot.err{background:var(--color-error);}
+.tab.sensitive{position:relative;}
+.tab .lock{font-size:11px;}
+body[data-perms="limited"] .tab.sensitive{display:none;}
+
+.tabpanel{display:none;}
+.tabpanel.active{display:block;}
+
+.card{background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:var(--s4);}
+.card .c-head{display:flex;align-items:center;justify-content:space-between;padding:var(--s4);border-bottom:1px solid var(--hairline);}
+.card .c-head h2{font-size:15px;}
+.card .c-body{padding:var(--s4);}
+
+/* blocking banner for expired required doc */
+.block-banner{display:none;align-items:flex-start;gap:10px;background:color-mix(in srgb,var(--color-error) 9%,transparent);border:1px solid color-mix(in srgb,var(--color-error) 40%,transparent);color:var(--color-error);border-radius:10px;padding:12px 14px;margin-bottom:var(--s4);font-size:14px;line-height:1.45;}
+.block-banner.show{display:flex;}
+.block-banner b{font-weight:700;}
+.block-banner .ask{margin-top:8px;display:inline-flex;}
+.block-banner .ask button{font-size:12.5px;font-weight:700;border:1px solid var(--color-error);background:var(--color-error);color:#fff;border-radius:7px;padding:6px 12px;min-height:36px;}
+
+/* documents list */
+.doc{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:var(--s3);padding:13px var(--s4);border-bottom:1px solid var(--surface-2);}
+.doc:last-child{border-bottom:0;}
+.doc .dn{font-weight:600;color:var(--text-strong);}
+.doc .dv{font-size:12.5px;color:var(--text-muted);margin-top:2px;}
+.dstatus{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;}
+.dstatus .d{width:9px;height:9px;border-radius:50%;}
+.d-ok{color:var(--color-success);} .d-ok .d{background:var(--color-success);}
+.d-exp{color:var(--color-error);} .d-exp .d{background:var(--color-error);}
+.d-none{color:var(--text-muted);} .d-none .d{background:transparent;border:1.5px solid var(--text-muted);}
+.doc .acts{display:flex;gap:6px;}
+.linkbtn{background:none;border:1px solid var(--hairline);border-radius:8px;color:var(--text);font-size:13px;font-weight:600;padding:7px 11px;min-height:38px;}
+.linkbtn:hover{background:var(--surface-2);}
+.linkbtn.danger{color:var(--color-error);border-color:color-mix(in srgb,var(--color-error) 40%,transparent);}
+
+/* summary strip */
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3);}
+.scell{background:var(--surface-2);border-radius:10px;padding:var(--s3) var(--s4);}
+.scell .sl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;}
+.scell .sv{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text-strong);margin-top:3px;font-variant-numeric:tabular-nums;}
+
+/* data tab */
+.datagrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);}
+.f{display:flex;flex-direction:column;gap:6px;}
+.f label{font-size:12.5px;font-weight:600;color:var(--text-strong);}
+.f input,.f select{width:100%;font-family:var(--font-body);font-size:14.5px;color:var(--text-strong);background:var(--surface-1);border:1px solid var(--hairline);border-radius:9px;padding:10px 12px;min-height:var(--tap);}
+.f input:focus-visible,.f select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.medical{grid-column:1 / -1;border:1px solid color-mix(in srgb,var(--color-error) 30%,transparent);border-radius:10px;padding:var(--s4);background:color-mix(in srgb,var(--color-error) 5%,transparent);}
+.medical .mt{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--color-error);font-size:13px;margin-bottom:8px;}
+.medical .sens{font-size:11px;font-weight:700;color:#fff;background:var(--color-error);padding:1px 7px;border-radius:5px;}
+
+/* progress tab */
+.skill{display:flex;align-items:center;gap:var(--s3);padding:10px 0;border-bottom:1px solid var(--surface-2);}
+.skill:last-child{border-bottom:0;}
+.skill .sk-name{flex:1;font-size:14px;color:var(--text-strong);}
+.skill .sk-bar{width:120px;height:8px;border-radius:999px;background:var(--surface-3);overflow:hidden;}
+.skill .sk-bar i{display:block;height:100%;background:var(--accent);}
+.skill .sk-pct{font-size:12.5px;color:var(--text-muted);font-variant-numeric:tabular-nums;min-width:36px;text-align:right;}
+.ro-note{font-size:12px;color:var(--text-muted);margin-top:8px;}
+
+/* attendance timeline */
+.att{display:flex;gap:6px;flex-wrap:wrap;}
+.att .a{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;}
+.att .a.p{background:color-mix(in srgb,var(--color-success) 18%,transparent);color:var(--color-success);}
+.att .a.x{background:color-mix(in srgb,var(--color-error) 14%,transparent);color:var(--color-error);}
+.att .a.m{background:color-mix(in srgb,var(--color-warning) 16%,transparent);color:var(--color-warning);}
+
+/* payments tab */
+.pay-row{display:flex;justify-content:space-between;align-items:center;padding:11px var(--s4);border-bottom:1px solid var(--surface-2);font-size:14px;}
+.pay-row:last-child{border-bottom:0;}
+.pay-row .pd{color:var(--text-muted);font-size:12.5px;font-variant-numeric:tabular-nums;}
+.pay-row .amt{font-weight:600;font-variant-numeric:tabular-nums;}
+.pay-row .amt.neg{color:var(--color-error);}
+.pay-row .amt.pos{color:var(--color-success);}
+
+/* secondary error in section (offline / load fail) */
+.sec-err{display:none;padding:20px var(--s4);text-align:center;color:var(--color-error);font-size:13.5px;}
+
+.actionbar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s4);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;font-weight:600;font-size:14px;min-height:var(--tap);padding:0 16px;border:1px solid var(--hairline);background:var(--surface-1);color:var(--text-strong);}
+.btn:hover{background:var(--surface-2);}.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.btn-primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);box-shadow:0 6px 16px -8px var(--accent);font-size:14.5px;padding:0 20px;}
+.btn-primary:hover{background:#4338ca;}.btn-sm{min-height:40px;font-size:13.5px;}
+.btn-danger{color:var(--color-error);border-color:color-mix(in srgb,var(--color-error) 45%,transparent);background:transparent;}
+.btn-danger:hover{background:color-mix(in srgb,var(--color-error) 8%,transparent);}
+.actionbar .grow{flex:1;}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(26,31,46,.45);display:none;align-items:center;justify-content:center;z-index:70;padding:var(--s4);}
+.scrim.show{display:flex;}
+.modal{background:var(--surface-1);border-radius:var(--radius);box-shadow:0 24px 60px -20px rgba(0,0,0,.5);max-width:440px;width:100%;padding:var(--s6);}
+.modal h3{font-size:18px;margin-bottom:var(--s2);}.modal p{color:var(--text-muted);margin:0 0 var(--s4);}
+.m-actions{display:flex;gap:var(--s3);justify-content:flex-end;}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--brand-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);transition:opacity .25s,transform .25s;z-index:80;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}.toast.ok{background:var(--color-success);}.toast.warn{background:var(--color-warning);}
+
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+@media (max-width:1080px){:root{--rail-w:64px;}.nav-item span.t{display:none;}.nav-item{justify-content:center;}.rail .grp{display:none;}.nav-item .badge{position:absolute;margin:0;transform:translate(14px,-12px);}}
+@media (max-width:640px){.rail{display:none;}.ctx .field.hide-sm{display:none;}.datagrid,.summary{grid-template-columns:1fr;}.doc{grid-template-columns:1fr;gap:8px;}.sibswitch{margin-left:0;width:100%;justify-content:space-between;}}
+</style>
+</head>
+<body data-perms="full">
+
+<header class="topbar">
+  <div class="logo"><span class="mark">D</span><span data-i18n="brand.name">Klub Pływacki Delfin<small data-i18n="brand.role">Panel organizatora</small></span></div>
+  <div class="spacer"></div>
+  <div class="ctx">
+    <div class="field"><label for="mode" data-i18n="ctx.mode">Tryb</label><select id="mode"><option data-i18n="mode.classes">Zajęcia</option><option data-i18n="mode.events">Zawody</option></select></div>
+    <div class="field hide-sm"><label for="facility" data-i18n="ctx.facility">Placówka</label><select id="facility"><option>Klub Pływacki Delfin</option><option>Szkoła Pływania Nurek</option></select></div>
+    <div class="field"><label for="lang" data-i18n="ctx.lang">Język</label><select id="lang"><option value="pl-PL">Polski</option><option value="en-GB">English</option></select></div>
+    <div class="acct">JN</div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Nawigacja panelu">
+    <div class="grp" data-i18n="nav.section">Zajęcia</div>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="t" data-i18n="nav.dashboard">Pulpit</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="18" cy="9" r="2"/></svg><span class="t" data-i18n="nav.groups">Grupy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span class="t" data-i18n="nav.schedule">Grafik</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8M5 12v7h14"/></svg><span class="t" data-i18n="nav.enrol">Zapisy</span></a>
+    <a class="nav-item active" href="#" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="t" data-i18n="nav.participants">Uczestnicy</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span class="t" data-i18n="nav.payments">Płatności</span><span class="badge tnum">4</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-3"/></svg><span class="t" data-i18n="nav.reports">Raporty</span></a>
+    <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span class="t" data-i18n="nav.settings">Ustawienia</span></a>
+  </nav>
+
+  <main class="main">
+    <div class="wrap">
+      <div class="demobar" role="group" aria-label="Podgląd stanu makiety">
+        <span class="lbl" data-i18n="demo.label">Podgląd stanu</span>
+        <div class="seg">
+          <button id="st-filled" aria-pressed="true" data-i18n="demo.filled">Pełny profil</button>
+          <button id="st-expired" aria-pressed="false" data-i18n="demo.expired">Wygasły dokument</button>
+        </div>
+        <span style="margin-left:auto"></span>
+        <span class="lbl" data-i18n="demo.perms">Uprawnienia</span>
+        <div class="seg">
+          <button id="pm-full" aria-pressed="true" data-i18n="perms.full">Pełne</button>
+          <button id="pm-limited" aria-pressed="false" data-i18n="perms.limited">Ograniczone</button>
+        </div>
+      </div>
+
+      <button class="back" id="backBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> <span data-i18n="back">Wróć do listy</span></button>
+
+      <div class="phead">
+        <div class="avatar" id="avatar">AN</div>
+        <div class="pinfo">
+          <h1 id="kidName">Anna Nowak</h1>
+          <div class="meta"><span class="lvl" id="kidLvl">P2</span> <span id="kidGroup">Delfiny</span> · <span data-i18n="guardian">opiekun</span>: <span id="kidParent">Jan Nowak</span></div>
+        </div>
+        <div class="sibswitch" role="group" aria-label="Przełącz rodzeństwo">
+          <button id="sibPrev" aria-label="Poprzednie dziecko">◂</button>
+          <span class="sn" id="sibName">Anna Nowak</span>
+          <button id="sibNext" aria-label="Następne dziecko">▸</button>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" data-tab="data" data-i18n="tab.data">Dane</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="progress" data-i18n="tab.progress">Postęp</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="docs"><span data-i18n="tab.docs">Dokumenty</span><span class="dot err" id="docDot" style="display:none"></span></button>
+        <button class="tab sensitive" role="tab" aria-selected="false" data-tab="payments"><span data-i18n="tab.payments">Płatności</span><span class="lock">🔒</span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="attendance" data-i18n="tab.attendance">Obecność</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="passport" data-i18n="tab.passport">Paszport</button>
+      </div>
+
+      <!-- blocking banner -->
+      <div class="block-banner" id="blockBanner" role="alert">
+        <span>⛔</span>
+        <span>
+          <b data-i18n="block.title">Udział w zajęciach zablokowany.</b>
+          <span data-i18n="block.body">Brak ważnej zgody „Orzeczenie lekarskie” — wygasła 10.04.2026. Bez niej dziecko nie może uczestniczyć w zajęciach.</span>
+          <span class="ask"><button id="askParent" data-i18n="block.ask">Poproś rodzica o nowy dokument</button></span>
+        </span>
+      </div>
+
+      <!-- DATA -->
+      <div class="tabpanel" id="tab-data">
+        <div class="card"><div class="c-body">
+          <div class="datagrid">
+            <div class="f"><label data-i18n="d.firstname">Imię</label><input type="text" value="Anna"></div>
+            <div class="f"><label data-i18n="d.lastname">Nazwisko</label><input type="text" value="Nowak"></div>
+            <div class="f"><label data-i18n="d.birth">Data urodzenia</label><input type="date" value="2017-03-14"></div>
+            <div class="f"><label data-i18n="d.group">Grupa</label><select><option>Delfiny (P2)</option><option>Żabki (P1)</option><option>Rekiny (P3)</option></select></div>
+            <div class="medical">
+              <div class="mt">🔒 <span data-i18n="d.medical">Dane medyczne</span> <span class="sens" data-i18n="sens">szczególna kategoria RODO</span></div>
+              <div class="f"><label data-i18n="d.allergy">Alergie / uwagi zdrowotne</label><input type="text" id="medField" value="brak znanych alergii" readonly></div>
+              <button class="linkbtn" id="editMedical" style="margin-top:10px" data-i18n="d.editmedical">Edytuj dane medyczne</button>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="tabpanel" id="tab-progress">
+        <div class="card">
+          <div class="c-head"><h2 data-i18n="prog.title">Postęp na drzewie umiejętności (P2)</h2></div>
+          <div class="c-body">
+            <div class="skill"><span class="sk-name">Zanurzenie twarzy</span><span class="sk-bar"><i style="width:100%"></i></span><span class="sk-pct">100%</span></div>
+            <div class="skill"><span class="sk-name">Wydech do wody</span><span class="sk-bar"><i style="width:100%"></i></span><span class="sk-pct">100%</span></div>
+            <div class="skill"><span class="sk-name">Praca nóg — kraul</span><span class="sk-bar"><i style="width:60%"></i></span><span class="sk-pct">60%</span></div>
+            <div class="skill"><span class="sk-name">Oddychanie — kraul</span><span class="sk-bar"><i style="width:30%"></i></span><span class="sk-pct">30%</span></div>
+            <p class="ro-note" data-i18n="prog.ro">Widok w odczycie. Postęp zaznacza instruktor (INS-05); definicja drzewa w OCL-10.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCS -->
+      <div class="tabpanel active" id="tab-docs">
+        <div class="card">
+          <div class="c-head"><h2 data-i18n="docs.title">Dokumenty i zgody</h2><button class="btn btn-sm" id="addDoc" data-i18n="docs.add">+ Dodaj dokument</button></div>
+          <div id="docList"></div>
+        </div>
+        <div class="card"><div class="c-body">
+          <div class="summary">
+            <div class="scell"><div class="sl" data-i18n="sum.group">Grupa / poziom</div><div class="sv">Delfiny · P2</div></div>
+            <div class="scell sensicol"><div class="sl" data-i18n="sum.wallet">Saldo portfela</div><div class="sv" id="walletVal">40,00 zł</div></div>
+            <div class="scell"><div class="sl" data-i18n="sum.freq">Frekwencja</div><div class="sv">92%</div></div>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- PAYMENTS (sensitive) -->
+      <div class="tabpanel" id="tab-payments">
+        <div class="card">
+          <div class="c-head"><h2 data-i18n="pay.title">Historia płatności i portfel</h2><button class="btn btn-sm" id="manualPay" data-i18n="pay.manual">Płatność ręczna</button></div>
+          <div>
+            <div class="pay-row"><span><b data-i18n="pay.wallet">Saldo portfela (wspólne z rodzeństwem)</b><div class="pd" data-i18n="pay.shared">współdzielone z: Piotr Nowak</div></span><span class="amt pos tnum">+40,00 zł</span></div>
+            <div class="pay-row"><span>Abonament — maj 2026<div class="pd tnum">02.05.2026 · Przelewy24</div></span><span class="amt tnum" data-fmt-money="120">120,00 zł</span></div>
+            <div class="pay-row"><span>Abonament — kwiecień 2026<div class="pd tnum">03.04.2026 · BLIK</div></span><span class="amt tnum" data-fmt-money="120">120,00 zł</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTENDANCE -->
+      <div class="tabpanel" id="tab-attendance">
+        <div class="card">
+          <div class="c-head"><h2 data-i18n="att.title">Historia obecności</h2><span class="ghint">92% · maj 2026</span></div>
+          <div class="c-body">
+            <div class="att" id="attGrid"></div>
+            <p class="ro-note"><span style="color:var(--color-success)">●</span> <span data-i18n="att.present">obecny</span> &nbsp; <span style="color:var(--color-warning)">●</span> <span data-i18n="att.makeup">odrobione</span> &nbsp; <span style="color:var(--color-error)">●</span> <span data-i18n="att.absent">nieobecny</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASSPORT -->
+      <div class="tabpanel" id="tab-passport">
+        <div class="card">
+          <div class="c-head"><h2 data-i18n="pass.title">Paszport sportowy</h2></div>
+          <div class="c-body">
+            <p style="margin-top:0;color:var(--text-muted)" data-i18n="pass.body">Wspólny dla obu modułów — zajęcia i zawody. Osiągnięcia i poziomy przenoszą się między placówkami operatora.</p>
+            <div class="summary">
+              <div class="scell"><div class="sl" data-i18n="pass.level">Poziom pływania</div><div class="sv">P2</div></div>
+              <div class="scell"><div class="sl" data-i18n="pass.badges">Odznaki</div><div class="sv tnum">5</div></div>
+              <div class="scell"><div class="sl" data-i18n="pass.events">Zawody</div><div class="sv tnum">2</div></div>
+            </div>
+            <button class="btn btn-sm" style="margin-top:var(--s4)" id="exportPass" data-i18n="pass.export">Konfiguracja eksportu (OCL-17)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="actionbar">
+        <button class="btn btn-primary" id="editProfile" data-i18n="action.edit">Edytuj dane / status</button>
+        <span class="grow"></span>
+        <button class="btn btn-sm" id="msgParent" data-i18n="action.message">Wiadomość do rodzica</button>
+        <button class="btn btn-sm" id="moveGroup" data-i18n="action.move">Przenieś do grupy</button>
+        <button class="btn btn-danger btn-sm" id="unenroll" data-i18n="action.unenroll">Wypisz dziecko</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- medical edit confirm -->
+<div class="scrim" id="medScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mm-t">
+    <h3 id="mm-t" data-i18n="med.title">Edycja danych medycznych</h3>
+    <p data-i18n="med.body">To dane szczególnej kategorii pod RODO. Zmiana zostanie zapisana w śladzie audytu z Twoim kontem i czasem.</p>
+    <div class="m-actions">
+      <button class="btn btn-sm" id="mm-close" data-i18n="action.back">Wróć</button>
+      <button class="btn btn-primary btn-sm" id="mm-confirm" data-i18n="med.confirm">Potwierdzam, edytuj</button>
+    </div>
+  </div>
+</div>
+
+<!-- delete doc confirm -->
+<div class="scrim" id="delScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dm-t">
+    <h3 id="dm-t" data-i18n="deldoc.title">Usunąć dokument?</h3>
+    <p data-i18n="deldoc.body">Dokumentów nie usuwamy trwale — zostaną zarchiwizowane z zachowaniem śladu audytu. Można je przywrócić.</p>
+    <div class="m-actions">
+      <button class="btn btn-sm" id="dm-close" data-i18n="action.back">Wróć</button>
+      <button class="btn btn-danger btn-sm" id="dm-confirm" data-i18n="deldoc.confirm">Archiwizuj dokument</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const I18N={
+ "pl-PL":{
+  "brand.name":"Klub Pływacki Delfin","brand.role":"Panel organizatora",
+  "ctx.mode":"Tryb","ctx.facility":"Placówka","ctx.lang":"Język","mode.classes":"Zajęcia","mode.events":"Zawody",
+  "nav.section":"Zajęcia","nav.dashboard":"Pulpit","nav.groups":"Grupy","nav.schedule":"Grafik","nav.enrol":"Zapisy","nav.participants":"Uczestnicy","nav.payments":"Płatności","nav.reports":"Raporty","nav.settings":"Ustawienia",
+  "demo.label":"Podgląd stanu","demo.filled":"Pełny profil","demo.expired":"Wygasły dokument","demo.perms":"Uprawnienia","perms.full":"Pełne","perms.limited":"Ograniczone",
+  "back":"Wróć do listy","guardian":"opiekun",
+  "tab.data":"Dane","tab.progress":"Postęp","tab.docs":"Dokumenty","tab.payments":"Płatności","tab.attendance":"Obecność","tab.passport":"Paszport",
+  "block.title":"Udział w zajęciach zablokowany.","block.body":"Brak ważnej zgody „Orzeczenie lekarskie” — wygasła 10.04.2026. Bez niej dziecko nie może uczestniczyć w zajęciach.","block.ask":"Poproś rodzica o nowy dokument",
+  "d.firstname":"Imię","d.lastname":"Nazwisko","d.birth":"Data urodzenia","d.group":"Grupa","d.medical":"Dane medyczne","sens":"szczególna kategoria RODO","d.allergy":"Alergie / uwagi zdrowotne","d.editmedical":"Edytuj dane medyczne",
+  "prog.title":"Postęp na drzewie umiejętności (P2)","prog.ro":"Widok w odczycie. Postęp zaznacza instruktor (INS-05); definicja drzewa w OCL-10.",
+  "docs.title":"Dokumenty i zgody","docs.add":"+ Dodaj dokument",
+  "doc.rodo":"Zgoda RODO","doc.med":"Orzeczenie lekarskie","doc.image":"Zgoda na wizerunek",
+  "doc.validto":"ważna do","doc.expired":"WYGASŁ","doc.missing":"brak",
+  "doc.preview":"Podgląd","doc.renew":"Odnów","doc.delete":"Usuń",
+  "sum.group":"Grupa / poziom","sum.wallet":"Saldo portfela","sum.freq":"Frekwencja",
+  "pay.title":"Historia płatności i portfel","pay.manual":"Płatność ręczna","pay.wallet":"Saldo portfela (wspólne z rodzeństwem)","pay.shared":"współdzielone z: Piotr Nowak",
+  "att.title":"Historia obecności","att.present":"obecny","att.makeup":"odrobione","att.absent":"nieobecny",
+  "pass.title":"Paszport sportowy","pass.body":"Wspólny dla obu modułów — zajęcia i zawody. Osiągnięcia i poziomy przenoszą się między placówkami operatora.","pass.level":"Poziom pływania","pass.badges":"Odznaki","pass.events":"Zawody","pass.export":"Konfiguracja eksportu (OCL-17)",
+  "action.edit":"Edytuj dane / status","action.message":"Wiadomość do rodzica","action.move":"Przenieś do grupy","action.unenroll":"Wypisz dziecko","action.back":"Wróć",
+  "med.title":"Edycja danych medycznych","med.body":"To dane szczególnej kategorii pod RODO. Zmiana zostanie zapisana w śladzie audytu z Twoim kontem i czasem.","med.confirm":"Potwierdzam, edytuj",
+  "deldoc.title":"Usunąć dokument?","deldoc.body":"Dokumentów nie usuwamy trwale — zostaną zarchiwizowane z zachowaniem śladu audytu. Można je przywrócić.","deldoc.confirm":"Archiwizuj dokument",
+  "toast.saved":"Zapisano zmiany w profilu","toast.ask":"Wysłano rodzicowi prośbę o nowy dokument","toast.add":"Dodaj dokument — wybierz typ i plik","toast.preview":"Podgląd dokumentu","toast.medOpen":"Odblokowano edycję danych medycznych — zmiana w audycie","toast.archived":"Zarchiwizowano dokument (ślad audytu zachowany)","toast.msg":"Otwarto wiadomość do rodzica (OCL-15)","toast.move":"Przeniesiono do grupy","toast.unenroll":"Wypisano — wybierz, czy zachować historię i paszport","toast.manual":"Zarejestrowano płatność ręczną","toast.pass":"Otwarto konfigurację eksportu paszportu (OCL-17)","toast.sib":"Przełączono na: "
+ },
+ "en-GB":{
+  "brand.name":"Delfin Swim Club","brand.role":"Organiser panel",
+  "ctx.mode":"Mode","ctx.facility":"Facility","ctx.lang":"Language","mode.classes":"Classes","mode.events":"Events",
+  "nav.section":"Classes","nav.dashboard":"Dashboard","nav.groups":"Groups","nav.schedule":"Schedule","nav.enrol":"Enrolment","nav.participants":"Participants","nav.payments":"Payments","nav.reports":"Reports","nav.settings":"Settings",
+  "demo.label":"State preview","demo.filled":"Full profile","demo.expired":"Expired document","demo.perms":"Permissions","perms.full":"Full","perms.limited":"Limited",
+  "back":"Back to list","guardian":"guardian",
+  "tab.data":"Details","tab.progress":"Progress","tab.docs":"Documents","tab.payments":"Payments","tab.attendance":"Attendance","tab.passport":"Passport",
+  "block.title":"Participation in classes blocked.","block.body":"Missing a valid “Medical certificate” consent — expired on 10.04.2026. Without it the child cannot take part in classes.","block.ask":"Ask the parent for a new document",
+  "d.firstname":"First name","d.lastname":"Surname","d.birth":"Date of birth","d.group":"Group","d.medical":"Medical data","sens":"special category GDPR","d.allergy":"Allergies / health notes","d.editmedical":"Edit medical data",
+  "prog.title":"Progress on the skill tree (P2)","prog.ro":"Read-only view. Progress is marked by the instructor (INS-05); tree defined in OCL-10.",
+  "docs.title":"Documents and consents","docs.add":"+ Add document",
+  "doc.rodo":"GDPR consent","doc.med":"Medical certificate","doc.image":"Image consent",
+  "doc.validto":"valid until","doc.expired":"EXPIRED","doc.missing":"missing",
+  "doc.preview":"Preview","doc.renew":"Renew","doc.delete":"Delete",
+  "sum.group":"Group / level","sum.wallet":"Wallet balance","sum.freq":"Attendance",
+  "pay.title":"Payment history and wallet","pay.manual":"Manual payment","pay.wallet":"Wallet balance (shared with sibling)","pay.shared":"shared with: Piotr Nowak",
+  "att.title":"Attendance history","att.present":"present","att.makeup":"made up","att.absent":"absent",
+  "pass.title":"Sports passport","pass.body":"Shared across both modules — classes and events. Achievements and levels carry across the operator's facilities.","pass.level":"Swim level","pass.badges":"Badges","pass.events":"Events","pass.export":"Export configuration (OCL-17)",
+  "action.edit":"Edit details / status","action.message":"Message the parent","action.move":"Move to group","action.unenroll":"Unenrol child","action.back":"Back",
+  "med.title":"Editing medical data","med.body":"This is a special category under GDPR. The change will be saved to the audit trail with your account and time.","med.confirm":"Confirm, edit",
+  "deldoc.title":"Delete document?","deldoc.body":"Documents are not permanently deleted — they are archived with the audit trail kept. They can be restored.","deldoc.confirm":"Archive document",
+  "toast.saved":"Profile changes saved","toast.ask":"Request for a new document sent to the parent","toast.add":"Add document — pick a type and file","toast.preview":"Document preview","toast.medOpen":"Medical data editing unlocked — change in the audit trail","toast.archived":"Document archived (audit trail kept)","toast.msg":"Parent message opened (OCL-15)","toast.move":"Moved to group","toast.unenroll":"Unenrolled — choose whether to keep history and passport","toast.manual":"Manual payment recorded","toast.pass":"Passport export configuration opened (OCL-17)","toast.sib":"Switched to: "
+ }
+};
+const FALLBACK="en-GB",FACILITY_REGION="pl-PL";let lang="pl-PL";
+const RTL=new Set(["ar","he","fa","ur"]);
+function t(k){const d=I18N[lang]||{};if(k in d)return d[k];const f=I18N[FALLBACK]||{};return (k in f)?f[k]:k;}
+function money(v){return new Intl.NumberFormat(FACILITY_REGION,{style:"currency",currency:"PLN"}).format(v);}
+function dlong(y,m,d){return new Intl.DateTimeFormat(FACILITY_REGION,{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(y,m-1,d));}
+
+const SIBS=["Anna Nowak","Piotr Nowak"];
+let sib=0, expiredMode=false;
+
+// documents (med expiry differs by state)
+function docs(){
+  return [
+    {key:"doc.rodo",status:"ok",validTo:[2026,9,1]},
+    {key:"doc.med",status:expiredMode?"exp":"ok",validTo:expiredMode?[2026,4,10]:[2026,12,1],required:true},
+    {key:"doc.image",status:"none"}
+  ];
+}
+function renderDocs(){
+  const list=document.getElementById("docList");
+  list.innerHTML=docs().map((d,i)=>{
+    let st,meta="";
+    if(d.status==="ok"){st=`<span class="dstatus d-ok"><span class="d"></span>${t("doc.validto")} ${dlong(...d.validTo)}</span>`;}
+    else if(d.status==="exp"){st=`<span class="dstatus d-exp"><span class="d"></span>⚠ ${t("doc.expired")} ${dlong(...d.validTo)}</span>`;}
+    else{st=`<span class="dstatus d-none"><span class="d"></span>${t("doc.missing")}</span>`;}
+    const acts=(d.status==="none")
+      ? `<button class="linkbtn" data-act="add">${t("docs.add").replace("+ ","")}</button>`
+      : `<button class="linkbtn" data-act="preview">${t("doc.preview")}</button>`
+        + (d.status==="exp"?`<button class="linkbtn" data-act="renew">${t("doc.renew")}</button>`:"")
+        + `<button class="linkbtn danger" data-act="del">${t("doc.delete")}</button>`;
+    return `<div class="doc"><div><div class="dn">${t(d.key)}</div></div><div>${st}</div><div class="acts">${acts}</div></div>`;
+  }).join("");
+  list.querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>{
+    const a=b.dataset.act;
+    if(a==="del")document.getElementById("delScrim").classList.add("show");
+    else if(a==="add")toast(t("toast.add"));
+    else if(a==="preview")toast(t("toast.preview"));
+    else if(a==="renew")toast(t("toast.ask"),"ok");
+  }));
+  // doc tab warning dot + blocking banner
+  const hasExpiredRequired=docs().some(d=>d.required&&d.status==="exp");
+  document.getElementById("docDot").style.display=hasExpiredRequired?"inline-block":"none";
+  document.getElementById("blockBanner").classList.toggle("show",hasExpiredRequired);
+}
+
+function renderAtt(){
+  const seq=["p","p","x","p","p","m","p","p","p","p","x","p"];
+  document.getElementById("attGrid").innerHTML=seq.map((s,i)=>`<span class="a ${s}">${i+1}</span>`).join("");
+}
+
+function setTab(name){
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.tab===name));
+  document.querySelectorAll(".tabpanel").forEach(p=>p.classList.toggle("active",p.id==="tab-"+name));
+}
+
+function applyLang(){
+  document.documentElement.lang=lang.split("-")[0];
+  document.documentElement.dir=RTL.has(lang.split("-")[0])?"rtl":"ltr";
+  document.querySelectorAll("[data-i18n]").forEach(n=>{
+    const k=n.getAttribute("data-i18n");
+    if(k==="brand.name"){n.firstChild.textContent=t(k);return;}
+    n.textContent=t(k);
+  });
+  document.querySelectorAll("[data-fmt-money]").forEach(el=>{el.textContent=money(parseFloat(el.getAttribute("data-fmt-money")));});
+  document.getElementById("walletVal").textContent=money(40);
+  renderDocs();renderAtt();
+}
+function toast(msg,kind){const el=document.getElementById("toast");el.textContent=msg;el.className="toast show"+(kind?" "+kind:"");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2600);}
+
+// tabs
+document.querySelectorAll(".tab").forEach(tb=>tb.addEventListener("click",()=>setTab(tb.dataset.tab)));
+document.getElementById("lang").addEventListener("change",e=>{lang=e.target.value;applyLang();});
+
+// sibling switch
+function setSib(i){
+  sib=(i+SIBS.length)%SIBS.length;
+  const name=SIBS[sib];
+  document.getElementById("sibName").textContent=name;
+  document.getElementById("kidName").textContent=name;
+  document.getElementById("avatar").textContent=name.split(" ").map(w=>w[0]).join("");
+  toast(t("toast.sib")+name);
+}
+document.getElementById("sibPrev").addEventListener("click",()=>setSib(sib-1));
+document.getElementById("sibNext").addEventListener("click",()=>setSib(sib+1));
+
+// actions
+document.getElementById("editProfile").addEventListener("click",()=>toast(t("toast.saved"),"ok"));
+document.getElementById("askParent").addEventListener("click",()=>toast(t("toast.ask"),"ok"));
+document.getElementById("msgParent").addEventListener("click",()=>toast(t("toast.msg")));
+document.getElementById("moveGroup").addEventListener("click",()=>toast(t("toast.move"),"ok"));
+document.getElementById("unenroll").addEventListener("click",()=>toast(t("toast.unenroll"),"warn"));
+document.getElementById("manualPay").addEventListener("click",()=>toast(t("toast.manual"),"ok"));
+document.getElementById("exportPass").addEventListener("click",()=>toast(t("toast.pass")));
+document.getElementById("addDoc").addEventListener("click",()=>toast(t("toast.add")));
+document.getElementById("backBtn").addEventListener("click",()=>toast("OCL-08"));
+
+// medical edit confirm
+document.getElementById("editMedical").addEventListener("click",()=>document.getElementById("medScrim").classList.add("show"));
+document.getElementById("mm-close").addEventListener("click",()=>document.getElementById("medScrim").classList.remove("show"));
+document.getElementById("mm-confirm").addEventListener("click",()=>{document.getElementById("medField").removeAttribute("readonly");document.getElementById("medField").focus();document.getElementById("medScrim").classList.remove("show");toast(t("toast.medOpen"),"warn");});
+// del doc confirm
+document.getElementById("dm-close").addEventListener("click",()=>document.getElementById("delScrim").classList.remove("show"));
+document.getElementById("dm-confirm").addEventListener("click",()=>{document.getElementById("delScrim").classList.remove("show");toast(t("toast.archived"),"ok");});
+document.querySelectorAll(".scrim").forEach(s=>s.addEventListener("click",e=>{if(e.target===s)s.classList.remove("show");}));
+
+// state + perms toggles
+document.getElementById("st-filled").addEventListener("click",()=>{expiredMode=false;document.getElementById("st-filled").setAttribute("aria-pressed",true);document.getElementById("st-expired").setAttribute("aria-pressed",false);renderDocs();});
+document.getElementById("st-expired").addEventListener("click",()=>{expiredMode=true;document.getElementById("st-expired").setAttribute("aria-pressed",true);document.getElementById("st-filled").setAttribute("aria-pressed",false);setTab("docs");renderDocs();document.getElementById("blockBanner").scrollIntoView({behavior:"smooth",block:"center"});});
+document.getElementById("pm-full").addEventListener("click",()=>{document.body.dataset.perms="full";document.getElementById("pm-full").setAttribute("aria-pressed",true);document.getElementById("pm-limited").setAttribute("aria-pressed",false);});
+document.getElementById("pm-limited").addEventListener("click",()=>{document.body.dataset.perms="limited";document.getElementById("pm-limited").setAttribute("aria-pressed",true);document.getElementById("pm-full").setAttribute("aria-pressed",false);
+  // if a sensitive tab was active, fall back to docs
+  if(document.querySelector('.tab[aria-selected="true"]').dataset.tab==="payments")setTab("docs");});
+
+// init
+applyLang();
+setTab("data");
+</script>
+</body>
+</html>
