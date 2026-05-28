@@ -159,7 +159,7 @@ a.node:focus-visible .cap{color:var(--accent);}
 .phone .cta{display:block;width:100%;background:linear-gradient(180deg,var(--accent-2),var(--accent));color:var(--on-accent);text-align:center;padding:5px 0;border-radius:8px;font:800 9px/1 var(--font-display);letter-spacing:.02em;}
 .phone .cta.passive{background:var(--surface-3);color:var(--text-strong);}
 
-/* węzeł referencyjny (ekran spoza grupy KID - inny moduł, jeszcze bez pliku) */
+/* węzeł referencyjny (ekran spoza grupy KID - inny moduł; klikalny, gdy makieta istnieje) */
 .phone.ref{border-style:dashed;background:var(--surface-2);box-shadow:none;}
 .phone.ref .band{background:var(--surface-3);}
 .phone.ref .cta{background:var(--surface-3);color:var(--text-muted);}
@@ -275,8 +275,9 @@ footer.page p+p{margin-top:var(--s3);}
     KID-01, ekran zgody opiekuna realizowany z konta dorosłego, oraz KID-02, opcjonalny
     widok tylko do odczytu dla nastolatka. <b>Kliknięcie kafla KID otwiera jego makietę
     w nowej karcie.</b> Kafle z linią przerywaną to <b>konteksty spoza grupy</b> (PAR, GST,
-    INS, OCL) - punkty wejścia i źródła danych opisane w kontrakcie; nie mają jeszcze
-    plików, więc nie są klikalne. <b>Miętowe</b> strzałki to akcje główne, <b>szare</b>
+    INS, OCL) - punkty wejścia i źródła danych opisane w kontrakcie. Te, których makieta
+    już istnieje, też otwierają się po kliknięciu; kontekst bez makiety (GST) pozostaje
+    nieaktywny. <b>Miętowe</b> strzałki to akcje główne, <b>szare</b>
     to wejścia i powiązania drugorzędne, <b>bursztynowe przerywane</b> to rozgałęzienia
     od wyjątków (offline, brak uprawnień, zmiana wersji, cofnięcie dostępu).
   </p>
@@ -358,7 +359,7 @@ footer.page p+p{margin-top:var(--s3);}
     <!-- ============================ WĘZŁY: GÓRNY PAS (konteksty wejścia) ============================ -->
 
     <!-- PAR-04 blokada zapisu (zajęcia) -->
-    <span class="node node-ref" style="left:96px;top:46px" aria-label="Kontekst PAR-04: blokada zapisu dziecka na grupę (ekran spoza grupy KID)">
+    <a class="node node-ref" style="left:96px;top:46px" href="PAR-04_zapis-na-grupe_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran PAR-04: blokada zapisu dziecka na grupę (spoza grupy KID)">
       <div class="phone ref">
         <span class="refbadge">PAR</span>
         <div class="band" aria-hidden="true"></div>
@@ -373,10 +374,10 @@ footer.page p+p{margin-top:var(--s3);}
         <div class="foot"><span class="cta passive">Dokończ zapis</span></div>
       </div>
       <div class="cap">PAR-04<small>blokada zapisu</small></div>
-    </span>
+    </a>
 
     <!-- PAR-03 profil dziecka -->
-    <span class="node node-ref" style="left:426px;top:46px" aria-label="Kontekst PAR-03: profil dziecka w koncie rodzinnym (ekran spoza grupy KID)">
+    <a class="node node-ref" style="left:426px;top:46px" href="PAR-03_profile-dzieci_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran PAR-03: profil dziecka w koncie rodzinnym (spoza grupy KID)">
       <div class="phone ref">
         <span class="refbadge">PAR</span>
         <div class="band" aria-hidden="true"></div>
@@ -391,10 +392,10 @@ footer.page p+p{margin-top:var(--s3);}
         <div class="foot"><span class="cta passive">Otwórz profil</span></div>
       </div>
       <div class="cap">PAR-03<small>profil dziecka</small></div>
-    </span>
+    </a>
 
     <!-- PAR-09 dokumenty -->
-    <span class="node node-ref" style="left:756px;top:46px" aria-label="Kontekst PAR-09: zgody i dokumenty rodziny (ekran spoza grupy KID)">
+    <a class="node node-ref" style="left:756px;top:46px" href="PAR-09_dokumenty-dziecka_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran PAR-09: zgody i dokumenty rodziny (spoza grupy KID)">
       <div class="phone ref">
         <span class="refbadge">PAR</span>
         <div class="band" aria-hidden="true"></div>
@@ -409,7 +410,7 @@ footer.page p+p{margin-top:var(--s3);}
         <div class="foot"><span class="cta passive">Otwórz zgody</span></div>
       </div>
       <div class="cap">PAR-09<small>zgody i dokumenty</small></div>
-    </span>
+    </a>
 
     <!-- ============================ WĘZŁY: ŚRODEK (ekrany KID, klikalne) ============================ -->
 
@@ -480,7 +481,7 @@ footer.page p+p{margin-top:var(--s3);}
     </span>
 
     <!-- PAR-16 zarządzanie zgodami / zakres drugiego opiekuna -->
-    <span class="node node-ref" style="left:786px;top:718px" aria-label="Kontekst PAR-16: zarządzanie zgodami i zakresem drugiego opiekuna (ekran spoza grupy KID)">
+    <a class="node node-ref" style="left:786px;top:718px" href="PAR-16_ustawienia-i-zgody_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran PAR-16: zarządzanie zgodami i zakresem drugiego opiekuna (spoza grupy KID)">
       <div class="phone ref">
         <span class="refbadge">PAR</span>
         <div class="band" aria-hidden="true"></div>
@@ -496,10 +497,10 @@ footer.page p+p{margin-top:var(--s3);}
         <div class="foot"><span class="cta passive">Zarządzaj zgodami</span></div>
       </div>
       <div class="cap">PAR-16<small>zakres opiekunów</small></div>
-    </span>
+    </a>
 
     <!-- INS-05 / PAR-08 postęp (źródło danych KID-02) -->
-    <span class="node node-ref" style="left:150px;top:1000px" aria-label="Kontekst INS-05 i PAR-08: źródło danych o postępie umiejętności (ekran spoza grupy KID)">
+    <a class="node node-ref" style="left:150px;top:1000px" href="INS-05_umiejetnosci_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran INS-05: drzewo umiejętności, źródło danych o postępie (spoza grupy KID; powiązany PAR-08)">
       <div class="phone ref" style="height:150px">
         <span class="refbadge">INS</span>
         <div class="band" aria-hidden="true"></div>
@@ -514,10 +515,10 @@ footer.page p+p{margin-top:var(--s3);}
         <div class="foot"><span class="cta passive">Drzewo skilli</span></div>
       </div>
       <div class="cap">INS-05 · PAR-08<small>źródło postępu</small></div>
-    </span>
+    </a>
 
     <!-- OCL-17 / PAR-13 paszport + PAR-15 zdjęcia (źródło danych KID-02) -->
-    <span class="node node-ref" style="left:756px;top:1000px" aria-label="Kontekst OCL-17, PAR-13 i PAR-15: źródło paszportu i zdjęć (ekran spoza grupy KID)">
+    <a class="node node-ref" style="left:756px;top:1000px" href="PAR-13_paszport-sportowy_hifi.html" target="_blank" rel="noopener" aria-label="Otwórz ekran PAR-13: paszport sportowy, źródło paszportu i zdjęć (spoza grupy KID; powiązane OCL-17, PAR-15)">
       <div class="phone ref" style="height:150px">
         <span class="refbadge">PAR · OCL</span>
         <div class="band" aria-hidden="true"></div>
@@ -536,7 +537,7 @@ footer.page p+p{margin-top:var(--s3);}
         <div class="foot"><span class="cta passive">PAR-15 · zdjęcia</span></div>
       </div>
       <div class="cap">OCL-17 · PAR-13 · PAR-15<small>paszport i zdjęcia</small></div>
-    </span>
+    </a>
 
   </div>
 </div>
