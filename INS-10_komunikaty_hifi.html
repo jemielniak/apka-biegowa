@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INS-10 · Komunikaty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#0d1a1e; --accent:#21d8c4;
+  --color-success:#4ade80; --color-warning:#f6b73c; --color-error:#ff6b5e; --color-info:#5aa8ff;
+  --surface-1:#13242a; --surface-2:#1a313a; --surface-3:#234049; --hairline:#2c4b55;
+  --text-strong:#f0f6f5; --text:#c7d6d8; --text-muted:#83a0a5; --on-accent:#062420; --paper:#eef4f1;
+  --font-display:"Bricolage Grotesque", system-ui; --font-body:"IBM Plex Sans", system-ui;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:16px; --shadow:0 12px 32px -14px rgba(0,0,0,.7); --tap:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06100f;color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%}
+.num{font-variant-numeric:tabular-nums}
+.shell{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--brand-ink)}
+header.app{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border-bottom:1px solid var(--hairline)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);min-height:var(--tap)}
+.htitle{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:18px}
+.lang{display:flex;align-items:center;gap:var(--s1);background:var(--surface-3);border:1px solid var(--hairline);color:var(--text-strong);border-radius:999px;padding:0 var(--s3);height:40px;font:600 14px/1 var(--font-body);cursor:pointer;flex:none}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);font-size:12.5px;color:var(--text-muted);border-top:1px solid var(--hairline);background:var(--surface-1)}
+.spacer{flex:1}.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.on{background:var(--color-success);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-success) 25%,transparent)}
+body.is-offline .dot.on{background:var(--color-warning);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-warning) 25%,transparent)}
+.netnote .off{display:none;color:var(--color-warning);font-weight:600}body.is-offline .netnote .on{display:none}body.is-offline .netnote .off{display:inline}
+.offline-banner{display:none;align-items:flex-start;gap:var(--s3);margin:var(--s4) var(--s4) 0;padding:var(--s3) var(--s4);border:1px solid color-mix(in srgb,var(--color-warning) 50%,var(--hairline));border-left:4px solid var(--color-warning);border-radius:var(--radius);background:color-mix(in srgb,var(--color-warning) 12%,var(--surface-1));color:var(--text-strong);font-size:13.5px;line-height:1.4}
+body.is-offline .offline-banner{display:flex}.offline-banner b{font-weight:600}
+.seg{display:flex;gap:var(--s1);margin:var(--s4) var(--s4) 0;padding:var(--s1);background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px}
+.seg button{flex:1;border:0;background:transparent;color:var(--text-muted);font:600 13px/1 var(--font-body);height:40px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected=true]{background:var(--surface-3);color:var(--text-strong)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{flex:1;padding:var(--s4) var(--s4) calc(var(--s10)*2.4)}
+.field{display:block;font-size:13px;color:var(--text-muted);font-weight:600;margin:var(--s4) 0 var(--s2)}
+.recip{display:flex;gap:var(--s2)}
+.recip button{flex:1;min-height:48px;border-radius:13px;border:1.5px solid var(--hairline);background:var(--surface-1);color:var(--text);font:600 14px/1 var(--font-body);cursor:pointer}
+.recip button[aria-pressed=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.recip button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.selectish{display:flex;align-items:center;gap:var(--s3);min-height:48px;padding:0 var(--s4);background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:13px;color:var(--text-strong);font:600 14px/1 var(--font-body);cursor:pointer;width:100%;text-align:left}
+.selectish:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.selectish .chev{margin-left:auto;color:var(--text-muted)}
+.selectish small{color:var(--text-muted);font-weight:500}
+textarea{width:100%;min-height:96px;background:var(--surface-1);border:1.5px solid var(--hairline);border-radius:var(--radius);color:var(--text-strong);font:500 15px/1.5 var(--font-body);padding:var(--s3) var(--s4);resize:vertical}
+textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-color:var(--accent)}
+.warn{display:flex;gap:var(--s3);margin-top:var(--s3);padding:var(--s3) var(--s4);border-radius:12px;font-size:13.5px;line-height:1.45}
+.warn.consent{background:color-mix(in srgb,var(--color-warning) 13%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-warning) 50%,transparent);color:#ffe9c2}
+.warn.sensitive{background:color-mix(in srgb,var(--color-error) 13%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-error) 45%,transparent);color:#ffd9d4}
+.warn b{color:#fff;font-weight:600}
+.warn .act{display:block;margin-top:6px;color:var(--accent);font-weight:600;cursor:pointer}
+.hist{margin-top:var(--s6)}
+.sect{display:flex;align-items:center;gap:var(--s3);margin:0 0 var(--s3);color:var(--text-muted);font:700 12px/1 var(--font-display);letter-spacing:1.5px;text-transform:uppercase}
+.sect::after{content:"";flex:1;height:1px;background:var(--hairline)}
+.msg-item{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);margin-bottom:var(--s2)}
+.msg-item .mi{flex:1;min-width:0}
+.msg-item .mi b{display:block;font-weight:600;color:var(--text-strong);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msg-item .mi small{color:var(--text-muted);font-size:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--hairline);flex:none}
+.pill.ok{color:var(--color-success);border-color:color-mix(in srgb,var(--color-success) 45%,transparent);background:color-mix(in srgb,var(--color-success) 10%,transparent)}
+/* confirm view (alt) */
+.confirmview{display:none}body.is-confirm .confirmview{display:block}body.is-confirm .composeview{display:none}
+.confirm-card{background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid color-mix(in srgb,var(--accent) 40%,var(--hairline));border-radius:var(--radius);padding:var(--s5);box-shadow:var(--shadow);margin-top:var(--s3);text-align:center}
+.confirm-card .big{font-family:var(--font-display);font-weight:800;color:var(--accent);font-size:48px;line-height:1}
+.confirm-card .lab{color:var(--text);font-size:15px;margin-top:var(--s2)}
+.confirm-card .sub{color:var(--text-muted);font-size:13px;margin-top:var(--s3)}
+.confirm-list{margin-top:var(--s4);text-align:left}
+.confirm-list .cl{display:flex;align-items:center;justify-content:space-between;padding:var(--s3) 0;border-top:1px solid var(--hairline);font-size:13.5px;color:var(--text)}
+.confirm-list .cl b{color:var(--text-strong);font-weight:600}
+.confirm-list .cl .skip{color:var(--color-warning);font-weight:600}
+.info-note{display:flex;gap:var(--s3);margin-top:var(--s4);padding:var(--s3) var(--s4);border-radius:12px;font-size:13px;line-height:1.45;background:color-mix(in srgb,var(--color-info) 11%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-info) 38%,transparent);color:#d6ecff}
+.hide{display:none!important}
+footer.app{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:20;background:linear-gradient(0deg,var(--surface-2),var(--surface-1));border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom))}
+.saveline{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s3)}
+.saveline .off{display:none;color:var(--color-warning);font-weight:600}body.is-offline .saveline .on{display:none}body.is-offline .saveline .off{display:inline}
+.cta{width:100%;min-height:var(--tap);border:0;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:18px;cursor:pointer;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;gap:var(--s3)}
+.cta:focus-visible{outline:3px solid var(--text-strong);outline-offset:3px}
+.cta .badge{background:var(--on-accent);color:var(--accent);border-radius:999px;font-size:13px;padding:2px 10px}
+.links{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);justify-content:center;margin-top:var(--s4)}
+.links a{color:var(--text-muted);font-size:14px;text-decoration:none;min-height:40px;display:inline-flex;align-items:center;cursor:pointer}
+.links a:hover{color:var(--text-strong)}.links a:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body class="pl-PL">
+<div class="shell">
+  <header class="app">
+    <div class="bar">
+      <span class="htitle" data-i="title">Nowy komunikat</span>
+      <button class="lang" id="langBtn" aria-label="Zmień język"><span id="langLabel">PL</span> ▾</button>
+    </div>
+    <div class="sys">
+      <span class="lastsend" id="lastSend">Ostatnia wysyłka: dziś 9:12</span>
+      <span class="spacer"></span>
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="netnote"><span class="on" data-i="synced">Sync ok</span><span class="off" data-i="offShort">Offline</span></span>
+    </div>
+  </header>
+
+  <div class="offline-banner" role="status">
+    <span aria-hidden="true">⚠</span>
+    <span><b data-i="offTitle">Tryb offline.</b> <span data-i="offBody">Komunikat przygotujesz i zakolejkujesz teraz, wysyłka ruszy po powrocie sieci.</span></span>
+  </div>
+
+  <div class="seg" role="tablist" aria-label="Podgląd stanu ekranu">
+    <button role="tab" aria-selected="true" data-state="compose" data-i="stCompose">Tworzenie</button>
+    <button role="tab" aria-selected="false" data-state="confirm" data-i="stConfirm">Potwierdź odbiorców</button>
+  </div>
+
+  <main>
+    <!-- COMPOSE -->
+    <section class="composeview">
+      <span class="field" data-i="fRecip">Odbiorca</span>
+      <div class="recip" role="group" aria-label="Odbiorca">
+        <button aria-pressed="true" data-i="rGroup">Cała grupa</button>
+        <button aria-pressed="false" data-i="rFamily">Jedna rodzina</button>
+      </div>
+
+      <span class="field" data-i="fChannel">Kanał (wg zgód rodziców)</span>
+      <button class="selectish"><span data-i="chPush">Push</span><span class="chev" aria-hidden="true">▾</span></button>
+
+      <span class="field" data-i="fTemplate">Szablon</span>
+      <button class="selectish"><span data-i="tplKit">Przypomnienie o stroju</span><span class="chev" aria-hidden="true">▾</span></button>
+
+      <span class="field" data-i="fBody">Treść</span>
+      <textarea id="body" data-i-ph="bodyPh">Jutro proszę o klapki i czepek, zbiórka 5 minut przed zajęciami.</textarea>
+
+      <div class="warn consent" role="status">
+        <span aria-hidden="true">⚠</span>
+        <span><b><span class="num">2</span> <span data-i="cnSkip">rodziny bez zgody na push.</span></b> <span data-i="cnBody">Zostaną pominięte.</span><span class="act" data-i="cnAct">Zaproponuj inny kanał dla tych rodzin →</span></span>
+      </div>
+
+      <div class="warn sensitive" role="alert">
+        <span aria-hidden="true">⚠</span>
+        <span><b data-i="snB">Dane wrażliwe w treści grupowej?</b> <span data-i="snBody">Komunikat do całej grupy widzą wszyscy rodzice.</span><span class="act" data-i="snAct">Wyślij do jednej rodziny →</span></span>
+      </div>
+
+      <div class="hist">
+        <div class="sect" data-i="secHist">Wysłane</div>
+        <div class="msg-item">
+          <div class="mi"><b data-i="h1t">Zmiana sali na czwartek</b><small id="h1d">wczoraj 17:40 · 11 odb.</small></div>
+          <span class="pill ok" data-i="hDelivered">dostarczone</span>
+        </div>
+        <div class="msg-item">
+          <div class="mi"><b data-i="h2t">Przypomnienie o zdjęciach</b><small id="h2d">pon. 12:05 · 11 odb.</small></div>
+          <span class="pill ok" data-i="hDelivered2">dostarczone</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONFIRM (alt: potwierdzenie liczby odbiorców przed masową wysyłką) -->
+    <section class="confirmview">
+      <div class="confirm-card">
+        <div class="big num" id="recCount">9</div>
+        <div class="lab" data-i="cfLab">odbiorców otrzyma ten komunikat</div>
+        <div class="confirm-list">
+          <div class="cl"><span data-i="cfGroup">Grupa Delfinki</span><b class="num">11</b></div>
+          <div class="cl"><span data-i="cfChannel">Kanał push (wg zgód)</span><b class="num">9</b></div>
+          <div class="cl"><span data-i="cfSkipped">Pominięte (brak zgody)</span><span class="skip num">2</span></div>
+        </div>
+        <div class="sub" data-i="cfSub">Sprawdź liczbę, zanim komunikat trafi do całej grupy.</div>
+      </div>
+      <div class="info-note" role="note">
+        <span aria-hidden="true">ⓘ</span>
+        <span data-i="cfNote">Pominięte rodziny zobaczysz z powodem na poprzednim kroku. Możesz im wysłać inny kanał osobno.</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app">
+    <div class="saveline">
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="on" data-i="ready">Gotowe do wysyłki</span>
+      <span class="off" data-i="queued">Komunikat w kolejce · ruszy po sieci</span>
+    </div>
+    <button class="cta" id="primary"><span id="primaryLbl" data-i="ctaSend">Wyślij komunikat</span><span class="badge num hide" id="ctaBadge">9</span></button>
+    <div class="links">
+      <a id="aPreview" data-i="aPreview">Podgląd oczami rodzica</a>
+      <a id="aDraft" data-i="aDraft">Zapisz roboczy</a>
+      <a id="aLimit" data-i="aLimit">Ogranicz odbiorców</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL", lastSend:new Date(2026,4,28,9,12), h1:new Date(2026,4,27,17,40), h2:new Date(2026,4,25,12,5),
+  recipients:11, willReceive:9, skipped:2};
+const I18N={
+ "pl-PL":{title:"Nowy komunikat", synced:"Sync ok", offShort:"Offline",
+  lastSendPre:"Ostatnia wysyłka: dziś ",
+  offTitle:"Tryb offline.", offBody:"Komunikat przygotujesz i zakolejkujesz teraz, wysyłka ruszy po powrocie sieci.",
+  stCompose:"Tworzenie", stConfirm:"Potwierdź odbiorców",
+  fRecip:"Odbiorca", rGroup:"Cała grupa", rFamily:"Jedna rodzina",
+  fChannel:"Kanał (wg zgód rodziców)", chPush:"Push",
+  fTemplate:"Szablon", tplKit:"Przypomnienie o stroju",
+  fBody:"Treść", bodyPh:"Napisz krótką treść…",
+  cnSkip:"rodziny bez zgody na push.", cnBody:"Zostaną pominięte.", cnAct:"Zaproponuj inny kanał dla tych rodzin →",
+  snB:"Dane wrażliwe w treści grupowej?", snBody:"Komunikat do całej grupy widzą wszyscy rodzice.", snAct:"Wyślij do jednej rodziny →",
+  secHist:"Wysłane", h1t:"Zmiana sali na czwartek", h2t:"Przypomnienie o zdjęciach", hDelivered:"dostarczone", hDelivered2:"dostarczone", recpShort:"odb.",
+  cfLab:"odbiorców otrzyma ten komunikat", cfGroup:"Grupa Delfinki", cfChannel:"Kanał push (wg zgód)", cfSkipped:"Pominięte (brak zgody)",
+  cfSub:"Sprawdź liczbę, zanim komunikat trafi do całej grupy.",
+  cfNote:"Pominięte rodziny zobaczysz z powodem na poprzednim kroku. Możesz im wysłać inny kanał osobno.",
+  ready:"Gotowe do wysyłki", queued:"Komunikat w kolejce · ruszy po sieci",
+  ctaSend:"Wyślij komunikat", ctaConfirm:"Potwierdź i wyślij",
+  aPreview:"Podgląd oczami rodzica", aDraft:"Zapisz roboczy", aLimit:"Ogranicz odbiorców"
+ },
+ "en-GB":{title:"New message", synced:"Synced", offShort:"Offline",
+  lastSendPre:"Last send: today ",
+  offTitle:"Offline mode.", offBody:"You can write and queue the message now; sending starts once you're back online.",
+  stCompose:"Compose", stConfirm:"Confirm recipients",
+  fRecip:"Recipient", rGroup:"Whole group", rFamily:"One family",
+  fChannel:"Channel (by parent consent)", chPush:"Push",
+  fTemplate:"Template", tplKit:"Kit reminder",
+  fBody:"Message", bodyPh:"Write a short message…",
+  cnSkip:"families without push consent.", cnBody:"They'll be skipped.", cnAct:"Suggest another channel for them →",
+  snB:"Sensitive data in a group message?", snBody:"A whole-group message is seen by every parent.", snAct:"Send to one family →",
+  secHist:"Sent", h1t:"Hall change on Thursday", h2t:"Reminder about photos", hDelivered:"delivered", hDelivered2:"delivered", recpShort:"recip.",
+  cfLab:"recipients will get this message", cfGroup:"Dolphins group", cfChannel:"Push channel (by consent)", cfSkipped:"Skipped (no consent)",
+  cfSub:"Check the count before it goes to the whole group.",
+  cfNote:"Skipped families appear with a reason on the previous step. You can reach them on another channel separately.",
+  ready:"Ready to send", queued:"Message queued · sends when online",
+  ctaSend:"Send message", ctaConfirm:"Confirm and send",
+  aPreview:"Preview as a parent", aDraft:"Save draft", aLimit:"Limit recipients"
+ }
+};
+const FALLBACK="en-GB";
+function t(k){const l=I18N[DATA.locale]||{};return (k in l)?l[k]:(I18N[FALLBACK][k]??k);}
+function fmtTime(d){return new Intl.DateTimeFormat(DATA.locale,{hour:"2-digit",minute:"2-digit"}).format(d);}
+function fmtHist(d){
+  const day=new Intl.DateTimeFormat(DATA.locale,{weekday:"short"}).format(d);
+  return day+" "+fmtTime(d);
+}
+function applyLang(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i);});
+  const ta=document.getElementById("body"); ta.placeholder=t("bodyPh");
+  document.getElementById("lastSend").textContent=t("lastSendPre")+fmtTime(DATA.lastSend);
+  document.getElementById("recCount").textContent=DATA.willReceive;
+  document.getElementById("ctaBadge").textContent=DATA.willReceive;
+  document.getElementById("h1d").textContent=fmtHist(DATA.h1)+" · "+DATA.recipients+" "+t("recpShort");
+  document.getElementById("h2d").textContent=fmtHist(DATA.h2)+" · "+DATA.recipients+" "+t("recpShort");
+  document.getElementById("langLabel").textContent=DATA.locale.split("-")[0].toUpperCase();
+  document.documentElement.lang=DATA.locale;document.documentElement.dir=RTL.has(DATA.locale.split("-")[0])?"rtl":"ltr";
+}
+document.getElementById("langBtn").addEventListener("click",()=>{DATA.locale=DATA.locale==="pl-PL"?"en-GB":"pl-PL";applyLang();});
+
+// recipient toggle
+document.querySelectorAll(".recip button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".recip button").forEach(x=>x.setAttribute("aria-pressed",x===b));}));
+
+const tabs=document.querySelectorAll('[role=tab]');
+const primaryLbl=document.getElementById("primaryLbl"), ctaBadge=document.getElementById("ctaBadge");
+function setState(s){
+  tabs.forEach(tb=>tb.setAttribute("aria-selected",tb.dataset.state===s));
+  const confirm=s==="confirm";
+  document.body.classList.toggle("is-confirm",confirm);
+  primaryLbl.textContent=confirm? t("ctaConfirm"): t("ctaSend");
+  primaryLbl.dataset.i=confirm? "ctaConfirm":"ctaSend";
+  ctaBadge.classList.toggle("hide",!confirm);
+}
+tabs.forEach(tb=>tb.addEventListener("click",()=>setState(tb.dataset.state)));
+
+applyLang();
+setState("compose");
+</script>
+</body>
+</html>

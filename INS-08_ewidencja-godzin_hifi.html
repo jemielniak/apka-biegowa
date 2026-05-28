@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="pl-PL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INS-08 · Ewidencja godzin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-ink:#0d1a1e; --accent:#21d8c4;
+  --color-success:#4ade80; --color-warning:#f6b73c; --color-error:#ff6b5e; --color-info:#5aa8ff;
+  --surface-1:#13242a; --surface-2:#1a313a; --surface-3:#234049; --hairline:#2c4b55;
+  --text-strong:#f0f6f5; --text:#c7d6d8; --text-muted:#83a0a5; --on-accent:#062420; --paper:#eef4f1;
+  --font-display:"Bricolage Grotesque", system-ui; --font-body:"IBM Plex Sans", system-ui;
+  --u:4px; --s1:calc(var(--u)*1); --s2:calc(var(--u)*2); --s3:calc(var(--u)*3); --s4:calc(var(--u)*4);
+  --s5:calc(var(--u)*5); --s6:calc(var(--u)*6); --s8:calc(var(--u)*8); --s10:calc(var(--u)*10);
+  --radius:16px; --shadow:0 12px 32px -14px rgba(0,0,0,.7); --tap:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06100f;color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%}
+.num{font-variant-numeric:tabular-nums}
+.shell{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--brand-ink)}
+header.app{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border-bottom:1px solid var(--hairline)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);min-height:var(--tap)}
+.htitle{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:18px}
+.right{display:flex;align-items:center;gap:var(--s2)}
+.period{display:flex;align-items:center;gap:var(--s1);background:var(--surface-1);border:1px solid var(--hairline);color:var(--text-strong);border-radius:999px;padding:0 var(--s3);height:38px;font:600 13px/1 var(--font-body);cursor:pointer}
+.period:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.lang{display:flex;align-items:center;gap:var(--s1);background:var(--surface-3);border:1px solid var(--hairline);color:var(--text-strong);border-radius:999px;padding:0 var(--s3);height:38px;font:600 14px/1 var(--font-body);cursor:pointer;flex:none}
+.lang:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sys{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);font-size:12.5px;color:var(--text-muted);border-top:1px solid var(--hairline);background:var(--surface-1)}
+.status{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:700;color:var(--text-strong)}
+.status .lt{width:8px;height:8px;border-radius:50%;background:var(--color-warning)}
+.status.confirmed .lt{background:var(--color-success)}
+.spacer{flex:1}.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.on{background:var(--color-success);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-success) 25%,transparent)}
+body.is-offline .dot.on{background:var(--color-warning);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-warning) 25%,transparent)}
+.netnote .off{display:none;color:var(--color-warning);font-weight:600}body.is-offline .netnote .on{display:none}body.is-offline .netnote .off{display:inline}
+.offline-banner{display:none;align-items:flex-start;gap:var(--s3);margin:var(--s4) var(--s4) 0;padding:var(--s3) var(--s4);border:1px solid color-mix(in srgb,var(--color-warning) 50%,var(--hairline));border-left:4px solid var(--color-warning);border-radius:var(--radius);background:color-mix(in srgb,var(--color-warning) 12%,var(--surface-1));color:var(--text-strong);font-size:13.5px;line-height:1.4}
+body.is-offline .offline-banner{display:flex}.offline-banner b{font-weight:600}
+.seg{display:flex;gap:var(--s1);margin:var(--s4) var(--s4) 0;padding:var(--s1);background:var(--surface-1);border:1px solid var(--hairline);border-radius:999px}
+.seg button{flex:1;border:0;background:transparent;color:var(--text-muted);font:600 13px/1 var(--font-body);height:40px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected=true]{background:var(--surface-3);color:var(--text-strong)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{flex:1;padding:var(--s4) var(--s4) calc(var(--s10)*2.4)}
+.sumcard{background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid color-mix(in srgb,var(--accent) 40%,var(--hairline));border-radius:var(--radius);padding:var(--s4) var(--s5);margin-top:var(--s3);box-shadow:var(--shadow)}
+.sumcard .lab{font:700 12px/1 var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
+.sumcard .big{font-family:var(--font-display);font-weight:800;color:var(--text-strong);font-size:40px;letter-spacing:-1px;margin-top:var(--s1)}
+.sumcard .big small{font-size:20px;color:var(--accent)}
+.breakdown{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);margin-top:var(--s3);font-size:13px;color:var(--text-muted)}
+.breakdown b{color:var(--text);font-weight:600}
+.thead{display:grid;grid-template-columns:64px 1fr auto auto;gap:var(--s2);padding:var(--s4) var(--s3) var(--s2);font:700 11px/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+.thead .r{text-align:right}
+.entry{display:grid;grid-template-columns:64px 1fr auto auto;gap:var(--s2);align-items:center;width:100%;text-align:left;min-height:var(--tap);padding:var(--s3);background:var(--surface-1);border:1px solid var(--hairline);border-radius:var(--radius);margin-bottom:var(--s2);cursor:pointer;color:inherit}
+.entry:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.entry .date{font-family:var(--font-display);font-weight:700;color:var(--text-strong);font-size:13px}
+.entry .grp{min-width:0}
+.entry .grp b{display:block;font-weight:600;color:var(--text-strong);font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.entry .grp small{color:var(--text-muted);font-size:12px}
+.entry .dur{font-family:var(--font-display);font-weight:800;color:var(--text-strong);font-size:15px;text-align:right}
+.entry .delta{font-size:12px;font-weight:600;text-align:right;color:var(--text-muted)}
+.entry .delta.up{color:var(--color-warning)} .entry .delta.eq{color:var(--text-muted)}
+.entry.missing{border-color:color-mix(in srgb,var(--color-warning) 40%,var(--hairline))}
+.entry.missing .dur{color:var(--color-warning);font-size:12px;font-weight:700}
+.info-note{display:flex;gap:var(--s3);margin-top:var(--s4);padding:var(--s3) var(--s4);border-radius:12px;font-size:13px;line-height:1.45;background:color-mix(in srgb,var(--color-info) 11%,var(--surface-1));border:1px solid color-mix(in srgb,var(--color-info) 38%,transparent);color:#d6ecff}
+.diff{display:none;margin-top:var(--s4);border:1px solid color-mix(in srgb,var(--color-warning) 50%,transparent);border-radius:var(--radius);overflow:hidden}
+body.is-diff .diff{display:block}
+.diff .dh{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4);background:color-mix(in srgb,var(--color-warning) 14%,var(--surface-1));font:700 13px/1.3 var(--font-display);color:#ffe9c2}
+.diff .drow{display:flex;align-items:center;justify-content:space-between;padding:var(--s3) var(--s4);border-top:1px solid var(--hairline);font-size:13.5px;color:var(--text)}
+.diff .drow b{font-family:var(--font-display);font-weight:800;color:var(--text-strong)}
+.diff .drow .d{color:var(--color-warning);font-weight:700}
+.hide{display:none!important}
+footer.app{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:20;background:linear-gradient(0deg,var(--surface-2),var(--surface-1));border-top:1px solid var(--hairline);padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom))}
+.saveline{display:flex;align-items:center;gap:var(--s2);font-size:12.5px;color:var(--text-muted);margin-bottom:var(--s3)}
+.saveline .off{display:none;color:var(--color-warning);font-weight:600}body.is-offline .saveline .on{display:none}body.is-offline .saveline .off{display:inline}
+.cta{width:100%;min-height:var(--tap);border:0;border-radius:var(--radius);background:var(--accent);color:var(--on-accent);font-family:var(--font-display);font-weight:800;font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
+.cta:focus-visible{outline:3px solid var(--text-strong);outline-offset:3px}
+body.is-offline .cta{opacity:.5;pointer-events:none}
+.links{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);justify-content:center;margin-top:var(--s4)}
+.links a{color:var(--text-muted);font-size:14px;text-decoration:none;min-height:40px;display:inline-flex;align-items:center;cursor:pointer}
+.links a:hover{color:var(--text-strong)}.links a:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body class="pl-PL">
+<div class="shell">
+  <header class="app">
+    <div class="bar">
+      <span class="htitle" data-i="title">Ewidencja godzin</span>
+      <div class="right">
+        <button class="period" id="periodBtn"><span id="periodLbl">Maj 2026</span> ▾</button>
+        <button class="lang" id="langBtn" aria-label="Zmień język"><span id="langLabel">PL</span> ▾</button>
+      </div>
+    </div>
+    <div class="sys">
+      <span class="status" id="status"><span class="lt" aria-hidden="true"></span><span data-i="stOpen">Okres otwarty</span></span>
+      <span class="spacer"></span>
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="netnote"><span class="on" data-i="synced">Sync ok</span><span class="off" data-i="offShort">Offline · odczyt</span></span>
+    </div>
+  </header>
+
+  <div class="offline-banner" role="status">
+    <span aria-hidden="true">⚠</span>
+    <span><b data-i="offTitle">Tryb offline.</b> <span data-i="offBody">Pokazujemy ostatnio pobrane zestawienie do odczytu. Potwierdzenie okresu wymaga sieci.</span></span>
+  </div>
+
+  <div class="seg" role="tablist" aria-label="Podgląd stanu ekranu">
+    <button role="tab" aria-selected="true" data-state="default" data-i="stDefault">Zestawienie</button>
+    <button role="tab" aria-selected="false" data-state="diff" data-i="stDiff">Plan ≠ wykonanie</button>
+  </div>
+
+  <main>
+    <div class="sumcard">
+      <div class="lab" data-i="sumLab">Suma okresu</div>
+      <div class="big num"><span id="sumH">38,5</span><small> h</small></div>
+      <div class="breakdown">
+        <span><span data-i="bkOwn">własne</span> <b class="num" id="bkOwn">30</b></span>
+        <span><span data-i="bkSub">zastępstwa</span> <b class="num" id="bkSub">5</b></span>
+        <span><span data-i="bkOne">lekcje 1:1</span> <b class="num" id="bkOne">3,5</b></span>
+      </div>
+    </div>
+
+    <div class="thead" aria-hidden="true"><span data-i="thDate">Data</span><span data-i="thGroup">Grupa</span><span class="r" data-i="thDur">Czas</span><span class="r" data-i="thDelta">Δ plan</span></div>
+
+    <button class="entry">
+      <span class="date" id="e1d">06.05</span>
+      <span class="grp"><b data-i="gDelfinki">Delfinki</b><small data-i="tOwn">własne</small></span>
+      <span class="dur num">1,0 h</span>
+      <span class="delta eq">=</span>
+    </button>
+    <button class="entry">
+      <span class="date" id="e2d">06.05</span>
+      <span class="grp"><b data-i="gZabki">Żabki</b><small data-i="tSub">zastępstwo</small></span>
+      <span class="dur num">1,0 h</span>
+      <span class="delta up num">+0,25</span>
+    </button>
+    <button class="entry missing">
+      <span class="date" id="e3d">08.05</span>
+      <span class="grp"><b data-i="gRekiny">Rekiny</b><small data-i="tOwn2">własne</small></span>
+      <span class="dur" data-i="noClose">brak obecności</span>
+      <span class="delta" aria-hidden="true">›</span>
+    </button>
+
+    <div class="info-note" role="note">
+      <span aria-hidden="true">ⓘ</span>
+      <span data-i="missNote">Zajęcia bez zamkniętej obecności nie wliczają się do sumy, dopóki nie domkniesz ich w obecności (INS-04).</span>
+    </div>
+
+    <!-- alt: plan vs wykonanie przed zatwierdzeniem -->
+    <div class="diff" role="note">
+      <div class="dh" data-i="diffH">Przed potwierdzeniem sprawdź różnicę planu i wykonania</div>
+      <div class="drow"><span data-i="diffPlan">Plan okresu</span><b class="num">38,0 h</b></div>
+      <div class="drow"><span data-i="diffDone">Wykonanie</span><b class="num">38,5 h</b></div>
+      <div class="drow"><span data-i="diffDelta">Różnica</span><span class="d num">+0,5 h</span></div>
+    </div>
+  </main>
+
+  <footer class="app">
+    <div class="saveline">
+      <span class="dot on" aria-hidden="true"></span>
+      <span class="on" data-i="readOnly">Zestawienie tylko do odczytu · korekty przez zgłoszenie</span>
+      <span class="off" data-i="offRead">Odczyt offline · potwierdzenie wymaga sieci</span>
+    </div>
+    <button class="cta" id="primary" data-i="ctaConfirm">Potwierdź godziny okresu</button>
+    <div class="links">
+      <a id="aFix" data-i="aFix">Zgłoś korektę wpisu</a>
+      <a id="aExport" data-i="aExport">Eksportuj zestawienie</a>
+      <a id="aPeriod" data-i="aPeriod">Zmień okres</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const RTL=new Set(["ar","he","fa","ur"]);
+const DATA={locale:"pl-PL", period:new Date(2026,4,1),
+  sum:38.5, own:30, sub:5, one:3.5,
+  entries:[new Date(2026,4,6),new Date(2026,4,6),new Date(2026,4,8)]};
+const I18N={
+ "pl-PL":{title:"Ewidencja godzin", synced:"Sync ok", offShort:"Offline · odczyt",
+  stOpen:"Okres otwarty", stConfirmed:"Okres potwierdzony",
+  offTitle:"Tryb offline.", offBody:"Pokazujemy ostatnio pobrane zestawienie do odczytu. Potwierdzenie okresu wymaga sieci.",
+  stDefault:"Zestawienie", stDiff:"Plan ≠ wykonanie",
+  sumLab:"Suma okresu", bkOwn:"własne", bkSub:"zastępstwa", bkOne:"lekcje 1:1",
+  thDate:"Data", thGroup:"Grupa", thDur:"Czas", thDelta:"Δ plan",
+  gDelfinki:"Delfinki", gZabki:"Żabki", gRekiny:"Rekiny", tOwn:"własne", tOwn2:"własne", tSub:"zastępstwo", noClose:"brak obecności",
+  missNote:"Zajęcia bez zamkniętej obecności nie wliczają się do sumy, dopóki nie domkniesz ich w obecności (INS-04).",
+  diffH:"Przed potwierdzeniem sprawdź różnicę planu i wykonania", diffPlan:"Plan okresu", diffDone:"Wykonanie", diffDelta:"Różnica",
+  readOnly:"Zestawienie tylko do odczytu · korekty przez zgłoszenie", offRead:"Odczyt offline · potwierdzenie wymaga sieci",
+  ctaConfirm:"Potwierdź godziny okresu",
+  aFix:"Zgłoś korektę wpisu", aExport:"Eksportuj zestawienie", aPeriod:"Zmień okres"
+ },
+ "en-GB":{title:"Hours ledger", synced:"Synced", offShort:"Offline · read-only",
+  stOpen:"Period open", stConfirmed:"Period confirmed",
+  offTitle:"Offline mode.", offBody:"Showing the last fetched ledger, read-only. Confirming the period needs a network.",
+  stDefault:"Ledger", stDiff:"Plan ≠ actual",
+  sumLab:"Period total", bkOwn:"own", bkSub:"cover", bkOne:"1:1 lessons",
+  thDate:"Date", thGroup:"Group", thDur:"Time", thDelta:"Δ plan",
+  gDelfinki:"Dolphins", gZabki:"Frogs", gRekiny:"Sharks", tOwn:"own", tOwn2:"own", tSub:"cover", noClose:"no attendance",
+  missNote:"Classes without closed attendance don't count toward the total until you close them in attendance (INS-04).",
+  diffH:"Before confirming, check plan against actual", diffPlan:"Period plan", diffDone:"Actual", diffDelta:"Difference",
+  readOnly:"Ledger is read-only · corrections via request", offRead:"Read-only offline · confirming needs a network",
+  ctaConfirm:"Confirm period hours",
+  aFix:"Report an entry correction", aExport:"Export ledger", aPeriod:"Change period"
+ }
+};
+const FALLBACK="en-GB";
+function t(k){const l=I18N[DATA.locale]||{};return (k in l)?l[k]:(I18N[FALLBACK][k]??k);}
+function nfHours(v){return new Intl.NumberFormat(DATA.locale,{minimumFractionDigits:1,maximumFractionDigits:2}).format(v);}
+function nfInt(v){return new Intl.NumberFormat(DATA.locale,{maximumFractionDigits:2}).format(v);}
+function fmt(){
+  document.getElementById("periodLbl").textContent=new Intl.DateTimeFormat(DATA.locale,{month:"long",year:"numeric"}).format(DATA.period).replace(/^./,c=>c.toUpperCase());
+  document.getElementById("sumH").textContent=nfHours(DATA.sum);
+  document.getElementById("bkOwn").textContent=nfInt(DATA.own);
+  document.getElementById("bkSub").textContent=nfInt(DATA.sub);
+  document.getElementById("bkOne").textContent=nfHours(DATA.one);
+  const md=new Intl.DateTimeFormat(DATA.locale,{day:"2-digit",month:"2-digit"});
+  document.getElementById("e1d").textContent=md.format(DATA.entries[0]);
+  document.getElementById("e2d").textContent=md.format(DATA.entries[1]);
+  document.getElementById("e3d").textContent=md.format(DATA.entries[2]);
+}
+function applyLang(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i);});
+  document.getElementById("langLabel").textContent=DATA.locale.split("-")[0].toUpperCase();
+  document.documentElement.lang=DATA.locale;document.documentElement.dir=RTL.has(DATA.locale.split("-")[0])?"rtl":"ltr";
+  fmt();
+}
+document.getElementById("langBtn").addEventListener("click",()=>{DATA.locale=DATA.locale==="pl-PL"?"en-GB":"pl-PL";applyLang();});
+
+const tabs=document.querySelectorAll('[role=tab]');
+tabs.forEach(tb=>tb.addEventListener("click",()=>{
+  tabs.forEach(x=>x.setAttribute("aria-selected",x===tb));
+  document.body.classList.toggle("is-diff", tb.dataset.state==="diff");
+}));
+
+applyLang();
+</script>
+</body>
+</html>
